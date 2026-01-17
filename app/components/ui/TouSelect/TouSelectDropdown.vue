@@ -4,7 +4,7 @@
       type="button"
       :class="
         cn(
-          'glass flex h-12 w-full items-center justify-between rounded-xl border border-white/30 bg-white/20 px-4 py-3 text-sm font-medium text-gray-800 transition-all duration-300 hover:bg-white/30 hover:border-white/40 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+          'glass flex h-12 w-full items-center justify-between rounded-[12px] border border-white/40 px-4 py-3 text-sm font-medium text-gray-800 transition-all duration-300 hover:bg-white/30 hover:border-white/50 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
           isOpen && 'ring-2 ring-pink-400 border-pink-300',
           props.class,
         )
@@ -43,7 +43,7 @@
         <div
           v-if="isOpen"
           ref="dropdownMenuRef"
-          class="glass fixed rounded-xl border border-white/30 shadow-2xl max-h-64 overflow-hidden"
+          class="glass fixed rounded-[16px] border border-white/40 shadow-2xl max-h-64 overflow-hidden"
           :style="{
             zIndex: 99999,
             top: `${dropdownPosition.top}px`,

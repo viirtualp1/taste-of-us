@@ -17,20 +17,20 @@
             Pick a date to jump to that week.
           </p>
         </div>
-        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div class="flex items-center gap-2 sm:gap-3 shrink-0 w-full sm:w-auto">
           <tou-button
             variant="ghost"
-            class="shrink-0 flex items-center gap-1.5"
+            class="flex-1 sm:flex-none sm:shrink flex items-center justify-center gap-1.5 bg-white/20 hover:bg-white/30"
             @click="$emit('prev-week')"
           >
             <Icon name="heroicons:chevron-left" class="w-4 h-4" />
             <span>Prev</span>
           </tou-button>
           <div
-            class="bg-white rounded-lg px-2 sm:px-4 py-2 border border-gray-200 shrink-0"
+            class="flex-1 sm:flex-none glass-nested rounded-[12px] px-2 sm:px-4 py-2 border"
           >
             <input
-              class="bg-transparent text-xs sm:text-sm font-semibold text-gray-800 outline-none w-[120px] sm:w-auto"
+              class="bg-transparent text-xs sm:text-sm font-semibold text-gray-800 outline-none w-full sm:w-[120px]"
               type="date"
               :value="weekStartInput"
               @change="onInputChange"
@@ -38,7 +38,7 @@
           </div>
           <tou-button
             variant="ghost"
-            class="shrink-0 flex items-center gap-1.5"
+            class="flex-1 sm:flex-none sm:shrink-0 flex items-center justify-center gap-1.5 bg-white/20 hover:bg-white/30"
             @click="$emit('next-week')"
           >
             <span>Next</span>
@@ -48,16 +48,16 @@
       </div>
 
       <div
-        class="flex items-center gap-2 sm:gap-3 overflow-x-auto scrollbar-hide rounded-xl py-2 -mx-2 px-2"
+        class="flex items-center gap-2 sm:gap-3 overflow-x-auto scrollbar-hide rounded-[20px] py-2 -mx-2 px-2"
       >
         <button
           v-for="(day, dayIndex) in weekDays"
           :key="day.date"
-          class="min-w-[100px] sm:min-w-[120px] lg:min-w-[110px] xl:min-w-[140px] flex-shrink-0 rounded-xl px-2 sm:px-3 lg:px-2 xl:px-4 py-2 sm:py-3 text-left transition-all flex flex-col gap-1"
+          class="min-w-[100px] sm:min-w-[120px] lg:min-w-[110px] xl:min-w-[140px] flex-shrink-0 rounded-[16px] px-2 sm:px-3 lg:px-2 xl:px-4 py-2 sm:py-3 text-left transition-all flex flex-col gap-1"
           :class="
             dayIndex === activeDayIndex
-              ? 'glass border-2 border-pink-400 ring-2 ring-pink-200 bg-pink-50/50'
-              : 'glass border-2 border-white/30 hover:border-pink-300/50 hover:bg-pink-50/20'
+              ? 'glass border border-pink-400/60 ring-2 ring-pink-200/50 bg-pink-50/60'
+              : 'glass border border-white/40 hover:border-pink-300/60 hover:bg-pink-50/40'
           "
           @click="$emit('select-day', dayIndex)"
         >

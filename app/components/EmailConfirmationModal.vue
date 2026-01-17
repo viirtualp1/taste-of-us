@@ -25,7 +25,8 @@
         >
           <div
             v-if="isOpen"
-            class="relative z-50 glass rounded-xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
+            class="relative z-50 glass rounded-[20px] shadow-2xl max-w-md w-full mx-4 overflow-hidden"
+            style="border-radius: 20px;"
           >
             <div
               class="flex items-center justify-between p-4 border-b border-white/20"
@@ -34,7 +35,7 @@
                 Confirm Your Email
               </h2>
               <button
-                class="flex items-center rounded-lg p-2 hover:bg-white/20 transition-colors"
+                class="flex items-center rounded-[12px] p-2 hover:bg-white/20 transition-colors"
                 @click="closeModal"
               >
                 <Icon name="heroicons:x-mark" class="w-5 h-5 text-gray-600" />
@@ -66,7 +67,7 @@
                 </p>
               </div>
 
-              <div class="bg-blue-50/80 border border-blue-200 rounded-lg p-4">
+              <div class="bg-blue-50/80 border border-blue-200 rounded-[16px] p-4">
                 <div class="flex items-start gap-3">
                   <Icon
                     name="heroicons:information-circle"
@@ -82,7 +83,7 @@
               </div>
 
               <button
-                class="w-full px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg"
+                class="w-full px-4 py-2 rounded-[12px] bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg"
                 @click="closeModal"
               >
                 Got it

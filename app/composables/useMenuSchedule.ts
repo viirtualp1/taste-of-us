@@ -40,40 +40,62 @@ export function useMenuSchedule(
         const savedMenu = schedule[0].menu_data
         if (
           Array.isArray(savedMenu) &&
+          weekDays.value &&
+          Array.isArray(weekDays.value) &&
           savedMenu.length === weekDays.value.length
         ) {
           selectedMenu.value = savedMenu.map((day: any) => {
             if (day.brunch !== undefined && day.dinner !== undefined) {
-              return { brunch: day.brunch || '', dinner: day.dinner || '' }
+              return {
+                brunch: day.brunch || '',
+                dinner: day.dinner || '',
+                dessert: day.dessert || '',
+              }
             }
             if (day.breakfast !== undefined || day.lunch !== undefined) {
               const brunch = day.breakfast || day.lunch || ''
-              return { brunch, dinner: day.dinner || '' }
+              return {
+                brunch,
+                dinner: day.dinner || '',
+                dessert: day.dessert || '',
+              }
             }
-            return { brunch: '', dinner: '' }
+            return { brunch: '', dinner: '', dessert: '' }
           })
           isLoading.value = false
           return
         }
       }
 
-      selectedMenu.value = weekDays.value.map(() => ({
-        brunch: '',
-        dinner: '',
-      }))
+      if (weekDays.value && Array.isArray(weekDays.value)) {
+        selectedMenu.value = weekDays.value.map(() => ({
+          brunch: '',
+          dinner: '',
+          dessert: '',
+        }))
+      }
     } catch (error) {
       console.error('Error loading schedule:', error)
-      selectedMenu.value = weekDays.value.map(() => ({
-        brunch: '',
-        dinner: '',
-      }))
+      if (weekDays.value && Array.isArray(weekDays.value)) {
+        selectedMenu.value = weekDays.value.map(() => ({
+          brunch: '',
+          dinner: '',
+          dessert: '',
+        }))
+      }
     } finally {
       isLoading.value = false
     }
   }
 
   const saveSchedule = async () => {
-    if (!weekStart.value || !isClient.value || weekDays.value.length === 0)
+    if (
+      !weekStart.value ||
+      !isClient.value ||
+      !weekDays.value ||
+      !Array.isArray(weekDays.value) ||
+      weekDays.value.length === 0
+    )
       return
 
     try {
@@ -95,7 +117,7 @@ export function useMenuSchedule(
   watch(
     weekStart,
     async () => {
-      if (weekDays.value.length > 0) {
+      if (weekDays.value && Array.isArray(weekDays.value) && weekDays.value.length > 0) {
         await loadSchedule()
       }
     },
@@ -105,7 +127,12 @@ export function useMenuSchedule(
   watch(
     selectedMenu,
     () => {
-      if (isClient.value && weekDays.value.length > 0) {
+      if (
+        isClient.value &&
+        weekDays.value &&
+        Array.isArray(weekDays.value) &&
+        weekDays.value.length > 0
+      ) {
         const timeoutId = setTimeout(() => {
           saveSchedule()
         }, 1000)
@@ -118,10 +145,17 @@ export function useMenuSchedule(
   watch(
     weekDays,
     (days) => {
-      if (days.length > 0 && selectedMenu.value.length !== days.length) {
-        selectedMenu.value = days.map(() => ({
+      if (
+        days &&
+        days.value &&
+        Array.isArray(days.value) &&
+        days.value.length > 0 &&
+        selectedMenu.value.length !== days.value.length
+      ) {
+        selectedMenu.value = days.value.map(() => ({
           brunch: '',
           dinner: '',
+          dessert: '',
         }))
       }
     },

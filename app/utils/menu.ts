@@ -1,15 +1,17 @@
-export type MenuCategory = 'brunch' | 'dinner'
+export type MenuCategory = 'brunch' | 'dinner' | 'dessert'
 
 export type CuisineType = 'asian' | 'european' | 'slavic' | 'all'
 
 export interface MenuSelection {
   brunch: string
   dinner: string
+  dessert: string
 }
 
 export interface MenuData {
   brunch: string[]
   dinner: string[]
+  dessert: string[]
 }
 
 export interface Dish {
@@ -22,6 +24,7 @@ export interface Dish {
 export const CATEGORIES: Array<{ key: MenuCategory; label: string }> = [
   { key: 'brunch', label: 'Brunch' },
   { key: 'dinner', label: 'Dinner' },
+  { key: 'dessert', label: 'Dessert' },
 ]
 
 export const CUISINES: Array<{ key: CuisineType; label: string }> = [
@@ -35,6 +38,7 @@ export function getCategoryIcon(category: MenuCategory): string {
   const icons: Record<MenuCategory, string> = {
     brunch: '🌅',
     dinner: '🌙',
+    dessert: '🍰',
   }
 
   return icons[category]

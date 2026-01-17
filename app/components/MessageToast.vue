@@ -10,7 +10,7 @@
     <div
       v-if="message"
       :class="[
-        'glass rounded-xl p-4 text-center font-medium shadow-lg',
+        'glass rounded-[16px] p-4 text-center font-medium shadow-lg',
         messageType === 'success'
           ? 'text-green-700 bg-green-50/80 border border-green-200/50'
           : 'text-red-700 bg-red-50/80 border border-red-200/50',

@@ -8,6 +8,7 @@ interface MenuDay {
   meals: {
     brunch: string
     dinner: string
+    dessert: string
   }
 }
 
@@ -184,7 +185,8 @@ function formatMenuForTelegram(menu: MenuDay[]) {
     text += `📅 *${day.day}* (${date})\n`
     if (day.meals.brunch) text += `🌅 Brunch: ${day.meals.brunch}\n`
     if (day.meals.dinner) text += `🌙 Dinner: ${day.meals.dinner}\n`
-    if (!day.meals.brunch && !day.meals.dinner) {
+    if (day.meals.dessert) text += `🍰 Dessert: ${day.meals.dessert}\n`
+    if (!day.meals.brunch && !day.meals.dinner && !day.meals.dessert) {
       text += `_No meals planned_\n`
     }
     text += '\n'
@@ -458,6 +460,7 @@ async function generateMenuPDF(menu: MenuDay[]) {
       const icons: Record<string, string> = {
         brunch: '🌅',
         dinner: '🌙',
+        dessert: '🍰',
       }
       return icons[type] || '🍽️'
     }
@@ -601,6 +604,11 @@ async function generateMenuPDF(menu: MenuDay[]) {
               background: rgba(255, 200, 225, 0.7);
             }
 
+            .meal-item.dessert {
+              border-left-color: #fbbf24;
+              background: rgba(255, 237, 213, 0.7);
+            }
+
             .meal-icon {
               font-size: 18px;
               flex-shrink: 0;
@@ -660,6 +668,7 @@ async function generateMenuPDF(menu: MenuDay[]) {
                   const meals = [
                     { type: 'brunch', name: day.meals.brunch },
                     { type: 'dinner', name: day.meals.dinner },
+                    { type: 'dessert', name: day.meals.dessert },
                   ].filter((meal) => meal.name)
 
                   return `

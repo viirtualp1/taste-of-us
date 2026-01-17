@@ -99,6 +99,17 @@ export function useAuth() {
 
   const logout = () => {
     clearSession()
+    if (typeof window !== 'undefined') {
+      navigateTo('/')
+    }
+  }
+
+  const handleAuthError = (error: any) => {
+    if (error?.statusCode === 401 || error?.data?.statusCode === 401) {
+      logout()
+      return true
+    }
+    return false
   }
 
   const confirmEmail = async (token: string, type?: string) => {
@@ -156,5 +167,6 @@ export function useAuth() {
     confirmEmail,
     getAuthHeaders,
     loadSession,
+    handleAuthError,
   }
 }

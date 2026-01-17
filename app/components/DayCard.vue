@@ -42,11 +42,11 @@
               <span class="text-sm sm:text-base">{{ category.label }}</span>
             </tou-label>
             <button
-              class="w-full p-4 rounded-lg text-left transition-all border-2 glass"
+              class="w-full p-4 rounded-[16px] text-left transition-all border glass-nested"
               :class="
                 selectedMenu?.[category.key]
-                  ? 'border-pink-400 bg-pink-50/50'
-                  : 'border-gray-200 hover:border-pink-300 hover:bg-pink-50/30'
+                  ? 'border-pink-400/60 bg-pink-50/60'
+                  : 'border-white/40 hover:border-pink-300/60 hover:bg-pink-50/40'
               "
               @click="openModal(category.key)"
             >
@@ -69,7 +69,7 @@
     </tou-card>
   </transition>
 
-  <DishSelectionModal
+  <dish-selection-modal
     :is-open="isModalOpen"
     :category="selectedCategory"
     :dishes="dishesForCategory"

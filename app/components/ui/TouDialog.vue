@@ -24,7 +24,8 @@
         >
           <div
             v-if="modelValue"
-            class="relative z-50 glass rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+            class="relative z-50 glass rounded-[20px] shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+            style="border-radius: 20px;"
           >
             <div
               class="flex items-center justify-between p-6 border-b border-white/20"
@@ -33,7 +34,7 @@
                 <slot name="title">Select a dish</slot>
               </h2>
               <button
-                class="rounded-lg p-2 hover:bg-white/20 transition-colors"
+                class="rounded-[12px] p-2 hover:bg-white/20 transition-colors"
                 @click="$emit('update:modelValue', false)"
               >
                 <Icon name="heroicons:x-mark" class="w-5 h-5 text-gray-600" />

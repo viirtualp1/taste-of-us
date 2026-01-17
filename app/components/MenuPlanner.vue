@@ -44,30 +44,24 @@
         "
       />
 
-      <action-buttons
-        :is-sending="isSending"
-        @reset="resetMenu"
-        @send="() => sendMenu(saveSchedule)"
-      />
-
       <message-toast :message="message" :message-type="messageType" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, provide, watch } from 'vue'
 import MenuOverviewSkeleton from '@/components/MenuOverviewSkeleton.vue'
 import MenuOverview from '@/components/MenuOverview.vue'
 import WeekSelectorSkeleton from '@/components/WeekSelectorSkeleton.vue'
 import WeekSelector from '@/components/WeekSelector.vue'
 import DayCardSkeleton from '@/components/DayCardSkeleton.vue'
 import DayCard from '@/components/DayCard.vue'
-import ActionButtons from '@/components/ActionButtons.vue'
 import MessageToast from '@/components/MessageToast.vue'
 import { useWeekNavigation } from '@/composables/useWeekNavigation'
 import { useMenuSchedule } from '@/composables/useMenuSchedule'
 import { useMenuSelection } from '@/composables/useMenuSelection'
+import { useMenuState } from '@/composables/useMenuState'
 import { calculateStats, CATEGORIES } from '@/utils/menu'
 import type { MenuData, Dish, MenuCategory } from '@/utils/menu'
 
@@ -75,6 +69,7 @@ const { data: menuData } = await useFetch<MenuData>('/api/dishes', {
   default: () => ({
     brunch: [],
     dinner: [],
+    dessert: [],
   }),
 })
 
@@ -136,6 +131,26 @@ const { selectedMenu, isLoading, loadSchedule, saveSchedule } = useMenuSchedule(
 const { isSending, message, messageType, updateMenu, resetMenu, sendMenu } =
   useMenuSelection(selectedMenu, weekDays)
 
+const { setWeekDays, setSelectedMenu, setIsSending } = useMenuState()
+
+watch(weekDays, (days) => {
+  setWeekDays(days)
+}, { immediate: true })
+
+watch(selectedMenu, (menu) => {
+  setSelectedMenu(menu)
+}, { immediate: true, deep: true })
+
+watch(() => isSending.value, (sending) => {
+  setIsSending(sending)
+}, { immediate: true })
+
+provide('menuActions', {
+  resetMenu: () => resetMenu(),
+  sendMenu: () => sendMenu(saveSchedule),
+  isSending,
+})
+
 const handleMenuUpdate = (
   dayIndex: number,
   category: MenuCategory,
@@ -143,17 +158,15 @@ const handleMenuUpdate = (
 ) => {
   updateMenu(dayIndex, category, value)
 
-  // Проверяем, выбраны ли оба блюда после обновления
   const currentMenu = selectedMenu.value[dayIndex]
   if (currentMenu) {
     const hasBrunch = !!currentMenu.brunch
     const hasDinner = !!currentMenu.dinner
+    const hasDessert = !!currentMenu.dessert
 
-    // Если выбраны оба блюда (последний вариант выбран), переключаемся на следующий день
-    if (hasBrunch && hasDinner) {
+    if (hasBrunch && hasDinner && hasDessert) {
       const nextDayIndex = dayIndex + 1
       if (nextDayIndex < weekDays.value.length) {
-        // Небольшая задержка для плавного перехода
         setTimeout(() => {
           focusDay(nextDayIndex)
         }, 300)

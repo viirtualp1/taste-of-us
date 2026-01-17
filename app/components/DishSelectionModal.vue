@@ -28,8 +28,9 @@
           <div
             v-if="isOpen"
             ref="modalRef"
-            class="relative z-50 glass rounded-t-3xl sm:rounded-xl shadow-2xl max-w-4xl w-full overflow-hidden flex flex-col"
+            class="relative z-50 glass rounded-t-[26px] sm:rounded-[26px] shadow-2xl max-w-4xl w-full overflow-hidden flex flex-col"
             :class="isMobile ? '' : 'h-[85vh]'"
+            style="border-radius: 26px;"
             :style="
               isMobile
                 ? {
@@ -67,7 +68,7 @@
                 Select {{ categoryLabel }}
               </h2>
               <button
-                class="flex items-center rounded-lg p-2 hover:bg-white/20 transition-colors"
+                class="flex items-center rounded-[12px] p-2 hover:bg-white/20 transition-colors"
                 @click="closeModal"
               >
                 <Icon name="heroicons:x-mark" class="w-5 h-5 text-gray-600" />
@@ -75,17 +76,17 @@
             </div>
             <div class="flex-1 flex overflow-hidden">
               <div
-                class="hidden sm:flex flex-col w-48 border-r border-white/20 flex-shrink-0 bg-white/10"
+                class="hidden sm:flex flex-col w-48 border-r border-white/30 flex-shrink-0 bg-white/20"
               >
                 <div class="p-4 space-y-2 overflow-y-auto">
                   <button
                     v-for="cuisine in CUISINES"
                     :key="cuisine.key"
-                    class="w-full px-4 py-3 rounded-lg text-sm font-medium transition-all text-left"
+                    class="w-full px-4 py-3 rounded-[12px] text-sm font-medium transition-all text-left"
                     :class="
                       selectedCuisine === cuisine.key
                         ? 'bg-pink-500 text-white shadow-md'
-                        : 'bg-white/70 text-gray-700 hover:bg-white/90 border border-gray-200'
+                        : 'glass-nested text-gray-700 hover:bg-white/50'
                     "
                     @click="selectedCuisine = cuisine.key"
                   >
@@ -100,11 +101,11 @@
                   <button
                     v-for="cuisine in CUISINES"
                     :key="cuisine.key"
-                    class="px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap flex-shrink-0"
+                    class="px-4 py-2 rounded-[12px] text-sm font-medium transition-all whitespace-nowrap flex-shrink-0"
                     :class="
                       selectedCuisine === cuisine.key
                         ? 'bg-pink-500 text-white shadow-md'
-                        : 'bg-white/70 text-gray-700 hover:bg-white/90 border border-gray-200'
+                        : 'glass-nested text-gray-700 hover:bg-white/50'
                     "
                     @click="selectedCuisine = cuisine.key"
                   >
@@ -131,11 +132,11 @@
                     <button
                       v-for="dish in filteredDishes"
                       :key="dish.id || dish.name"
-                      class="p-5 rounded-xl text-left transition-all border-2 flex flex-col gap-2 min-h-[100px]"
+                      class="p-5 rounded-[16px] text-left transition-all border glass-nested flex flex-col gap-2 min-h-[100px]"
                       :class="
                         selectedDish === dish.name
-                          ? 'border-pink-500 bg-pink-50 shadow-lg scale-105'
-                          : 'border-gray-200 bg-white/70 hover:border-pink-300 hover:bg-pink-50/50 hover:shadow-md'
+                          ? 'border-pink-500/60 bg-pink-50/60 shadow-lg scale-[1.02]'
+                          : 'border-white/40 hover:border-pink-300/60 hover:bg-pink-50/40 hover:shadow-md'
                       "
                       @click="selectDish(dish.name)"
                     >

@@ -7,7 +7,7 @@ export function useMenuSelection(
   selectedMenu: { value: MenuSelection[] },
   weekDays: { value: WeekDay[] },
 ) {
-  const { getAuthHeaders, isAuthenticated } = useAuth()
+  const { getAuthHeaders, isAuthenticated, handleAuthError } = useAuth()
   const isSending = ref(false)
   const message = ref('')
   const messageType = ref<'success' | 'error'>('success')
@@ -18,8 +18,9 @@ export function useMenuSelection(
     value: string,
   ) => {
     if (!selectedMenu.value[dayIndex]) {
-      selectedMenu.value[dayIndex] = { brunch: '', dinner: '' }
+      selectedMenu.value[dayIndex] = { brunch: '', dinner: '', dessert: '' }
     }
+
     selectedMenu.value[dayIndex][category] = value
   }
 
@@ -27,7 +28,9 @@ export function useMenuSelection(
     selectedMenu.value = weekDays.value.map(() => ({
       brunch: '',
       dinner: '',
+      dessert: '',
     }))
+
     message.value = ''
   }
 
@@ -47,7 +50,7 @@ export function useMenuSelection(
       const menuPayload = weekDays.value.map((day, index) => ({
         day: day.display,
         date: day.date,
-        meals: selectedMenu.value[index] || { brunch: '', dinner: '' },
+        meals: selectedMenu.value[index] || { brunch: '', dinner: '', dessert: '' },
       }))
 
       const headers = getAuthHeaders() as Record<string, string>
@@ -61,6 +64,9 @@ export function useMenuSelection(
       message.value = 'Menu sent successfully!'
       messageType.value = 'success'
     } catch (error: any) {
+      if (handleAuthError(error)) {
+        return
+      }
       console.error('Error sending menu:', error)
       const errorMessage =
         error?.data?.message ||
