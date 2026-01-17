@@ -1,0 +1,32 @@
+{
+  "breakfast": [
+    "Vegetable Omelet",
+    "Oatmeal with Fruits",
+    "Pancakes with Berries",
+    "Scrambled Eggs with Bacon",
+    "Cottage Cheese with Honey",
+    "Avocado Toast",
+    "Cheese Pancakes",
+    "Buckwheat Porridge"
+  ],
+  "lunch": [
+    "Caesar Salad",
+    "Borscht",
+    "Carbonara Pasta",
+    "Chicken Soup",
+    "Greek Salad",
+    "Pilaf",
+    "Fish Soup",
+    "Lasagna"
+  ],
+  "dinner": [
+    "Grilled Salmon",
+    "Steak with Vegetables",
+    "Steamed Vegetables",
+    "Roasted Chicken",
+    "Baked Fish",
+    "Vegetable Stew",
+    "Cutlets with Side Dish",
+    "Shish Kebab"
+  ]
+}
