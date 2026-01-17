@@ -1,5 +1,5 @@
 <template>
-  <div :class="cn('flex flex-col space-y-1.5 p-6 pb-4', props.class)">
+  <div :class="cn('p-6', props.class)">
     <slot />
   </div>
 </template>
@@ -9,7 +9,9 @@ interface Props {
   class?: string
 }
 
-const props = withDefaults(defineProps<Props>(), {})
+const props = withDefaults(defineProps<Props>(), {
+  class: '',
+})
 
 function cn(...classes: (string | undefined | null | false)[]) {
   return classes.filter(Boolean).join(' ')

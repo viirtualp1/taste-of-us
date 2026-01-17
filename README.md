@@ -23,6 +23,7 @@ bun install
 This app uses Supabase for storing dishes and schedules. See [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) for detailed setup instructions.
 
 Quick setup:
+
 1. Create a Supabase project at [supabase.com](https://supabase.com)
 2. Run the SQL migration from `supabase/migrations/001_initial_schema.sql`
 3. Add your Supabase credentials to `.env`:

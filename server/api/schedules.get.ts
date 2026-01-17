@@ -19,7 +19,7 @@ export default defineEventHandler(async (event) => {
     if (error) {
       throw createError({
         statusCode: 500,
-        message: `Failed to fetch schedules: ${error.message}`
+        message: `Failed to fetch schedules: ${error.message}`,
       })
     }
 

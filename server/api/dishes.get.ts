@@ -8,9 +8,10 @@ export default defineEventHandler(async (event) => {
     let query = supabase
       .from('dishes')
       .select('*')
+      .in('category', ['brunch', 'dinner', 'breakfast', 'lunch'])
       .order('name', { ascending: true })
 
-    if (category && ['breakfast', 'lunch', 'dinner'].includes(category)) {
+    if (category && ['brunch', 'dinner'].includes(category)) {
       query = query.eq('category', category)
     }
 
@@ -19,19 +20,31 @@ export default defineEventHandler(async (event) => {
     if (error) {
       throw createError({
         statusCode: 500,
-        message: `Failed to fetch dishes: ${error.message}`
+        message: `Failed to fetch dishes: ${error.message}`,
       })
     }
 
     const grouped = {
-      breakfast: [] as string[],
-      lunch: [] as string[],
-      dinner: [] as string[]
+      brunch: [] as string[],
+      dinner: [] as string[],
+    }
+
+    const seen = {
+      brunch: new Set<string>(),
+      dinner: new Set<string>(),
     }
 
     data?.forEach((dish) => {
-      if (dish.category in grouped) {
-        grouped[dish.category as keyof typeof grouped].push(dish.name)
+      const category =
+        dish.category === 'breakfast' || dish.category === 'lunch'
+          ? 'brunch'
+          : dish.category
+      if (category in grouped && category in seen) {
+        const categoryKey = category as keyof typeof grouped
+        if (!seen[categoryKey].has(dish.name)) {
+          seen[categoryKey].add(dish.name)
+          grouped[categoryKey].push(dish.name)
+        }
       }
     })
 

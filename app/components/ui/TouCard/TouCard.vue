@@ -10,7 +10,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  class: undefined
+  class: undefined,
 })
 
 function cn(...classes: (string | undefined | null | false)[]) {

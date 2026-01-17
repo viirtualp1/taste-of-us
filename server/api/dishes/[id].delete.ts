@@ -7,20 +7,17 @@ export default defineEventHandler(async (event) => {
     if (!id) {
       throw createError({
         statusCode: 400,
-        message: 'Dish ID is required'
+        message: 'Dish ID is required',
       })
     }
 
     const supabase = createSupabaseClient()
-    const { error } = await supabase
-      .from('dishes')
-      .delete()
-      .eq('id', id)
+    const { error } = await supabase.from('dishes').delete().eq('id', id)
 
     if (error) {
       throw createError({
         statusCode: 500,
-        message: `Failed to delete dish: ${error.message}`
+        message: `Failed to delete dish: ${error.message}`,
       })
     }
 

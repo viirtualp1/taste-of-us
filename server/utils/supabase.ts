@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 
 export function createSupabaseClient() {
   const config = useRuntimeConfig()
-  
+
   const supabaseUrl = config.supabaseUrl
   const supabaseKey = config.supabaseServiceKey || config.public.supabaseAnonKey
 

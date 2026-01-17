@@ -12,7 +12,7 @@ export default defineEventHandler(async () => {
   try {
     const menuPath = join(process.cwd(), 'public/menu.json')
     const menuData: MenuData = JSON.parse(readFileSync(menuPath, 'utf-8'))
-    
+
     const supabase = createSupabaseClient()
     const dishes = []
 
@@ -26,11 +26,8 @@ export default defineEventHandler(async () => {
     let skipped = 0
 
     for (const dish of dishes) {
-      const { error } = await supabase
-        .from('dishes')
-        .insert(dish)
-        .select()
-      
+      const { error } = await supabase.from('dishes').insert(dish).select()
+
       if (error) {
         if (error.code === '23505') {
           skipped++
@@ -48,13 +45,14 @@ export default defineEventHandler(async () => {
     return {
       success: true,
       message: `Migrated ${inserted} dishes to Supabase (${skipped} already existed)`,
-      data
+      data,
     }
   } catch (error) {
     console.error('Error migrating menu:', error)
     throw createError({
       statusCode: 500,
-      message: error instanceof Error ? error.message : 'Failed to migrate menu'
+      message:
+        error instanceof Error ? error.message : 'Failed to migrate menu',
     })
   }
 })

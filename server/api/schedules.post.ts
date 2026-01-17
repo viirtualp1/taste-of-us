@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     if (!week_start || !menu_data) {
       throw createError({
         statusCode: 400,
-        message: 'week_start and menu_data are required'
+        message: 'week_start and menu_data are required',
       })
     }
 
@@ -32,7 +32,7 @@ export default defineEventHandler(async (event) => {
       if (error) {
         throw createError({
           statusCode: 500,
-          message: `Failed to update schedule: ${error.message}`
+          message: `Failed to update schedule: ${error.message}`,
         })
       }
       result = data
@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
       if (error) {
         throw createError({
           statusCode: 500,
-          message: `Failed to create schedule: ${error.message}`
+          message: `Failed to create schedule: ${error.message}`,
         })
       }
       result = data

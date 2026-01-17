@@ -1,12 +1,14 @@
 <template>
-  <div ref="dropdownRef" class="relative" style="z-index: 9999;">
+  <div ref="dropdownRef" class="relative" style="z-index: 9999">
     <button
       type="button"
-      :class="cn(
-        'glass flex h-12 w-full items-center justify-between rounded-xl border border-white/30 bg-white/20 px-4 py-3 text-sm font-medium text-gray-800 transition-all duration-300 hover:bg-white/30 hover:border-white/40 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-        isOpen && 'ring-2 ring-pink-400 border-pink-300',
-        props.class
-      )"
+      :class="
+        cn(
+          'glass flex h-12 w-full items-center justify-between rounded-xl border border-white/30 bg-white/20 px-4 py-3 text-sm font-medium text-gray-800 transition-all duration-300 hover:bg-white/30 hover:border-white/40 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+          isOpen && 'ring-2 ring-pink-400 border-pink-300',
+          props.class,
+        )
+      "
       :disabled="disabled"
       @click="toggleDropdown"
     >
@@ -20,47 +22,55 @@
         stroke="currentColor"
         viewBox="0 0 24 24"
       >
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M19 9l-7 7-7-7"
+        />
       </svg>
     </button>
 
-      <Teleport to="body">
-        <Transition
-          enter-active-class="transition ease-out duration-200"
-          enter-from-class="opacity-0 scale-95 translate-y-2"
-          enter-to-class="opacity-100 scale-100 translate-y-0"
-          leave-active-class="transition ease-in duration-150"
-          leave-from-class="opacity-100 scale-100 translate-y-0"
-          leave-to-class="opacity-0 scale-95 translate-y-2"
+    <Teleport to="body">
+      <Transition
+        enter-active-class="transition ease-out duration-200"
+        enter-from-class="opacity-0 scale-95 translate-y-2"
+        enter-to-class="opacity-100 scale-100 translate-y-0"
+        leave-active-class="transition ease-in duration-150"
+        leave-from-class="opacity-100 scale-100 translate-y-0"
+        leave-to-class="opacity-0 scale-95 translate-y-2"
+      >
+        <div
+          v-if="isOpen"
+          ref="dropdownMenuRef"
+          class="glass fixed rounded-xl border border-white/30 shadow-2xl max-h-64 overflow-hidden"
+          :style="{
+            zIndex: 99999,
+            top: `${dropdownPosition.top}px`,
+            left: `${dropdownPosition.left}px`,
+            width: `${dropdownPosition.width}px`,
+          }"
         >
-          <div
-            v-if="isOpen"
-            ref="dropdownMenuRef"
-            class="glass fixed rounded-xl border border-white/30 shadow-2xl max-h-64 overflow-hidden"
-            :style="{
-              zIndex: 99999,
-              top: `${dropdownPosition.top}px`,
-              left: `${dropdownPosition.left}px`,
-              width: `${dropdownPosition.width}px`
-            }"
-          >
-        <div class="max-h-64 overflow-y-auto scrollbar-hide">
-          <button
-            v-for="option in options"
-            :key="option.value"
-            type="button"
-            :class="cn(
-              'w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 hover:bg-white/30 border-b border-white/10 last:border-b-0',
-              modelValue === option.value && 'bg-pink-100/50 text-pink-700 font-semibold'
-            )"
-            @click="selectOption(option.value)"
-          >
-            {{ option.label }}
-          </button>
-        </div>
+          <div class="max-h-64 overflow-y-auto scrollbar-hide">
+            <button
+              v-for="option in options"
+              :key="option.value"
+              type="button"
+              :class="
+                cn(
+                  'w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 hover:bg-white/30 border-b border-white/10 last:border-b-0',
+                  modelValue === option.value &&
+                    'bg-pink-100/50 text-pink-700 font-semibold',
+                )
+              "
+              @click="selectOption(option.value)"
+            >
+              {{ option.label }}
+            </button>
           </div>
-        </Transition>
-      </Teleport>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -98,7 +108,7 @@ const dropdownMenuRef = ref<HTMLElement | null>(null)
 const dropdownPosition = ref({ top: 0, left: 0, width: 0 })
 
 const displayValue = computed(() => {
-  const selected = props.options.find(opt => opt.value === props.modelValue)
+  const selected = props.options.find((opt) => opt.value === props.modelValue)
   return selected?.label || ''
 })
 
@@ -109,7 +119,7 @@ const toggleDropdown = () => {
       dropdownPosition.value = {
         top: rect.bottom + window.scrollY + 8,
         left: rect.left + window.scrollX,
-        width: rect.width
+        width: rect.width,
       }
     }
     isOpen.value = !isOpen.value
