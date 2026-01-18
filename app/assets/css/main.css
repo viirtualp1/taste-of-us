@@ -48,24 +48,30 @@
   /* Apple Liquid Glass - Regular variant */
   .glass {
     background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(30px) saturate(180%);
-    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.4);
     box-shadow:
       0 8px 32px 0 rgba(0, 0, 0, 0.08),
       0 1px 2px 0 rgba(0, 0, 0, 0.04),
       inset 0 1px 0 0 rgba(255, 255, 255, 0.6);
+    will-change: transform;
+    transform: translateZ(0);
+    contain: layout style paint;
   }
 
   /* Apple Liquid Glass - Clear variant (for special cases) */
   .glass-clear {
     background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(40px) saturate(200%);
-    -webkit-backdrop-filter: blur(40px) saturate(200%);
+    backdrop-filter: blur(25px) saturate(200%);
+    -webkit-backdrop-filter: blur(25px) saturate(200%);
     border: 1px solid rgba(255, 255, 255, 0.25);
     box-shadow:
       0 8px 32px 0 rgba(0, 0, 0, 0.12),
       inset 0 1px 0 0 rgba(255, 255, 255, 0.4);
+    will-change: transform;
+    transform: translateZ(0);
+    contain: layout style paint;
   }
 
   /* Dark mode variant */
@@ -88,34 +94,28 @@
   /* Concentric shapes helper - для вложенных элементов */
   .glass-nested {
     background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(20px) saturate(160%);
-    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(15px) saturate(160%);
+    -webkit-backdrop-filter: blur(15px) saturate(160%);
     border: 1px solid rgba(255, 255, 255, 0.3);
+    will-change: transform;
+    transform: translateZ(0);
+    contain: layout style paint;
   }
 
   .gradient-bg {
     background: linear-gradient(
       135deg,
-      #667eea 0%,
-      #764ba2 25%,
+      #f8b4d9 0%,
+      #f5a3c7 25%,
       #f093fb 50%,
-      #4facfe 75%,
-      #00f2fe 100%
+      #e8a5e8 75%,
+      #f5a3c7 100%
     );
-    background-size: 400% 400%;
-    animation: gradient 15s ease infinite;
-  }
-
-  @keyframes gradient {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
+    /* Static gradient - no animation for better performance */
+    will-change: auto;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
   }
 
   .glow {

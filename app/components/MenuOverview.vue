@@ -1,21 +1,19 @@
 <template>
   <tou-card class="overflow-hidden h-full flex flex-col">
     <tou-card-content class="flex-1 flex flex-col">
-      <div class="flex items-start justify-between mb-4">
-        <div class="space-y-2 flex-1">
-          <p
-            class="text-xs sm:text-sm uppercase tracking-[0.25em] text-gray-500"
-          >
-            Overview
-          </p>
-          <h3 class="text-xl sm:text-2xl font-bold text-gray-900">
-            Plan the week together
-          </h3>
-          <p class="text-xs sm:text-sm text-gray-600">
-            Choose what your partner can cook. Skip any meal if you want a
-            lighter day.
-          </p>
-        </div>
+      <div class="space-y-2 flex-1">
+        <p
+          class="text-xs sm:text-sm uppercase tracking-[0.25em] text-gray-500"
+        >
+          Overview
+        </p>
+        <h3 class="text-xl sm:text-2xl font-bold text-gray-900">
+          Plan the week together
+        </h3>
+        <p class="text-xs sm:text-sm text-gray-600">
+          Choose what your partner can cook. Skip any meal if you want a
+          lighter day.
+        </p>
       </div>
       <div class="mt-4 sm:mt-6 flex items-center justify-around gap-2 sm:gap-4">
         <div class="text-center">

@@ -52,13 +52,21 @@
         </span>
       </button>
       <div class="h-4 w-px bg-gray-300/50" />
-      <button
-        class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95"
-        @click="$emit('open-profile')"
-      >
-        <Icon name="heroicons:user-circle" class="w-5 h-5" />
-        <span class="hidden sm:inline">Settings</span>
-      </button>
+              <button
+                class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95"
+                @click="$emit('open-dishes')"
+              >
+                <Icon name="heroicons:pencil-square" class="w-5 h-5" />
+                <span class="hidden sm:inline">Dishes</span>
+              </button>
+              <div class="h-4 w-px bg-gray-300/50" />
+              <button
+                class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95"
+                @click="$emit('open-profile')"
+              >
+                <Icon name="heroicons:user-circle" class="w-5 h-5" />
+                <span class="hidden sm:inline">Settings</span>
+              </button>
     </div>
   </div>
 </template>
@@ -72,6 +80,7 @@ defineProps<Props>()
 
 defineEmits<{
   send: []
+  'open-dishes': []
   'open-profile': []
 }>()
 </script>

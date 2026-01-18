@@ -33,7 +33,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Get user ID from JWT token
   const authHeader = getHeader(event, 'authorization')
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     throw createError({
@@ -45,7 +44,6 @@ export default defineEventHandler(async (event) => {
   const token = authHeader.replace('Bearer ', '')
   const supabase = createSupabaseClient()
 
-  // Verify JWT token and get user
   const {
     data: { user },
     error: authError,
@@ -58,7 +56,6 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Get user's Telegram Chat ID from database
   const { data: userSettings, error: settingsError } = await supabase
     .from('user_settings')
     .select('telegram_chat_id')
@@ -66,7 +63,6 @@ export default defineEventHandler(async (event) => {
     .single()
 
   if (settingsError && settingsError.code !== 'PGRST116') {
-    // PGRST116 is "not found" error, which is OK
     console.error('Error fetching user settings:', settingsError)
   }
 
@@ -228,8 +224,8 @@ async function sendTelegramMessage(
         if (errorJson.error_code) {
           errorMessage += ` (Error code: ${errorJson.error_code})`
         }
-      } catch {
-        // If parsing fails, use the raw error text
+      } catch (err) {
+        console.error('Error parsing error JSON:', err)
       }
 
       console.error('Telegram message send error:', {
@@ -279,8 +275,8 @@ async function pinTelegramMessage(
         if (errorJson.description) {
           errorMessage = `Telegram API error: ${errorJson.description}`
         }
-      } catch {
-        // If parsing fails, use the raw error text
+      } catch (err) {
+        console.error('Error parsing error JSON:', err)
       }
 
       console.error('Error pinning message:', {
@@ -381,8 +377,8 @@ async function sendTelegramDocument(
             errorMessage += ` (Error code: ${errorJson.error_code})`
           }
         }
-      } catch {
-        // If parsing fails, use the raw error text
+      } catch (err) {
+        console.error('Error parsing error JSON:', err)
       }
 
       console.error('Telegram document send error:', {
@@ -437,7 +433,6 @@ async function generateMenuPDF(menu: MenuDay[]) {
   try {
     const page = await browser.newPage()
 
-    // Read favicon and convert to base64
     let faviconBase64 = ''
     try {
       const faviconPath = join(process.cwd(), 'public', 'favicon.jpg')
