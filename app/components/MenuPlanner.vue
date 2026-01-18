@@ -62,7 +62,11 @@ import { useWeekNavigation } from '@/composables/useWeekNavigation'
 import { useMenuSchedule } from '@/composables/useMenuSchedule'
 import { useMenuSelection } from '@/composables/useMenuSelection'
 import { useMenuState } from '@/composables/useMenuState'
-import { calculateStats, CATEGORIES } from '@/utils/menu'
+import {
+  calculateStats,
+  CATEGORIES,
+  findNextIncompleteDay,
+} from '@/utils/menu'
 import type { MenuData, Dish, MenuCategory } from '@/utils/menu'
 
 const { data: menuData } = await useFetch<MenuData>('/api/dishes', {
@@ -165,10 +169,16 @@ const handleMenuUpdate = (
     const hasDessert = !!currentMenu.dessert
 
     if (hasBrunch && hasDinner && hasDessert) {
-      const nextDayIndex = dayIndex + 1
-      if (nextDayIndex < weekDays.value.length) {
+      const nextIncompleteDay = findNextIncompleteDay(
+        dayIndex,
+        selectedMenu.value,
+        weekDays.value.length,
+        CATEGORIES,
+      )
+
+      if (nextIncompleteDay !== null) {
         setTimeout(() => {
-          focusDay(nextDayIndex)
+          focusDay(nextIncompleteDay)
         }, 300)
       }
     }

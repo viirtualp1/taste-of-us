@@ -31,7 +31,7 @@
               class="flex items-center justify-between p-4 sm:p-6 border-b border-white/20"
             >
               <h2 class="text-xl font-bold text-gray-900">
-                {{ editingDish ? 'Edit Dish' : 'Add Dish' }}
+                {{ dish ? 'Edit Dish' : 'Add Dish' }}
               </h2>
               <button
                 class="flex items-center rounded-[12px] p-2 hover:bg-white/20 transition-colors"
@@ -109,7 +109,7 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue'
-import { useAuth } from '@/composables/useAuth'
+import { useApiFetch } from '@/composables/useApiFetch'
 import type { MenuCategory, Dish, CuisineType } from '@/utils/menu'
 
 interface Props {
@@ -125,7 +125,7 @@ const emit = defineEmits<{
   save: []
 }>()
 
-const { getAuthHeaders } = useAuth()
+const { apiFetch } = useApiFetch()
 const dishName = ref('')
 const dishCuisine = ref<CuisineType | ''>('')
 const error = ref('')
@@ -167,7 +167,6 @@ const handleSave = async () => {
   error.value = ''
 
   try {
-    const headers = getAuthHeaders()
     const payload = {
       name: dishName.value.trim(),
       category: props.category,
@@ -175,22 +174,21 @@ const handleSave = async () => {
     }
 
     if (props.dish) {
-      await $fetch(`/api/user/dishes/${props.dish.id}`, {
+      await apiFetch(`/api/user/dishes/${props.dish.id}`, {
         method: 'PUT',
-        headers,
         body: payload,
       })
     } else {
-      await $fetch('/api/user/dishes', {
+      await apiFetch('/api/user/dishes', {
         method: 'POST',
-        headers,
         body: payload,
       })
     }
 
     emit('save')
-  } catch (err: any) {
-    error.value = err?.data?.message || err?.message || 'Failed to save dish'
+  } catch (err: unknown) {
+    const apiError = err as { data?: { message?: string }; message?: string }
+    error.value = apiError?.data?.message || apiError?.message || 'Failed to save dish'
   } finally {
     isLoading.value = false
   }

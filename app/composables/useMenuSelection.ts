@@ -2,12 +2,14 @@ import { ref } from 'vue'
 import type { MenuCategory, MenuSelection } from '@/utils/menu'
 import type { WeekDay } from '@/utils/date'
 import { useAuth } from './useAuth'
+import { useApiFetch } from './useApiFetch'
 
 export function useMenuSelection(
   selectedMenu: { value: MenuSelection[] },
   weekDays: { value: WeekDay[] },
 ) {
-  const { getAuthHeaders, isAuthenticated, handleAuthError } = useAuth()
+  const { isAuthenticated } = useAuth()
+  const { apiFetch } = useApiFetch()
   const isSending = ref(false)
   const message = ref('')
   const messageType = ref<'success' | 'error'>('success')
@@ -50,29 +52,31 @@ export function useMenuSelection(
       const menuPayload = weekDays.value.map((day, index) => ({
         day: day.display,
         date: day.date,
-        meals: selectedMenu.value[index] || { brunch: '', dinner: '', dessert: '' },
+        meals: selectedMenu.value[index] || {
+          brunch: '',
+          dinner: '',
+          dessert: '',
+        },
       }))
 
-      const headers = getAuthHeaders() as Record<string, string>
-
-      await $fetch('/api/send-menu', {
+      await apiFetch('/api/send-menu', {
         method: 'POST',
-        headers: Object.keys(headers).length > 0 ? headers : undefined,
         body: { menu: menuPayload },
       })
 
       message.value = 'Menu sent successfully!'
       messageType.value = 'success'
-    } catch (error: any) {
-      if (handleAuthError(error)) {
-        return
-      }
+    } catch (error: unknown) {
       console.error('Error sending menu:', error)
-      const errorMessage =
-        error?.data?.message ||
-        error?.message ||
+      const apiError = error as {
+        data?: { message?: string }
+        message?: string
+      }
+
+      message.value =
+        apiError?.data?.message ||
+        apiError?.message ||
         'Error sending menu. Please try again.'
-      message.value = errorMessage
       messageType.value = 'error'
     } finally {
       isSending.value = false

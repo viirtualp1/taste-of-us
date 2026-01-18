@@ -94,8 +94,9 @@ onMounted(async () => {
     } else {
       error.value = result.error || 'Failed to confirm email'
     }
-  } catch (err: any) {
-    error.value = err?.message || 'An error occurred'
+  } catch (err: unknown) {
+    const apiError = err as { message?: string }
+    error.value = apiError?.message || 'An error occurred'
   } finally {
     isLoading.value = false
   }

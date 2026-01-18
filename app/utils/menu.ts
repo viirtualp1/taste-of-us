@@ -130,3 +130,28 @@ export function calculateStats(
 
   return { totalSlots, filledSlots, completion }
 }
+
+export function isDayComplete(
+  dayIndex: number,
+  selectedMenu: MenuSelection[],
+  categories: Array<{ key: MenuCategory; label: string }>,
+): boolean {
+  const day = selectedMenu[dayIndex]
+  if (!day) return false
+
+  return categories.every((category) => !!day[category.key])
+}
+
+export function findNextIncompleteDay(
+  startIndex: number,
+  selectedMenu: MenuSelection[],
+  weekDaysLength: number,
+  categories: Array<{ key: MenuCategory; label: string }>,
+): number | null {
+  for (let i = startIndex + 1; i < weekDaysLength; i++) {
+    if (!isDayComplete(i, selectedMenu, categories)) {
+      return i
+    }
+  }
+  return null
+}

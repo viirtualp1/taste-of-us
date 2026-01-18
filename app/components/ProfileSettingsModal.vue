@@ -25,25 +25,24 @@
         >
           <div
             v-if="isOpen"
-            class="relative z-50 glass rounded-[20px] shadow-2xl max-w-md w-full mx-4 overflow-hidden"
-            style="border-radius: 20px;"
+            class="relative z-50 glass rounded-xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
           >
             <div
               class="flex items-center justify-between p-4 border-b border-white/20"
             >
               <h2 class="text-xl font-bold text-gray-900">Profile Settings</h2>
               <button
-                class="flex items-center rounded-[12px] p-2 hover:bg-white/20 transition-colors"
+                class="flex items-center rounded-lg p-2 hover:bg-white/20 transition-colors"
                 @click="closeModal"
               >
                 <Icon name="heroicons:x-mark" class="w-5 h-5 text-gray-600" />
               </button>
             </div>
 
-            <div class="p-6 pt-3 space-y-6">
+            <div class="p-6 space-y-6">
               <div
                 v-if="error"
-                class="bg-red-50 border border-red-200 rounded-[16px] p-3"
+                class="bg-red-50 border border-red-200 rounded-lg p-3"
               >
                 <p class="text-sm text-red-800">{{ error }}</p>
               </div>
@@ -60,7 +59,7 @@
                   v-model="telegramId"
                   type="text"
                   placeholder="Enter your girlfriend's Telegram Chat ID"
-                  class="w-full px-4 py-2 rounded-[12px] border glass-nested focus:border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-200 transition-all"
+                  class="w-full px-4 py-2 rounded-lg border-2 border-gray-200 bg-white/70 focus:border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-200 transition-all"
                   :disabled="isLoading"
                 />
                 <p class="mt-2 text-xs text-gray-500">
@@ -68,7 +67,7 @@
                 </p>
               </div>
 
-              <div class="bg-blue-50/80 border border-blue-200 rounded-[16px] p-4">
+              <div class="bg-blue-50/80 border border-blue-200 rounded-lg p-4">
                 <div class="flex items-start gap-3">
                   <Icon
                     name="heroicons:information-circle"
@@ -100,7 +99,7 @@
               </div>
 
               <div
-                class="bg-yellow-50/80 border border-yellow-200 rounded-[16px] p-4"
+                class="bg-yellow-50/80 border border-yellow-200 rounded-lg p-4"
               >
                 <div class="flex items-start gap-3">
                   <Icon
@@ -123,13 +122,13 @@
 
               <div class="flex gap-3">
                 <button
-                  class="flex-1 px-4 py-2 rounded-[12px] glass-nested text-gray-700 font-medium hover:bg-white/50 transition-colors"
+                  class="flex-1 px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition-colors"
                   @click="closeModal"
                 >
                   Cancel
                 </button>
                 <button
-                  class="flex-1 px-4 py-2 rounded-[12px] bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   :disabled="isLoading"
                   @click="saveSettings"
                 >
@@ -145,8 +144,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { useAuth } from '@/composables/useAuth';
+import { ref, watch } from 'vue'
+import { useAuth } from '@/composables/useAuth'
 
 interface Props {
   isOpen: boolean
@@ -159,7 +158,7 @@ const emit = defineEmits<{
   save: [telegramId: string]
 }>()
 
-const { getAuthHeaders, isAuthenticated, handleAuthError } = useAuth()
+const { getAuthHeaders, isAuthenticated } = useAuth()
 const telegramId = ref('')
 const isLoading = ref(false)
 const error = ref('')
@@ -183,10 +182,6 @@ const loadSettings = async () => {
 
     telegramId.value = response.telegram_chat_id || ''
   } catch (err: any) {
-    if (handleAuthError(err)) {
-      closeModal()
-      return
-    }
     error.value =
       err?.data?.message || err?.message || 'Failed to load settings'
     console.error('Error loading settings:', err)
@@ -217,10 +212,6 @@ const saveSettings = async () => {
     emit('save', telegramId.value)
     closeModal()
   } catch (err: any) {
-    if (handleAuthError(err)) {
-      closeModal()
-      return
-    }
     error.value =
       err?.data?.message || err?.message || 'Failed to save settings'
     console.error('Error saving settings:', err)

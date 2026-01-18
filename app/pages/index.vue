@@ -218,8 +218,9 @@ const handleSubmit = async () => {
     } else {
       authError.value = result.error || 'An error occurred'
     }
-  } catch (err: any) {
-    authError.value = err?.message || 'An error occurred'
+  } catch (err: unknown) {
+    const apiError = err as { message?: string }
+    authError.value = apiError?.message || 'An error occurred'
   } finally {
     isLoading.value = false
   }

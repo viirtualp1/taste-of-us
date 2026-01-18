@@ -1,20 +1,22 @@
 <template>
-  <transition
-    mode="out-in"
-    enter-active-class="transition ease-out duration-300"
-    enter-from-class="opacity-0 translate-y-4"
-    enter-to-class="opacity-100 translate-y-0"
-    leave-active-class="transition ease-in duration-200"
-    leave-from-class="opacity-100 translate-y-0"
-    leave-to-class="opacity-0 -translate-y-4"
+  <tou-card
+    v-if="day"
+    class="overflow-visible flex-1 flex flex-col min-w-0"
   >
-    <tou-card
-      v-if="day"
-      :key="`day-${day.date}`"
-      class="overflow-visible flex-1 flex flex-col min-w-0"
-    >
-      <tou-card-header>
-        <div class="flex flex-wrap items-center justify-between gap-4">
+    <tou-card-header>
+      <transition
+        mode="out-in"
+        enter-active-class="transition ease-out duration-200"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition ease-in duration-150"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div
+          :key="`header-${day.date}`"
+          class="flex flex-wrap items-center justify-between gap-4"
+        >
           <div class="space-y-1">
             <tou-card-title>{{ day.display }}</tou-card-title>
           </div>
@@ -25,9 +27,20 @@
             {{ dayLabel }}
           </div>
         </div>
-      </tou-card-header>
-      <tou-card-content class="pt-0 flex-1 flex flex-col overflow-visible">
+      </transition>
+    </tou-card-header>
+    <tou-card-content class="pt-0 flex-1 flex flex-col overflow-visible">
+      <transition
+        mode="out-in"
+        enter-active-class="transition ease-out duration-200"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition ease-in duration-150"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
         <div
+          :key="`content-${day.date}`"
           class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 flex-1 overflow-visible"
         >
           <div
@@ -65,9 +78,9 @@
             </button>
           </div>
         </div>
-      </tou-card-content>
-    </tou-card>
-  </transition>
+      </transition>
+    </tou-card-content>
+  </tou-card>
 
   <dish-selection-modal
     :is-open="isModalOpen"

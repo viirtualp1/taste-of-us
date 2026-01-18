@@ -25,8 +25,7 @@
         >
           <div
             v-if="isOpen"
-            class="relative z-50 glass rounded-[20px] shadow-2xl max-w-md w-full mx-4 overflow-hidden"
-            style="border-radius: 20px;"
+            class="relative z-50 glass rounded-xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
           >
             <div
               class="flex items-center justify-between p-4 border-b border-white/20"
@@ -35,7 +34,7 @@
                 {{ isLogin ? 'Login' : 'Sign Up' }}
               </h2>
               <button
-                class="flex items-center rounded-[12px] p-2 hover:bg-white/20 transition-colors"
+                class="flex items-center rounded-lg p-2 hover:bg-white/20 transition-colors"
                 @click="closeModal"
               >
                 <Icon name="heroicons:x-mark" class="w-5 h-5 text-gray-600" />
@@ -45,7 +44,7 @@
             <div class="p-6 space-y-4">
               <div
                 v-if="error"
-                class="bg-red-50 border border-red-200 rounded-[16px] p-3"
+                class="bg-red-50 border border-red-200 rounded-lg p-3"
               >
                 <p class="text-sm text-red-800">{{ error }}</p>
               </div>
@@ -62,7 +61,7 @@
                   v-model="email"
                   type="email"
                   placeholder="your@email.com"
-                  class="w-full px-4 py-2 rounded-[12px] border glass-nested focus:border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-200 transition-all"
+                  class="w-full px-4 py-2 rounded-lg border-2 border-gray-200 bg-white/70 focus:border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-200 transition-all"
                   @keyup.enter="handleSubmit"
                 />
               </div>
@@ -79,20 +78,20 @@
                   v-model="password"
                   type="password"
                   placeholder="••••••••"
-                  class="w-full px-4 py-2 rounded-[12px] border glass-nested focus:border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-200 transition-all"
+                  class="w-full px-4 py-2 rounded-lg border-2 border-gray-200 bg-white/70 focus:border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-200 transition-all"
                   @keyup.enter="handleSubmit"
                 />
               </div>
 
               <div class="flex gap-3">
                 <button
-                  class="flex-1 px-4 py-2 rounded-[12px] glass-nested text-gray-700 font-medium hover:bg-white/50 transition-colors"
+                  class="flex-1 px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition-colors"
                   @click="closeModal"
                 >
                   Cancel
                 </button>
                 <button
-                  class="flex-1 px-4 py-2 rounded-[12px] bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
                   :disabled="isLoading"
                   @click="handleSubmit"
                 >

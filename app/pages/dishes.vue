@@ -34,7 +34,9 @@
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-3">
             <span class="text-2xl">{{ getCategoryIcon(category.key) }}</span>
-            <h2 class="text-xl font-bold text-gray-900">{{ category.label }}</h2>
+            <h2 class="text-xl font-bold text-gray-900">
+              {{ category.label }}
+            </h2>
             <span
               class="px-2.5 py-0.5 rounded-full text-xs font-semibold glass-nested"
             >
@@ -58,7 +60,10 @@
           />
         </div>
 
-        <div v-else-if="userDishes[category.key]?.length === 0" class="text-center py-8">
+        <div
+          v-else-if="userDishes[category.key]?.length === 0"
+          class="text-center py-8"
+        >
           <p class="text-gray-500">No dishes yet. Add your first dish!</p>
         </div>
 
@@ -119,7 +124,13 @@ import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 import DishFormModal from '@/components/DishFormModal.vue'
 import ImportDishesModal from '@/components/ImportDishesModal.vue'
-import { CATEGORIES, getCategoryIcon, type MenuCategory, type Dish, CUISINES } from '@/utils/menu'
+import {
+  CATEGORIES,
+  getCategoryIcon,
+  type MenuCategory,
+  type Dish,
+  CUISINES,
+} from '@/utils/menu'
 
 const getCuisineLabel = (cuisine: string) => {
   return CUISINES.find((c) => c.key === cuisine)?.label || cuisine
@@ -130,7 +141,8 @@ definePageMeta({
 })
 
 const router = useRouter()
-const { isAuthenticated, getAuthHeaders } = useAuth()
+const { isAuthenticated } = useAuth()
+const { apiFetch } = useApiFetch()
 
 const isLoading = ref(false)
 const userDishes = ref<Record<MenuCategory, Dish[]>>({
@@ -149,13 +161,8 @@ const loadUserDishes = async () => {
 
   isLoading.value = true
   try {
-    const headers = getAuthHeaders()
-    const response = await $fetch<Record<MenuCategory, Dish[]>>(
-      '/api/user/dishes',
-      {
-        headers,
-      },
-    )
+    const response =
+      await apiFetch<Record<MenuCategory, Dish[]>>('/api/user/dishes')
 
     userDishes.value = {
       brunch: response.brunch || [],
@@ -207,10 +214,8 @@ const confirmDeleteDish = async (dish: Dish) => {
   if (!confirm(`Are you sure you want to delete "${dish.name}"?`)) return
 
   try {
-    const headers = getAuthHeaders()
-    await $fetch(`/api/user/dishes/${dish.id}`, {
+    await apiFetch(`/api/user/dishes/${dish.id}`, {
       method: 'DELETE',
-      headers,
     })
 
     await loadUserDishes()

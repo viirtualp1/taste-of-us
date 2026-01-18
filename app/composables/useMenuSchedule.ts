@@ -44,20 +44,21 @@ export function useMenuSchedule(
           Array.isArray(weekDays.value) &&
           savedMenu.length === weekDays.value.length
         ) {
-          selectedMenu.value = savedMenu.map((day: any) => {
-            if (day.brunch !== undefined && day.dinner !== undefined) {
+          selectedMenu.value = savedMenu.map((day: unknown) => {
+            const dayData = day as Partial<MenuSelection & { breakfast?: string; lunch?: string }>
+            if (dayData.brunch !== undefined && dayData.dinner !== undefined) {
               return {
-                brunch: day.brunch || '',
-                dinner: day.dinner || '',
-                dessert: day.dessert || '',
+                brunch: dayData.brunch || '',
+                dinner: dayData.dinner || '',
+                dessert: dayData.dessert || '',
               }
             }
-            if (day.breakfast !== undefined || day.lunch !== undefined) {
-              const brunch = day.breakfast || day.lunch || ''
+            if (dayData.breakfast !== undefined || dayData.lunch !== undefined) {
+              const brunch = dayData.breakfast || dayData.lunch || ''
               return {
                 brunch,
-                dinner: day.dinner || '',
-                dessert: day.dessert || '',
+                dinner: dayData.dinner || '',
+                dessert: dayData.dessert || '',
               }
             }
             return { brunch: '', dinner: '', dessert: '' }

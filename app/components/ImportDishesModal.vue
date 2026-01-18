@@ -30,7 +30,9 @@
             <div
               class="flex items-center justify-between p-4 sm:p-6 border-b border-white/20 flex-shrink-0"
             >
-              <h2 class="text-xl font-bold text-gray-900">Import Dishes from JSON</h2>
+              <h2 class="text-xl font-bold text-gray-900">
+                Import Dishes from JSON
+              </h2>
               <button
                 class="flex items-center rounded-[12px] p-2 hover:bg-white/20 transition-colors"
                 @click="closeModal"
@@ -144,22 +146,20 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useAuth } from '@/composables/useAuth'
-import type { MenuCategory } from '@/utils/menu'
+import { useApiFetch } from '@/composables/useApiFetch'
 
 interface Props {
   isOpen: boolean
 }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 
 const emit = defineEmits<{
   close: []
   imported: []
 }>()
 
-const { getAuthHeaders } = useAuth()
-const dropZoneRef = ref<HTMLElement | null>(null)
+const { apiFetch } = useApiFetch()
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const selectedFile = ref<File | null>(null)
 const isDragging = ref(false)
@@ -234,8 +234,6 @@ const handleImport = async () => {
       throw new Error('JSON must be an array of dishes')
     }
 
-    const headers = getAuthHeaders()
-
     for (const dish of dishes) {
       if (!dish.name || !dish.category) {
         throw new Error(
@@ -249,15 +247,17 @@ const handleImport = async () => {
         )
       }
 
-      if (dish.cuisine && !['asian', 'european', 'slavic'].includes(dish.cuisine)) {
+      if (
+        dish.cuisine &&
+        !['asian', 'european', 'slavic'].includes(dish.cuisine)
+      ) {
         throw new Error(
           `Invalid cuisine: ${dish.cuisine}. Must be asian, european, or slavic`,
         )
       }
 
-      await $fetch('/api/user/dishes', {
+      await apiFetch('/api/user/dishes', {
         method: 'POST',
-        headers,
         body: {
           name: dish.name.trim(),
           category: dish.category,
@@ -268,9 +268,12 @@ const handleImport = async () => {
 
     emit('imported')
     closeModal()
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const apiError = err as { data?: { message?: string }; message?: string }
     error.value =
-      err?.data?.message || err?.message || 'Failed to import dishes. Please check the JSON format.'
+      apiError?.data?.message ||
+      apiError?.message ||
+      'Failed to import dishes. Please check the JSON format.'
     console.error('Import error:', err)
   } finally {
     isLoading.value = false

@@ -11,6 +11,17 @@ interface Session {
   expires_at?: number
 }
 
+interface AuthError {
+  statusCode?: number
+  status?: number
+  data?: {
+    statusCode?: number
+    message?: string
+  }
+  error?: boolean
+  message?: string
+}
+
 const user = ref<User | null>(null)
 const session = ref<Session | null>(null)
 const isLoading = ref(true)
@@ -69,10 +80,11 @@ export function useAuth() {
 
       saveSession(response.user, response.session)
       return { success: true }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const authError = error as AuthError
       return {
         success: false,
-        error: error?.data?.message || error?.message || 'Login failed',
+        error: authError?.data?.message || authError?.message || 'Login failed',
       }
     }
   }
@@ -89,10 +101,11 @@ export function useAuth() {
 
       saveSession(response.user, response.session)
       return { success: true }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const authError = error as AuthError
       return {
         success: false,
-        error: error?.data?.message || error?.message || 'Signup failed',
+        error: authError?.data?.message || authError?.message || 'Signup failed',
       }
     }
   }
@@ -104,8 +117,10 @@ export function useAuth() {
     }
   }
 
-  const handleAuthError = (error: any) => {
-    if (error?.statusCode === 401 || error?.data?.statusCode === 401) {
+  const handleAuthError = (error: unknown): boolean => {
+    const authError = error as AuthError
+    const statusCode = authError?.statusCode || authError?.data?.statusCode || authError?.status
+    if (statusCode === 401 || (authError?.error === true && authError?.statusCode === 401)) {
       logout()
       return true
     }
@@ -132,11 +147,12 @@ export function useAuth() {
           error: 'Failed to get session after confirmation',
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const authError = error as AuthError
       return {
         success: false,
         error:
-          error?.data?.message || error?.message || 'Failed to confirm email',
+          authError?.data?.message || authError?.message || 'Failed to confirm email',
       }
     }
   }
