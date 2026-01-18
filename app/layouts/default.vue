@@ -2,7 +2,12 @@
   <div>
     <div
       class="fixed inset-0 gradient-bg -z-10"
-      style="will-change: auto; transform: translateZ(0); backface-visibility: hidden; -webkit-backface-visibility: hidden;"
+      style="
+        will-change: auto;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+      "
     />
     <div class="relative min-h-screen">
       <main

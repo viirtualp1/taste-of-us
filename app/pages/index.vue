@@ -28,7 +28,12 @@
                     ? 'text-gray-900'
                     : 'text-gray-600 hover:text-gray-900'
                 "
-                @click="() => { isLogin = true; authError = '' }"
+                @click="
+                  () => {
+                    isLogin = true
+                    authError = ''
+                  }
+                "
               >
                 Login
               </button>
@@ -39,7 +44,12 @@
                     ? 'text-gray-900'
                     : 'text-gray-600 hover:text-gray-900'
                 "
-                @click="() => { isLogin = false; authError = '' }"
+                @click="
+                  () => {
+                    isLogin = false
+                    authError = ''
+                  }
+                "
               >
                 Sign up
               </button>
@@ -160,18 +170,17 @@ const menuActions = inject<{
   resetMenu: () => void
   sendMenu: () => Promise<void>
   isSending: { value: boolean }
-}>(
-  'menuActions',
-  {
-    resetMenu: () => {},
-    sendMenu: async () => {},
-    isSending: { value: false },
-  },
-)
+}>('menuActions', {
+  resetMenu: () => {},
+  sendMenu: async () => {},
+  isSending: { value: false },
+})
 
 const { weekDays, selectedMenu, isSending: isSendingState } = useMenuState()
 
-const isSending = computed(() => isSendingState.value || (menuActions?.isSending?.value ?? false))
+const isSending = computed(
+  () => isSendingState.value || (menuActions?.isSending?.value ?? false),
+)
 
 const handleReset = () => {
   menuActions?.resetMenu()

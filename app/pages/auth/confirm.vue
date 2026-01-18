@@ -1,6 +1,9 @@
 <template>
   <div class="min-h-screen flex items-center justify-center p-4">
-    <div class="glass rounded-[20px] p-8 max-w-md w-full text-center" style="border-radius: 20px;">
+    <div
+      class="glass rounded-[20px] p-8 max-w-md w-full text-center"
+      style="border-radius: 20px"
+    >
       <div v-if="isLoading" class="space-y-4">
         <div class="flex items-center justify-center">
           <div

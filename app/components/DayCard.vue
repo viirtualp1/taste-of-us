@@ -1,8 +1,5 @@
 <template>
-  <tou-card
-    v-if="day"
-    class="overflow-visible flex-1 flex flex-col min-w-0"
-  >
+  <tou-card v-if="day" class="overflow-visible flex-1 flex flex-col min-w-0">
     <tou-card-header>
       <transition
         mode="out-in"

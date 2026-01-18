@@ -64,7 +64,9 @@
                     >
                       <span class="text-base flex-shrink-0">🌅</span>
                       <div class="flex-1 min-w-0">
-                        <p class="text-xs text-gray-500 uppercase tracking-wide mb-0.5">
+                        <p
+                          class="text-xs text-gray-500 uppercase tracking-wide mb-0.5"
+                        >
                           Brunch
                         </p>
                         <p class="text-sm font-semibold text-gray-900">
@@ -87,7 +89,9 @@
                     >
                       <span class="text-base flex-shrink-0">🌙</span>
                       <div class="flex-1 min-w-0">
-                        <p class="text-xs text-gray-500 uppercase tracking-wide mb-0.5">
+                        <p
+                          class="text-xs text-gray-500 uppercase tracking-wide mb-0.5"
+                        >
                           Dinner
                         </p>
                         <p class="text-sm font-semibold text-gray-900">
@@ -110,7 +114,9 @@
                     >
                       <span class="text-base flex-shrink-0">🍰</span>
                       <div class="flex-1 min-w-0">
-                        <p class="text-xs text-gray-500 uppercase tracking-wide mb-0.5">
+                        <p
+                          class="text-xs text-gray-500 uppercase tracking-wide mb-0.5"
+                        >
                           Dessert
                         </p>
                         <p class="text-sm font-semibold text-gray-900">
@@ -145,8 +151,14 @@
                 :disabled="isSending"
                 @click="handleConfirm"
               >
-                <span v-if="isSending" class="flex items-center justify-center gap-2">
-                  <Icon name="heroicons:arrow-path" class="w-4 h-4 animate-spin" />
+                <span
+                  v-if="isSending"
+                  class="flex items-center justify-center gap-2"
+                >
+                  <Icon
+                    name="heroicons:arrow-path"
+                    class="w-4 h-4 animate-spin"
+                  />
                   Sending...
                 </span>
                 <span v-else>Confirm & Send</span>

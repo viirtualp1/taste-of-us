@@ -1,6 +1,5 @@
 import { createSupabaseClient } from '../../utils/supabase'
-import type { Dish } from '@/utils/menu'
-import type { MenuCategory } from '@/utils/menu'
+import type { Dish, MenuCategory } from '@/utils/menu'
 
 export default defineEventHandler(async (event) => {
   try {

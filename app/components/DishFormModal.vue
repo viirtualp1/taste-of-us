@@ -188,7 +188,8 @@ const handleSave = async () => {
     emit('save')
   } catch (err: unknown) {
     const apiError = err as { data?: { message?: string }; message?: string }
-    error.value = apiError?.data?.message || apiError?.message || 'Failed to save dish'
+    error.value =
+      apiError?.data?.message || apiError?.message || 'Failed to save dish'
   } finally {
     isLoading.value = false
   }

@@ -1,7 +1,7 @@
 <template>
   <div
     class="fixed bottom-0 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-2 py-2"
-    style="bottom: max(0.5rem, env(safe-area-inset-bottom));"
+    style="bottom: max(0.5rem, env(safe-area-inset-bottom))"
   >
     <div
       class="glass rounded-full px-4 py-2.5 flex items-center gap-3 text-sm font-medium"
@@ -52,21 +52,21 @@
         </span>
       </button>
       <div class="h-4 w-px bg-gray-300/50" />
-              <button
-                class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95"
-                @click="$emit('open-dishes')"
-              >
-                <Icon name="heroicons:pencil-square" class="w-5 h-5" />
-                <span class="hidden sm:inline">Dishes</span>
-              </button>
-              <div class="h-4 w-px bg-gray-300/50" />
-              <button
-                class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95"
-                @click="$emit('open-profile')"
-              >
-                <Icon name="heroicons:user-circle" class="w-5 h-5" />
-                <span class="hidden sm:inline">Settings</span>
-              </button>
+      <button
+        class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95"
+        @click="$emit('open-dishes')"
+      >
+        <Icon name="heroicons:pencil-square" class="w-5 h-5" />
+        <span class="hidden sm:inline">Dishes</span>
+      </button>
+      <div class="h-4 w-px bg-gray-300/50" />
+      <button
+        class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95"
+        @click="$emit('open-profile')"
+      >
+        <Icon name="heroicons:user-circle" class="w-5 h-5" />
+        <span class="hidden sm:inline">Settings</span>
+      </button>
     </div>
   </div>
 </template>

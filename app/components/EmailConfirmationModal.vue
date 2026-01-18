@@ -26,7 +26,7 @@
           <div
             v-if="isOpen"
             class="relative z-50 glass rounded-[20px] shadow-2xl max-w-md w-full mx-4 overflow-hidden"
-            style="border-radius: 20px;"
+            style="border-radius: 20px"
           >
             <div
               class="flex items-center justify-between p-4 border-b border-white/20"
@@ -67,7 +67,9 @@
                 </p>
               </div>
 
-              <div class="bg-blue-50/80 border border-blue-200 rounded-[16px] p-4">
+              <div
+                class="bg-blue-50/80 border border-blue-200 rounded-[16px] p-4"
+              >
                 <div class="flex items-start gap-3">
                   <Icon
                     name="heroicons:information-circle"

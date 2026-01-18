@@ -105,7 +105,8 @@ export function useAuth() {
       const authError = error as AuthError
       return {
         success: false,
-        error: authError?.data?.message || authError?.message || 'Signup failed',
+        error:
+          authError?.data?.message || authError?.message || 'Signup failed',
       }
     }
   }
@@ -119,8 +120,12 @@ export function useAuth() {
 
   const handleAuthError = (error: unknown): boolean => {
     const authError = error as AuthError
-    const statusCode = authError?.statusCode || authError?.data?.statusCode || authError?.status
-    if (statusCode === 401 || (authError?.error === true && authError?.statusCode === 401)) {
+    const statusCode =
+      authError?.statusCode || authError?.data?.statusCode || authError?.status
+    if (
+      statusCode === 401 ||
+      (authError?.error === true && authError?.statusCode === 401)
+    ) {
       logout()
       return true
     }
@@ -152,7 +157,9 @@ export function useAuth() {
       return {
         success: false,
         error:
-          authError?.data?.message || authError?.message || 'Failed to confirm email',
+          authError?.data?.message ||
+          authError?.message ||
+          'Failed to confirm email',
       }
     }
   }

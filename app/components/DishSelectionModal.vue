@@ -30,7 +30,7 @@
             ref="modalRef"
             class="relative z-50 glass rounded-t-[26px] sm:rounded-[26px] shadow-2xl max-w-4xl w-full overflow-hidden flex flex-col"
             :class="isMobile ? '' : 'h-[85vh]'"
-            style="border-radius: 26px;"
+            style="border-radius: 26px"
             :style="
               isMobile
                 ? {

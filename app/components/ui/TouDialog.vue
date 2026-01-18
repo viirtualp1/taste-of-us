@@ -25,7 +25,7 @@
           <div
             v-if="modelValue"
             class="relative z-50 glass rounded-[20px] shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
-            style="border-radius: 20px;"
+            style="border-radius: 20px"
           >
             <div
               class="flex items-center justify-between p-6 border-b border-white/20"

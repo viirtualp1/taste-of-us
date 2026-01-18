@@ -45,7 +45,9 @@ export function useMenuSchedule(
           savedMenu.length === weekDays.value.length
         ) {
           selectedMenu.value = savedMenu.map((day: unknown) => {
-            const dayData = day as Partial<MenuSelection & { breakfast?: string; lunch?: string }>
+            const dayData = day as Partial<
+              MenuSelection & { breakfast?: string; lunch?: string }
+            >
             if (dayData.brunch !== undefined && dayData.dinner !== undefined) {
               return {
                 brunch: dayData.brunch || '',
@@ -53,7 +55,10 @@ export function useMenuSchedule(
                 dessert: dayData.dessert || '',
               }
             }
-            if (dayData.breakfast !== undefined || dayData.lunch !== undefined) {
+            if (
+              dayData.breakfast !== undefined ||
+              dayData.lunch !== undefined
+            ) {
               const brunch = dayData.breakfast || dayData.lunch || ''
               return {
                 brunch,
@@ -118,7 +123,11 @@ export function useMenuSchedule(
   watch(
     weekStart,
     async () => {
-      if (weekDays.value && Array.isArray(weekDays.value) && weekDays.value.length > 0) {
+      if (
+        weekDays.value &&
+        Array.isArray(weekDays.value) &&
+        weekDays.value.length > 0
+      ) {
         await loadSchedule()
       }
     },

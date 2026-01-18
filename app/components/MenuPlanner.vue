@@ -62,11 +62,7 @@ import { useWeekNavigation } from '@/composables/useWeekNavigation'
 import { useMenuSchedule } from '@/composables/useMenuSchedule'
 import { useMenuSelection } from '@/composables/useMenuSelection'
 import { useMenuState } from '@/composables/useMenuState'
-import {
-  calculateStats,
-  CATEGORIES,
-  findNextIncompleteDay,
-} from '@/utils/menu'
+import { calculateStats, CATEGORIES, findNextIncompleteDay } from '@/utils/menu'
 import type { MenuData, Dish, MenuCategory } from '@/utils/menu'
 
 const { data: menuData } = await useFetch<MenuData>('/api/dishes', {
@@ -137,17 +133,29 @@ const { isSending, message, messageType, updateMenu, resetMenu, sendMenu } =
 
 const { setWeekDays, setSelectedMenu, setIsSending } = useMenuState()
 
-watch(weekDays, (days) => {
-  setWeekDays(days)
-}, { immediate: true })
+watch(
+  weekDays,
+  (days) => {
+    setWeekDays(days)
+  },
+  { immediate: true },
+)
 
-watch(selectedMenu, (menu) => {
-  setSelectedMenu(menu)
-}, { immediate: true, deep: true })
+watch(
+  selectedMenu,
+  (menu) => {
+    setSelectedMenu(menu)
+  },
+  { immediate: true, deep: true },
+)
 
-watch(() => isSending.value, (sending) => {
-  setIsSending(sending)
-}, { immediate: true })
+watch(
+  () => isSending.value,
+  (sending) => {
+    setIsSending(sending)
+  },
+  { immediate: true },
+)
 
 provide('menuActions', {
   resetMenu: () => resetMenu(),
