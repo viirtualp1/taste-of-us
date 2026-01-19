@@ -46,6 +46,12 @@ useHead({
     { rel: 'icon', type: 'image/jpg', href: '/favicon.jpg' },
     { rel: 'canonical', href: 'https://taste-of-us.com' },
   ],
+  script: [
+    {
+      src: 'https://telegram.org/js/telegram-web-app.js',
+      defer: true,
+    },
+  ],
 })
 
 useSeoMeta({

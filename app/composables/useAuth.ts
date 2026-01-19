@@ -1,3 +1,5 @@
+// OLD SUPABASE AUTH - COMMENTED OUT FOR TELEGRAM WEB APP MIGRATION
+/*
 import { ref, computed } from 'vue'
 
 interface User {
@@ -193,3 +195,7 @@ export function useAuth() {
     handleAuthError,
   }
 }
+*/
+
+// Use useTelegram instead
+export { useTelegram as useAuth } from './useTelegram'

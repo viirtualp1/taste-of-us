@@ -30,11 +30,13 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || '',
+    // OLD SUPABASE CONFIG - COMMENTED OUT FOR TELEGRAM WEB APP MIGRATION
+    // public: {
+    //   supabaseUrl: process.env.SUPABASE_URL || '',
+    //   supabaseAnonKey: process.env.SUPABASE_ANON_KEY || '',
+    // },
+    // Still using Supabase for database, but not for auth
     supabaseUrl: process.env.SUPABASE_URL || '',
     supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
-    public: {
-      supabaseUrl: process.env.SUPABASE_URL || '',
-      supabaseAnonKey: process.env.SUPABASE_ANON_KEY || '',
-    },
   },
 })

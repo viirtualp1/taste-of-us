@@ -33,6 +33,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // OLD SUPABASE AUTH - COMMENTED OUT FOR TELEGRAM WEB APP MIGRATION
+  /*
   const authHeader = getHeader(event, 'authorization')
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     throw createError({
@@ -75,6 +77,11 @@ export default defineEventHandler(async (event) => {
         'Telegram Chat ID is required. Please set it in your profile settings.',
     })
   }
+  */
+
+  const { requireTelegramAuth } = await import('../utils/auth')
+  const telegramUserId = await requireTelegramAuth(event)
+  const telegramChatId = String(telegramUserId)
 
   try {
     const menuText = formatMenuForTelegram(body.menu)

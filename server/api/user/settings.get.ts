@@ -1,3 +1,5 @@
+// OLD SUPABASE AUTH - COMMENTED OUT FOR TELEGRAM WEB APP MIGRATION
+/*
 import { createSupabaseClient } from '../../utils/supabase'
 
 export default defineEventHandler(async (event) => {
@@ -39,5 +41,32 @@ export default defineEventHandler(async (event) => {
 
   return {
     telegram_chat_id: userSettings?.telegram_chat_id || null,
+  }
+})
+*/
+
+import { requireTelegramAuth } from '../../utils/auth'
+import { createSupabaseClient } from '../../utils/supabase'
+
+export default defineEventHandler(async (event) => {
+  const telegramUserId = await requireTelegramAuth(event)
+
+  const supabase = createSupabaseClient()
+
+  const { data: userSettings, error: settingsError } = await supabase
+    .from('user_settings')
+    .select('telegram_chat_id')
+    .eq('telegram_chat_id', String(telegramUserId))
+    .single()
+
+  if (settingsError && settingsError.code !== 'PGRST116') {
+    throw createError({
+      statusCode: 500,
+      message: 'Failed to fetch user settings',
+    })
+  }
+
+  return {
+    telegram_chat_id: userSettings?.telegram_chat_id || String(telegramUserId),
   }
 })

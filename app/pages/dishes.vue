@@ -119,7 +119,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 import DishFormModal from '@/components/DishFormModal.vue'
@@ -141,7 +141,7 @@ definePageMeta({
 })
 
 const router = useRouter()
-const { isAuthenticated } = useAuth()
+const { isAuthenticated, isLoading: authLoading, authenticate } = useAuth()
 const { apiFetch } = useApiFetch()
 
 const isLoading = ref(false)
@@ -156,8 +156,19 @@ const isImportModalOpen = ref(false)
 const editingDish = ref<Dish | null>(null)
 const selectedCategory = ref<MenuCategory>('brunch')
 
+const hasNoDishes = computed(() => {
+  return (
+    (userDishes.value.brunch?.length || 0) +
+    (userDishes.value.dinner?.length || 0) +
+    (userDishes.value.dessert?.length || 0) ===
+    0
+  )
+})
+
 const loadUserDishes = async () => {
-  if (!isAuthenticated.value) return
+  if (!isAuthenticated.value) {
+    return
+  }
 
   isLoading.value = true
   try {
@@ -170,7 +181,7 @@ const loadUserDishes = async () => {
       dessert: response.dessert || [],
     }
   } catch (error) {
-    console.error('Error loading user dishes:', error)
+    console.error('[dishes] Error loading user dishes:', error)
   } finally {
     isLoading.value = false
   }
@@ -225,11 +236,23 @@ const confirmDeleteDish = async (dish: Dish) => {
   }
 }
 
-onMounted(() => {
-  if (!isAuthenticated.value) {
-    router.push('/')
-    return
+onMounted(async () => {
+  if (!isAuthenticated.value && !authLoading.value) {
+    try {
+      const result = await authenticate()
+      if (!result.success) {
+        router.push('/')
+        return
+      }
+    } catch (error) {
+      console.error('Authentication error:', error)
+      router.push('/')
+      return
+    }
   }
-  loadUserDishes()
+
+  if (isAuthenticated.value) {
+    loadUserDishes()
+  }
 })
 </script>

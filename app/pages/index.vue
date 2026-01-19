@@ -7,105 +7,16 @@
             Welcome to Taste of Us
           </h2>
           <p class="text-gray-600 text-sm">
-            Please log in or sign up to start planning your weekly menu.
+            Please open this app in Telegram to start planning your weekly menu.
           </p>
         </div>
 
-        <div class="space-y-6">
-          <div class="relative">
-            <div class="flex gap-2 glass-nested rounded-[16px] p-1 relative">
-              <div
-                class="absolute top-1 bottom-1 rounded-[12px] bg-white shadow-sm transition-all duration-300 ease-out"
-                :style="{
-                  left: isLogin ? '0.25rem' : '50%',
-                  width: 'calc(50% - 0.25rem)',
-                }"
-              />
-              <button
-                class="flex-1 relative z-10 px-4 py-2.5 rounded-[12px] text-sm font-medium transition-colors duration-300"
-                :class="
-                  isLogin
-                    ? 'text-gray-900'
-                    : 'text-gray-600 hover:text-gray-900'
-                "
-                @click="
-                  () => {
-                    isLogin = true
-                    authError = ''
-                  }
-                "
-              >
-                Login
-              </button>
-              <button
-                class="flex-1 relative z-10 px-4 py-2.5 rounded-[12px] text-sm font-medium transition-colors duration-300"
-                :class="
-                  !isLogin
-                    ? 'text-gray-900'
-                    : 'text-gray-600 hover:text-gray-900'
-                "
-                @click="
-                  () => {
-                    isLogin = false
-                    authError = ''
-                  }
-                "
-              >
-                Sign up
-              </button>
-            </div>
-          </div>
+        <div v-if="isLoading" class="text-center py-8">
+          <p class="text-gray-600">Initializing Telegram Web App...</p>
+        </div>
 
-          <div class="space-y-4">
-            <div
-              v-if="authError"
-              class="bg-red-50 border border-red-200 rounded-[12px] p-3"
-            >
-              <p class="text-sm text-red-800">{{ authError }}</p>
-            </div>
-
-            <div>
-              <label
-                for="email"
-                class="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Email
-              </label>
-              <input
-                id="email"
-                v-model="email"
-                type="email"
-                placeholder="your@email.com"
-                class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
-                @keyup.enter="handleSubmit"
-              />
-            </div>
-
-            <div>
-              <label
-                for="password"
-                class="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Password
-              </label>
-              <input
-                id="password"
-                v-model="password"
-                type="password"
-                placeholder="••••••••"
-                class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
-                @keyup.enter="handleSubmit"
-              />
-            </div>
-
-            <button
-              class="w-full px-4 py-2.5 rounded-full glass text-gray-900 font-medium transition-opacity hover:opacity-70 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-              :disabled="isLoading"
-              @click="handleSubmit"
-            >
-              {{ isLoading ? 'Loading...' : isLogin ? 'Login' : 'Sign up' }}
-            </button>
-          </div>
+        <div v-else-if="authError" class="bg-red-50 border border-red-200 rounded-[12px] p-3">
+          <p class="text-sm text-red-800">{{ authError }}</p>
         </div>
       </div>
     </div>
@@ -133,21 +44,15 @@
       @close="closeProfileModal"
       @save="handleSaveProfileSettings"
     />
-    <email-confirmation-modal
-      :is-open="isEmailConfirmationModalOpen"
-      :email="confirmationEmail"
-      @close="closeEmailConfirmationModal"
-    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, inject, computed } from 'vue'
-import { useAuth } from '@/composables/useAuth'
+import { ref, inject, computed, onMounted } from 'vue'
+import { useTelegram } from '@/composables/useTelegram'
 import { useMenuState } from '@/composables/useMenuState'
 import MenuPlanner from '../components/MenuPlanner.vue'
 import ActionButtons from '../components/ActionButtons.vue'
-import EmailConfirmationModal from '../components/EmailConfirmationModal.vue'
 import ProfileSettingsModal from '../components/ProfileSettingsModal.vue'
 import ConfirmMenuModal from '../components/ConfirmMenuModal.vue'
 
@@ -155,49 +60,15 @@ definePageMeta({
   layout: 'default',
 })
 
+// OLD SUPABASE AUTH - COMMENTED OUT FOR TELEGRAM WEB APP MIGRATION
+/*
 const { isAuthenticated, loadSession, login, signup } = useAuth()
 const isEmailConfirmationModalOpen = ref(false)
-const isProfileModalOpen = ref(false)
-const isConfirmModalOpen = ref(false)
-const confirmationEmail = ref('')
 const isLogin = ref(true)
 const email = ref('')
 const password = ref('')
 const authError = ref('')
 const isLoading = ref(false)
-
-const menuActions = inject<{
-  resetMenu: () => void
-  sendMenu: () => Promise<void>
-  isSending: { value: boolean }
-}>('menuActions', {
-  resetMenu: () => {},
-  sendMenu: async () => {},
-  isSending: { value: false },
-})
-
-const { weekDays, selectedMenu, isSending: isSendingState } = useMenuState()
-
-const isSending = computed(
-  () => isSendingState.value || (menuActions?.isSending?.value ?? false),
-)
-
-const handleReset = () => {
-  menuActions?.resetMenu()
-}
-
-const handleShowConfirm = () => {
-  isConfirmModalOpen.value = true
-}
-
-const closeConfirmModal = () => {
-  isConfirmModalOpen.value = false
-}
-
-const handleConfirmSend = async () => {
-  isConfirmModalOpen.value = false
-  await menuActions?.sendMenu()
-}
 
 const handleSubmit = async () => {
   if (!email.value || !password.value) {
@@ -239,9 +110,70 @@ const closeEmailConfirmationModal = () => {
   isEmailConfirmationModalOpen.value = false
   confirmationEmail.value = ''
 }
+*/
+
+// NEW TELEGRAM AUTH
+const { isAuthenticated, isLoading, authenticate, hapticFeedback } = useTelegram()
+const { apiFetch } = useApiFetch()
+const authError = ref('')
+const isProfileModalOpen = ref(false)
+const isConfirmModalOpen = ref(false)
+
+const menuActions = inject<{
+  resetMenu: () => void
+  sendMenu: () => Promise<void>
+  isSending: { value: boolean }
+}>('menuActions', {
+  resetMenu: () => {},
+  sendMenu: async () => {},
+  isSending: { value: false },
+})
+
+const { weekDays, selectedMenu, isSending: isSendingState } = useMenuState()
+
+const isSending = computed(
+  () => isSendingState.value || (menuActions?.isSending?.value ?? false),
+)
+
+onMounted(async () => {
+  if (!isAuthenticated.value && !isLoading.value) {
+    try {
+      const result = await authenticate()
+      if (!result.success) {
+        authError.value = result.error || 'Failed to authenticate with Telegram'
+      } else {
+        hapticFeedback.success()
+      }
+    } catch (error) {
+      authError.value = 'Failed to authenticate. Please open this app in Telegram.'
+      console.error('Authentication error:', error)
+    }
+  }
+})
+
+const handleReset = () => {
+  menuActions?.resetMenu()
+  hapticFeedback.light()
+}
+
+const handleShowConfirm = () => {
+  isConfirmModalOpen.value = true
+  hapticFeedback.light()
+}
+
+const closeConfirmModal = () => {
+  isConfirmModalOpen.value = false
+}
+
+const handleConfirmSend = async () => {
+  isConfirmModalOpen.value = false
+  await menuActions?.sendMenu()
+  hapticFeedback.success()
+}
 
 const handleOpenProfile = () => {
   isProfileModalOpen.value = true
+  hapticFeedback.light()
 }
 
 const closeProfileModal = () => {
@@ -250,9 +182,11 @@ const closeProfileModal = () => {
 
 const handleSaveProfileSettings = () => {
   closeProfileModal()
+  hapticFeedback.success()
 }
 
 const handleOpenDishes = () => {
   navigateTo('/dishes')
+  hapticFeedback.light()
 }
 </script>

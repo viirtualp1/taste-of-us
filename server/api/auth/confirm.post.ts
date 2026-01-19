@@ -1,3 +1,5 @@
+// OLD SUPABASE EMAIL CONFIRMATION - COMMENTED OUT FOR TELEGRAM WEB APP MIGRATION
+/*
 import { createSupabaseClient } from '../../utils/supabase'
 
 export default defineEventHandler(async (event) => {
@@ -74,3 +76,4 @@ export default defineEventHandler(async (event) => {
     session: data.session,
   }
 })
+*/
