@@ -121,11 +121,9 @@
         />
         <input
           v-model="newIngredientQuantity"
-          type="number"
-          inputmode="numeric"
-          min="0"
-          placeholder="Qty"
-          class="w-16 px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
+          type="text"
+          placeholder="Qty (e.g. 500g, 1kg)"
+          class="w-24 sm:w-32 px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
           @keydown.enter="addIngredient"
         />
         <button
@@ -215,9 +213,18 @@ const loadIngredients = async (dishId: string) => {
 }
 
 const addIngredient = async () => {
-  if (!props.dish || !newIngredientName.value.trim()) return
+  if (!props.dish) {
+    error.value = 'Please save the dish first before adding ingredients'
+    return
+  }
+
+  if (!newIngredientName.value.trim()) {
+    return
+  }
 
   isAddingIngredient.value = true
+  error.value = ''
+
   try {
     await apiFetch(`/api/user/dishes/${props.dish.id}/ingredients`, {
       method: 'POST',
@@ -226,11 +233,15 @@ const addIngredient = async () => {
         quantity: newIngredientQuantity.value.trim() || null,
       },
     })
+
     newIngredientName.value = ''
     newIngredientQuantity.value = ''
     await loadIngredients(props.dish.id)
-  } catch (err) {
+  } catch (err: unknown) {
     console.error('Error adding ingredient:', err)
+    const apiError = err as { data?: { message?: string }; message?: string }
+    error.value =
+      apiError?.data?.message || apiError?.message || 'Failed to add ingredient'
   } finally {
     isAddingIngredient.value = false
   }

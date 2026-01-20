@@ -74,11 +74,9 @@
         />
         <input
           v-model="newItemQuantity"
-          type="number"
-          inputmode="numeric"
-          min="0"
-          placeholder="Qty"
-          class="w-16 sm:w-24 px-2 sm:px-4 py-2.5 rounded-[12px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
+          type="text"
+          placeholder="Qty (e.g. 500g)"
+          class="w-20 sm:w-28 px-2 sm:px-4 py-2.5 rounded-[12px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
           @keydown.enter="addItem"
         />
         <button
@@ -202,11 +200,9 @@
           />
           <input
             v-model="newCommonItemQuantity"
-            type="number"
-            inputmode="numeric"
-            min="0"
-            placeholder="Qty"
-            class="w-14 sm:w-24 px-2 sm:px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
+            type="text"
+            placeholder="Qty (e.g. 500g)"
+            class="w-20 sm:w-28 px-2 sm:px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
             @keydown.enter="addCommonItem"
           />
           <button
