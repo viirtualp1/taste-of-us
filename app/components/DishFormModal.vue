@@ -156,7 +156,7 @@
           Cancel
         </button>
         <button
-          class="flex-1 px-4 py-2.5 rounded-[12px] glass text-gray-900 font-medium transition-opacity hover:opacity-70 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="flex-1 px-4 py-2.5 rounded-[12px] bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="isLoading || !dishName.trim()"
           @click="handleSave"
         >
