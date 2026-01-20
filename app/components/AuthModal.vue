@@ -1,127 +1,88 @@
 <template>
-  <Teleport to="body">
-    <Transition
-      enter-active-class="transition ease-out duration-300"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition ease-in duration-200"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
+  <BottomSheet
+    :is-open="isOpen"
+    :title="isLogin ? 'Login' : 'Sign Up'"
+    content-class="p-4 sm:p-6 space-y-4"
+    @close="closeModal"
+  >
+    <div
+      v-if="error"
+      class="bg-red-50 border border-red-200 rounded-[12px] p-3"
     >
-      <div
-        v-if="isOpen"
-        class="fixed inset-0 z-50 flex items-center justify-center"
-        @click.self="closeModal"
-        @keydown.esc="closeModal"
+      <p class="text-sm text-red-800">{{ error }}</p>
+    </div>
+
+    <div>
+      <label
+        for="email"
+        class="block text-sm font-medium text-gray-700 mb-2"
       >
-        <div class="fixed inset-0 bg-black/50" @click="closeModal" />
-        <Transition
-          enter-active-class="transition ease-out duration-300"
-          enter-from-class="opacity-0 scale-95"
-          enter-to-class="opacity-100 scale-100"
-          leave-active-class="transition ease-in duration-200"
-          leave-from-class="opacity-100 scale-100"
-          leave-to-class="opacity-0 scale-95"
+        Email
+      </label>
+      <input
+        id="email"
+        v-model="email"
+        type="email"
+        placeholder="your@email.com"
+        class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
+        @keyup.enter="handleSubmit"
+      />
+    </div>
+
+    <div>
+      <label
+        for="password"
+        class="block text-sm font-medium text-gray-700 mb-2"
+      >
+        Password
+      </label>
+      <input
+        id="password"
+        v-model="password"
+        type="password"
+        placeholder="••••••••"
+        class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
+        @keyup.enter="handleSubmit"
+      />
+    </div>
+
+    <div class="text-center pt-2">
+      <button
+        class="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+        @click="toggleMode"
+      >
+        {{
+          isLogin
+            ? "Don't have an account? Sign up"
+            : 'Already have an account? Login'
+        }}
+      </button>
+    </div>
+
+    <template #footer>
+      <div class="flex gap-3 p-4 sm:p-6">
+        <button
+          class="flex-1 px-4 py-2.5 rounded-[12px] glass-nested text-gray-700 font-medium hover:bg-white/50 transition-colors"
+          @click="closeModal"
         >
-          <div
-            v-if="isOpen"
-            class="relative z-50 glass rounded-xl shadow-2xl max-w-md w-full mx-4 overflow-hidden"
-          >
-            <div
-              class="flex items-center justify-between p-4 border-b border-white/20"
-            >
-              <h2 class="text-xl font-bold text-gray-900">
-                {{ isLogin ? 'Login' : 'Sign Up' }}
-              </h2>
-              <button
-                class="flex items-center rounded-lg p-2 hover:bg-white/20 transition-colors"
-                @click="closeModal"
-              >
-                <Icon name="heroicons:x-mark" class="w-5 h-5 text-gray-600" />
-              </button>
-            </div>
-
-            <div class="p-6 space-y-4">
-              <div
-                v-if="error"
-                class="bg-red-50 border border-red-200 rounded-lg p-3"
-              >
-                <p class="text-sm text-red-800">{{ error }}</p>
-              </div>
-
-              <div>
-                <label
-                  for="email"
-                  class="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Email
-                </label>
-                <input
-                  id="email"
-                  v-model="email"
-                  type="email"
-                  placeholder="your@email.com"
-                  class="w-full px-4 py-2 rounded-lg border-2 border-gray-200 bg-white/70 focus:border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-200 transition-all"
-                  @keyup.enter="handleSubmit"
-                />
-              </div>
-
-              <div>
-                <label
-                  for="password"
-                  class="block text-sm font-medium text-gray-700 mb-2"
-                >
-                  Password
-                </label>
-                <input
-                  id="password"
-                  v-model="password"
-                  type="password"
-                  placeholder="••••••••"
-                  class="w-full px-4 py-2 rounded-lg border-2 border-gray-200 bg-white/70 focus:border-pink-400 focus:outline-none focus:ring-2 focus:ring-pink-200 transition-all"
-                  @keyup.enter="handleSubmit"
-                />
-              </div>
-
-              <div class="flex gap-3">
-                <button
-                  class="flex-1 px-4 py-2 rounded-lg bg-gray-200 text-gray-700 font-medium hover:bg-gray-300 transition-colors"
-                  @click="closeModal"
-                >
-                  Cancel
-                </button>
-                <button
-                  class="flex-1 px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-                  :disabled="isLoading"
-                  @click="handleSubmit"
-                >
-                  {{ isLoading ? 'Loading...' : isLogin ? 'Login' : 'Sign Up' }}
-                </button>
-              </div>
-
-              <div class="text-center">
-                <button
-                  class="text-sm text-gray-600 hover:text-gray-900 transition-colors"
-                  @click="toggleMode"
-                >
-                  {{
-                    isLogin
-                      ? "Don't have an account? Sign up"
-                      : 'Already have an account? Login'
-                  }}
-                </button>
-              </div>
-            </div>
-          </div>
-        </Transition>
+          Cancel
+        </button>
+        <button
+          class="flex-1 px-4 py-2.5 rounded-[12px] bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="isLoading"
+          @click="handleSubmit"
+        >
+          {{ isLoading ? 'Loading...' : isLogin ? 'Login' : 'Sign Up' }}
+        </button>
       </div>
-    </Transition>
-  </Teleport>
+    </template>
+  </BottomSheet>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
+import BottomSheet from '@/components/ui/BottomSheet.vue'
 
 interface Props {
   isOpen: boolean
@@ -169,7 +130,6 @@ const handleSubmit = async () => {
         emit('success')
         closeModal()
       } else {
-        // For signup, show email confirmation modal
         emit('email-confirmation', email.value)
         closeModal()
       }
