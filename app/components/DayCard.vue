@@ -68,7 +68,7 @@
               </span>
               <span
                 v-if="selectedMenu?.[category.key]"
-                class="text-xs text-gray-500 mt-1 ml-1"
+                class="text-xs text-gray-500 block sm:inline sm:ml-1 mt-0.5 sm:mt-1"
               >
                 Click to change
               </span>

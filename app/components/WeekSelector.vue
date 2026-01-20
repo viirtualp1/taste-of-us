@@ -18,14 +18,13 @@
           </p>
         </div>
         <div class="flex items-center gap-2 sm:gap-3 shrink-0 w-full sm:w-auto">
-          <tou-button
-            variant="ghost"
-            class="flex-1 sm:flex-none sm:shrink flex items-center justify-center gap-1.5 bg-white/20 hover:bg-white/30"
+          <button
+            class="w-9 h-9 sm:w-auto sm:h-9 sm:px-3 flex items-center justify-center gap-1.5 rounded-[18px] text-sm font-semibold text-gray-800 bg-white/50 hover:bg-white/70 border border-white/60 transition-all"
             @click="$emit('prev-week')"
           >
-            <Icon name="heroicons:chevron-left" class="w-4 h-4" />
-            <span>Prev</span>
-          </tou-button>
+            <Icon name="heroicons:chevron-left" class="w-4 h-4 shrink-0" />
+            <span class="hidden sm:inline">Prev</span>
+          </button>
           <div
             class="flex-1 sm:flex-none glass-nested rounded-[12px] px-2 sm:px-4 py-2 border"
           >
@@ -36,14 +35,13 @@
               @change="onInputChange"
             />
           </div>
-          <tou-button
-            variant="ghost"
-            class="flex-1 sm:flex-none sm:shrink-0 flex items-center justify-center gap-1.5 bg-white/20 hover:bg-white/30"
+          <button
+            class="w-9 h-9 sm:w-auto sm:h-9 sm:px-3 flex items-center justify-center gap-1.5 rounded-[18px] text-sm font-semibold text-gray-800 bg-white/50 hover:bg-white/70 border border-white/60 transition-all"
             @click="$emit('next-week')"
           >
-            <span>Next</span>
-            <Icon name="heroicons:chevron-right" class="w-4 h-4" />
-          </tou-button>
+            <span class="hidden sm:inline">Next</span>
+            <Icon name="heroicons:chevron-right" class="w-4 h-4 shrink-0" />
+          </button>
         </div>
       </div>
 
@@ -82,7 +80,6 @@
 <script setup lang="ts">
 import TouCard from '@/components/ui/TouCard/TouCard.vue'
 import TouCardContent from '@/components/ui/TouCard/TouCardContent.vue'
-import TouButton from '@/components/ui/TouButton.vue'
 import type { WeekDay } from '@/utils/date'
 import type { MenuSelection } from '@/utils/menu'
 import {

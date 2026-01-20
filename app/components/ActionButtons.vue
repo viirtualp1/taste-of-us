@@ -62,6 +62,14 @@
       <div class="h-4 w-px bg-gray-300/50" />
       <button
         class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95"
+        @click="$emit('open-shopping')"
+      >
+        <Icon name="heroicons:shopping-cart" class="w-5 h-5" />
+        <span class="hidden sm:inline">Shopping</span>
+      </button>
+      <div class="h-4 w-px bg-gray-300/50" />
+      <button
+        class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95"
         @click="$emit('open-profile')"
       >
         <Icon name="heroicons:user-circle" class="w-5 h-5" />
@@ -81,6 +89,7 @@ defineProps<Props>()
 defineEmits<{
   send: []
   'open-dishes': []
+  'open-shopping': []
   'open-profile': []
 }>()
 </script>

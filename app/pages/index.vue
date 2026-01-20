@@ -15,7 +15,10 @@
           <p class="text-gray-600">Initializing Telegram Web App...</p>
         </div>
 
-        <div v-else-if="authError" class="bg-red-50 border border-red-200 rounded-[12px] p-3">
+        <div
+          v-else-if="authError"
+          class="bg-red-50 border border-red-200 rounded-[12px] p-3"
+        >
           <p class="text-sm text-red-800">{{ authError }}</p>
         </div>
       </div>
@@ -28,6 +31,7 @@
       @reset="handleReset"
       @send="handleShowConfirm"
       @open-dishes="handleOpenDishes"
+      @open-shopping="handleOpenShopping"
       @open-profile="handleOpenProfile"
     />
     <confirm-menu-modal
@@ -113,8 +117,8 @@ const closeEmailConfirmationModal = () => {
 */
 
 // NEW TELEGRAM AUTH
-const { isAuthenticated, isLoading, authenticate, hapticFeedback } = useTelegram()
-const { apiFetch } = useApiFetch()
+const { isAuthenticated, isLoading, authenticate, hapticFeedback } =
+  useTelegram()
 const authError = ref('')
 const isProfileModalOpen = ref(false)
 const isConfirmModalOpen = ref(false)
@@ -145,7 +149,8 @@ onMounted(async () => {
         hapticFeedback.success()
       }
     } catch (error) {
-      authError.value = 'Failed to authenticate. Please open this app in Telegram.'
+      authError.value =
+        'Failed to authenticate. Please open this app in Telegram.'
       console.error('Authentication error:', error)
     }
   }
@@ -187,6 +192,11 @@ const handleSaveProfileSettings = () => {
 
 const handleOpenDishes = () => {
   navigateTo('/dishes')
+  hapticFeedback.light()
+}
+
+const handleOpenShopping = () => {
+  navigateTo('/shopping')
   hapticFeedback.light()
 }
 </script>

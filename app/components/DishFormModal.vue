@@ -25,10 +25,10 @@
         >
           <div
             v-if="isOpen"
-            class="relative z-50 glass rounded-[20px] shadow-2xl max-w-md w-full overflow-hidden"
+            class="relative z-50 glass rounded-[20px] shadow-2xl max-w-md w-full overflow-hidden max-h-[90vh] flex flex-col"
           >
             <div
-              class="flex items-center justify-between p-4 sm:p-6 border-b border-white/20"
+              class="flex items-center justify-between p-4 sm:p-6 border-b border-white/20 shrink-0"
             >
               <h2 class="text-xl font-bold text-gray-900">
                 {{ dish ? 'Edit Dish' : 'Add Dish' }}
@@ -41,7 +41,7 @@
               </button>
             </div>
 
-            <div class="p-4 sm:p-6 space-y-4">
+            <div class="p-4 sm:p-6 space-y-4 overflow-y-auto">
               <div
                 v-if="error"
                 class="bg-red-50 border border-red-200 rounded-[12px] p-3"
@@ -84,6 +84,100 @@
                 </select>
               </div>
 
+              <div v-if="dish" class="pt-2">
+                <div class="flex items-center justify-between mb-3">
+                  <label class="block text-sm font-medium text-gray-700">
+                    Ingredients
+                  </label>
+                  <span class="text-xs text-gray-500">
+                    {{ ingredients.length }} item{{
+                      ingredients.length !== 1 ? 's' : ''
+                    }}
+                  </span>
+                </div>
+
+                <div v-if="isLoadingIngredients" class="space-y-2">
+                  <div
+                    v-for="i in 2"
+                    :key="i"
+                    class="h-10 glass-nested rounded-[10px] animate-pulse"
+                  />
+                </div>
+
+                <div v-else class="space-y-2">
+                  <div
+                    v-for="ingredient in ingredients"
+                    :key="ingredient.id"
+                    class="flex items-center gap-2 p-2.5 glass-nested rounded-[10px]"
+                  >
+                    <span class="flex-1 text-sm text-gray-800 truncate">
+                      {{ ingredient.name }}
+                      <span v-if="ingredient.quantity" class="text-gray-500">
+                        ({{ ingredient.quantity }})
+                      </span>
+                    </span>
+                    <button
+                      class="p-1.5 rounded-[6px] hover:bg-red-50/50 transition-colors"
+                      :disabled="isDeletingIngredient === ingredient.id"
+                      @click="deleteIngredient(ingredient.id)"
+                    >
+                      <Icon
+                        v-if="isDeletingIngredient === ingredient.id"
+                        name="heroicons:arrow-path"
+                        class="w-4 h-4 text-gray-400 animate-spin"
+                      />
+                      <Icon
+                        v-else
+                        name="heroicons:x-mark"
+                        class="w-4 h-4 text-red-500"
+                      />
+                    </button>
+                  </div>
+
+                  <div
+                    v-if="ingredients.length === 0"
+                    class="text-center py-3 text-sm text-gray-500"
+                  >
+                    No ingredients yet
+                  </div>
+                </div>
+
+                <div class="flex gap-2 mt-3">
+                  <input
+                    v-model="newIngredientName"
+                    type="text"
+                    placeholder="Ingredient name"
+                    class="flex-1 px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
+                    @keydown.enter="addIngredient"
+                  />
+                  <input
+                    v-model="newIngredientQuantity"
+                    type="number"
+                    inputmode="numeric"
+                    min="0"
+                    placeholder="Qty"
+                    class="w-20 px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
+                    @keydown.enter="addIngredient"
+                  />
+                  <button
+                    class="px-3 py-2 rounded-[10px] glass-nested text-gray-700 font-medium hover:bg-white/50 transition-colors disabled:opacity-50"
+                    :disabled="!newIngredientName.trim() || isAddingIngredient"
+                    @click="addIngredient"
+                  >
+                    <Icon
+                      v-if="isAddingIngredient"
+                      name="heroicons:arrow-path"
+                      class="w-4 h-4 animate-spin"
+                    />
+                    <Icon v-else name="heroicons:plus" class="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+
+              <p v-else class="text-xs text-gray-500 italic">
+                Save the dish first to add ingredients
+              </p>
+
               <div class="flex gap-3 pt-2">
                 <button
                   class="flex-1 px-4 py-2.5 rounded-[12px] glass-nested text-gray-700 font-medium hover:bg-white/50 transition-colors"
@@ -110,7 +204,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useApiFetch } from '@/composables/useApiFetch'
-import type { MenuCategory, Dish, CuisineType } from '@/utils/menu'
+import type { MenuCategory, Dish, CuisineType, Ingredient } from '@/utils/menu'
 
 interface Props {
   isOpen: boolean
@@ -131,15 +225,75 @@ const dishCuisine = ref<CuisineType | ''>('')
 const error = ref('')
 const isLoading = ref(false)
 
+const ingredients = ref<Ingredient[]>([])
+const isLoadingIngredients = ref(false)
+const newIngredientName = ref('')
+const newIngredientQuantity = ref('')
+const isAddingIngredient = ref(false)
+const isDeletingIngredient = ref<string | null>(null)
+
+const loadIngredients = async (dishId: string) => {
+  isLoadingIngredients.value = true
+  try {
+    const data = await apiFetch<Ingredient[]>(
+      `/api/user/dishes/${dishId}/ingredients`,
+    )
+    ingredients.value = data || []
+  } catch (err) {
+    console.error('Error loading ingredients:', err)
+    ingredients.value = []
+  } finally {
+    isLoadingIngredients.value = false
+  }
+}
+
+const addIngredient = async () => {
+  if (!props.dish || !newIngredientName.value.trim()) return
+
+  isAddingIngredient.value = true
+  try {
+    await apiFetch(`/api/user/dishes/${props.dish.id}/ingredients`, {
+      method: 'POST',
+      body: {
+        name: newIngredientName.value.trim(),
+        quantity: newIngredientQuantity.value.trim() || null,
+      },
+    })
+    newIngredientName.value = ''
+    newIngredientQuantity.value = ''
+    await loadIngredients(props.dish.id)
+  } catch (err) {
+    console.error('Error adding ingredient:', err)
+  } finally {
+    isAddingIngredient.value = false
+  }
+}
+
+const deleteIngredient = async (ingredientId: string) => {
+  isDeletingIngredient.value = ingredientId
+  try {
+    await apiFetch(`/api/user/ingredients/${ingredientId}`, {
+      method: 'DELETE',
+    })
+    ingredients.value = ingredients.value.filter((i) => i.id !== ingredientId)
+  } catch (err) {
+    console.error('Error deleting ingredient:', err)
+  } finally {
+    isDeletingIngredient.value = null
+  }
+}
+
 watch(
   () => props.dish,
   (dish) => {
     if (dish) {
       dishName.value = dish.name
       dishCuisine.value = dish.cuisine || ''
+      loadIngredients(dish.id)
     } else {
       dishName.value = ''
       dishCuisine.value = ''
+      ingredients.value = []
     }
     error.value = ''
   },
@@ -153,6 +307,9 @@ watch(
       dishName.value = ''
       dishCuisine.value = ''
       error.value = ''
+      ingredients.value = []
+      newIngredientName.value = ''
+      newIngredientQuantity.value = ''
     }
   },
 )

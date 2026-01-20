@@ -71,7 +71,9 @@ export default defineEventHandler(async (event) => {
     let userId = await getUserIdFromTelegram(event)
 
     if (!userId) {
-      const telegramUserId = getHeader(event, 'x-telegram-user-id') || getHeader(event, 'X-Telegram-User-Id')
+      const telegramUserId =
+        getHeader(event, 'x-telegram-user-id') ||
+        getHeader(event, 'X-Telegram-User-Id')
 
       if (telegramUserId) {
         const supabase = createSupabaseClient()

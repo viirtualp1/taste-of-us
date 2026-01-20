@@ -14,11 +14,18 @@ export interface MenuData {
   dessert: string[]
 }
 
+export interface Ingredient {
+  id: string
+  name: string
+  quantity?: string | null
+}
+
 export interface Dish {
   id: string
   name: string
   category: MenuCategory
   cuisine?: CuisineType
+  ingredients?: Ingredient[]
 }
 
 export const CATEGORIES: Array<{ key: MenuCategory; label: string }> = [

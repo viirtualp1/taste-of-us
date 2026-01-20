@@ -64,7 +64,9 @@ export function validateTelegramInitData(
   }
 }
 
-export function parseTelegramInitData(initData: string): TelegramInitData | null {
+export function parseTelegramInitData(
+  initData: string,
+): TelegramInitData | null {
   try {
     const urlParams = new URLSearchParams(initData)
     const userParam = urlParams.get('user')

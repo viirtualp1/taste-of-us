@@ -29,11 +29,10 @@
       <div
         v-for="category in CATEGORIES"
         :key="category.key"
-        class="glass rounded-[20px] p-6 flex-1 min-w-0"
+        class="glass rounded-[20px] px-6 py-4 flex-1 min-w-0"
       >
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-3">
-            <span class="text-2xl">{{ getCategoryIcon(category.key) }}</span>
             <h2 class="text-xl font-bold text-gray-900">
               {{ category.label }}
             </h2>
@@ -119,14 +118,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 import DishFormModal from '@/components/DishFormModal.vue'
 import ImportDishesModal from '@/components/ImportDishesModal.vue'
 import {
   CATEGORIES,
-  getCategoryIcon,
   type MenuCategory,
   type Dish,
   CUISINES,
@@ -155,15 +153,6 @@ const isDishModalOpen = ref(false)
 const isImportModalOpen = ref(false)
 const editingDish = ref<Dish | null>(null)
 const selectedCategory = ref<MenuCategory>('brunch')
-
-const hasNoDishes = computed(() => {
-  return (
-    (userDishes.value.brunch?.length || 0) +
-    (userDishes.value.dinner?.length || 0) +
-    (userDishes.value.dessert?.length || 0) ===
-    0
-  )
-})
 
 const loadUserDishes = async () => {
   if (!isAuthenticated.value) {

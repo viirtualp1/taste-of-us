@@ -144,8 +144,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { useAuth } from '@/composables/useAuth';
+import { ref, watch } from 'vue'
+import { useAuth } from '@/composables/useAuth'
 
 interface Props {
   isOpen: boolean

@@ -1,4 +1,7 @@
-import { validateTelegramInitData, parseTelegramInitData } from '../../utils/telegram'
+import {
+  validateTelegramInitData,
+  parseTelegramInitData,
+} from '../../utils/telegram'
 import { createSupabaseClient } from '../../utils/supabase'
 
 export default defineEventHandler(async (event) => {

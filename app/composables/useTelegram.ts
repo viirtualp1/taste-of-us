@@ -66,7 +66,9 @@ interface TelegramWebApp {
     }) => void
   }
   HapticFeedback: {
-    impactOccurred: (style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft') => void
+    impactOccurred: (
+      style: 'light' | 'medium' | 'heavy' | 'rigid' | 'soft',
+    ) => void
     notificationOccurred: (type: 'error' | 'success' | 'warning') => void
     selectionChanged: () => void
   }
@@ -77,30 +79,55 @@ interface TelegramWebApp {
   openLink: (url: string, options?: { try_instant_view?: boolean }) => void
   openTelegramLink: (url: string) => void
   openInvoice: (url: string, callback?: (status: string) => void) => void
-  showPopup: (params: {
-    title?: string
-    message: string
-    buttons?: Array<{
-      id?: string
-      type?: 'default' | 'ok' | 'close' | 'cancel' | 'destructive'
-      text: string
-    }>
-  }, callback?: (id: string) => void) => void
+  showPopup: (
+    params: {
+      title?: string
+      message: string
+      buttons?: Array<{
+        id?: string
+        type?: 'default' | 'ok' | 'close' | 'cancel' | 'destructive'
+        text: string
+      }>
+    },
+    callback?: (id: string) => void,
+  ) => void
   showAlert: (message: string, callback?: () => void) => void
-  showConfirm: (message: string, callback?: (confirmed: boolean) => void) => void
-  showScanQrPopup: (params: {
-    text?: string
-  }, callback?: (data: string) => void) => void
+  showConfirm: (
+    message: string,
+    callback?: (confirmed: boolean) => void,
+  ) => void
+  showScanQrPopup: (
+    params: {
+      text?: string
+    },
+    callback?: (data: string) => void,
+  ) => void
   closeScanQrPopup: () => void
   readTextFromClipboard: (callback?: (text: string) => void) => void
   requestWriteAccess: (callback?: (granted: boolean) => void) => void
   requestContact: (callback?: (granted: boolean) => void) => void
   cloudStorage: {
-    setItem: (key: string, value: string, callback?: (error: Error | null, success: boolean) => void) => void
-    getItem: (key: string, callback: (error: Error | null, value: string | null) => void) => void
-    getItems: (keys: string[], callback: (error: Error | null, values: Record<string, string>) => void) => void
-    removeItem: (key: string, callback?: (error: Error | null, success: boolean) => void) => void
-    removeItems: (keys: string[], callback?: (error: Error | null, success: boolean) => void) => void
+    setItem: (
+      key: string,
+      value: string,
+      callback?: (error: Error | null, success: boolean) => void,
+    ) => void
+    getItem: (
+      key: string,
+      callback: (error: Error | null, value: string | null) => void,
+    ) => void
+    getItems: (
+      keys: string[],
+      callback: (error: Error | null, values: Record<string, string>) => void,
+    ) => void
+    removeItem: (
+      key: string,
+      callback?: (error: Error | null, success: boolean) => void,
+    ) => void
+    removeItems: (
+      keys: string[],
+      callback?: (error: Error | null, success: boolean) => void,
+    ) => void
     getKeys: (callback: (error: Error | null, keys: string[]) => void) => void
   }
 }
@@ -126,7 +153,10 @@ export function useTelegram() {
           user.value = JSON.parse(savedUser)
         }
       } catch (e) {
-        console.error('[useTelegram] Error restoring user from localStorage:', e)
+        console.error(
+          '[useTelegram] Error restoring user from localStorage:',
+          e,
+        )
       }
 
       WebApp.ready()
@@ -139,7 +169,10 @@ export function useTelegram() {
         user.value = tg.initDataUnsafe.user
 
         try {
-          localStorage.setItem('telegram_user', JSON.stringify(tg.initDataUnsafe.user))
+          localStorage.setItem(
+            'telegram_user',
+            JSON.stringify(tg.initDataUnsafe.user),
+          )
         } catch (e) {
           console.error('[useTelegram] Error updating localStorage:', e)
         }
@@ -155,11 +188,13 @@ export function useTelegram() {
 
   const authenticate = async () => {
     if (!webApp.value) {
-      await new Promise(resolve => setTimeout(resolve, 100))
+      await new Promise((resolve) => setTimeout(resolve, 100))
     }
 
     if (!webApp.value?.initData) {
-      console.error('[useTelegram] authenticate: Web App not initialized or initData missing')
+      console.error(
+        '[useTelegram] authenticate: Web App not initialized or initData missing',
+      )
       throw new Error('Telegram Web App not initialized')
     }
 
@@ -216,9 +251,12 @@ export function useTelegram() {
     light: () => webApp.value?.HapticFeedback?.impactOccurred('light'),
     medium: () => webApp.value?.HapticFeedback?.impactOccurred('medium'),
     heavy: () => webApp.value?.HapticFeedback?.impactOccurred('heavy'),
-    success: () => webApp.value?.HapticFeedback?.notificationOccurred('success'),
+    success: () =>
+      webApp.value?.HapticFeedback?.notificationOccurred('success'),
     error: () => webApp.value?.HapticFeedback?.notificationOccurred('error'),
-    warning: () => webApp.value?.HapticFeedback?.notificationOccurred('warning'),
+    warning: () =>
+      webApp.value?.HapticFeedback?.notificationOccurred('warning'),
+    selection: () => webApp.value?.HapticFeedback?.selectionChanged(),
   }
 
   const showAlert = (message: string) => {
