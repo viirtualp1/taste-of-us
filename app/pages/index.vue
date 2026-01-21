@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-10 pb-14 sm:pb-0">
     <div v-if="!isAuthenticated" class="flex justify-center">
-      <div class="glass rounded-[20px] p-6 sm:p-8 max-w-md w-full">
+      <div class="glass border border-gray-300/60 rounded-[20px] p-6 sm:p-8 max-w-md w-full">
         <div class="text-center mb-6">
           <h2 class="text-2xl font-bold text-gray-900 mb-2">
             Welcome to Taste of Us

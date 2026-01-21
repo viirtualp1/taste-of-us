@@ -15,6 +15,11 @@
           class="flex flex-wrap items-center justify-between gap-4"
         >
           <div class="space-y-1">
+            <p
+              class="text-xs sm:text-sm uppercase tracking-[0.25em] text-gray-500"
+            >
+              Dish selector
+            </p>
             <tou-card-title>{{ day.display }}</tou-card-title>
           </div>
           <div
@@ -52,11 +57,11 @@
               <span class="text-sm sm:text-base">{{ category.label }}</span>
             </tou-label>
             <button
-              class="w-full p-4 rounded-[16px] text-left transition-all border glass-nested"
+              class="w-full p-4 rounded-[16px] text-left transition-all border border-gray-200/50 glass-nested hover:border-green-300/60 hover:bg-green-50/40"
               :class="
                 selectedMenu?.[category.key]
-                  ? 'border-pink-400/60 bg-pink-50/60'
-                  : 'border-white/40 hover:border-pink-300/60 hover:bg-pink-50/40'
+                  ? 'bg-green-50/60'
+                  : ''
               "
               @click="openModal(category.key)"
             >

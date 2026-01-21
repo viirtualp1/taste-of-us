@@ -24,11 +24,11 @@
         >
           <div
             v-if="modelValue"
-            class="relative z-50 glass rounded-[20px] shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+            class="relative z-50 glass border border-gray-300/60 rounded-[20px] shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
             style="border-radius: 20px"
           >
             <div
-              class="flex items-center justify-between p-6 border-b border-white/20"
+              class="flex items-center justify-between px-4 py-3 border-b border-white/20"
             >
               <h2 class="text-xl font-bold text-gray-900">
                 <slot name="title">Select a dish</slot>

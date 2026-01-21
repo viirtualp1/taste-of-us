@@ -2,7 +2,7 @@
   <BottomSheet
     :is-open="isOpen"
     title="Confirm Menu"
-    content-class="p-4 sm:p-6"
+    content-class="p-4 sm:p-6 pb-0"
     desktop-max-width="max-w-3xl"
     @close="handleEdit"
   >
@@ -24,7 +24,7 @@
         <div class="space-y-2">
           <div
             v-if="selectedMenu[index]?.brunch"
-            class="flex items-start gap-2 p-2 rounded-[12px] bg-pink-50/60 border-l-[3px] border-pink-300"
+            class="flex items-start gap-2 p-2 rounded-[12px] bg-green-50/60 border-l-[3px] border-green-300"
           >
             <span class="text-base flex-shrink-0">🌅</span>
             <div class="flex-1 min-w-0">
@@ -49,7 +49,7 @@
 
           <div
             v-if="selectedMenu[index]?.dinner"
-            class="flex items-start gap-2 p-2 rounded-[12px] bg-purple-50/60 border-l-[3px] border-purple-300"
+            class="flex items-start gap-2 p-2 rounded-[12px] bg-emerald-50/60 border-l-[3px] border-emerald-300"
           >
             <span class="text-base flex-shrink-0">🌙</span>
             <div class="flex-1 min-w-0">
@@ -101,15 +101,15 @@
     </div>
 
     <template #footer>
-      <div class="flex items-center gap-3 p-4 sm:p-6">
+      <div class="flex items-center gap-3 p-4 sm:p-6 pt-4">
         <button
-          class="flex-1 px-4 py-2.5 rounded-[12px] glass-nested text-gray-700 font-medium hover:bg-white/50 transition-colors"
+          class="flex-1 px-4 py-2.5 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all"
           @click="handleEdit"
         >
           Edit
         </button>
         <button
-          class="flex-1 px-4 py-2.5 rounded-[12px] bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          class="flex-1 px-4 py-2.5 rounded-[12px] bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="isSending"
           @click="handleConfirm"
         >

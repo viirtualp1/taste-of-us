@@ -95,7 +95,7 @@ export function getDayBadgeClass(
     return 'bg-green-100/80 text-green-700 border border-green-200/80'
   }
 
-  return 'bg-purple-100/80 text-purple-700 border border-purple-200/80'
+  return 'bg-emerald-100/80 text-emerald-700 border border-emerald-200/80'
 }
 
 export function getDayLabelColor(
@@ -113,7 +113,7 @@ export function getDayLabelColor(
     return 'text-green-600 font-semibold'
   }
 
-  return 'text-purple-600 font-medium'
+  return 'text-emerald-600 font-medium'
 }
 
 export function calculateStats(

@@ -36,14 +36,14 @@ const baseClasses =
 
 const variantClassesMap = {
   default:
-    'bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg hover:shadow-xl hover:from-purple-700 hover:to-pink-700',
+    'bg-gradient-to-r from-green-600 to-emerald-600 text-white shadow-lg hover:shadow-xl hover:from-green-700 hover:to-emerald-700',
   destructive:
     'bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-lg hover:shadow-xl',
   outline:
-    'glass border border-white/40 text-gray-800 hover:bg-white/30 hover:border-white/60',
-  secondary: 'glass text-gray-800 hover:bg-white/40',
-  ghost: 'text-gray-800 hover:bg-white/20',
-  link: 'text-purple-600 underline-offset-4 hover:underline',
+    'glass border border-gray-200/50 text-gray-800 hover:border-green-300/60 hover:bg-green-50/40',
+  secondary: 'glass border border-gray-200/50 text-gray-800 hover:border-green-300/60 hover:bg-green-50/40',
+  ghost: 'text-gray-800 hover:bg-green-50/40',
+  link: 'text-green-600 underline-offset-4 hover:underline',
 }
 
 const sizeClassesMap = {

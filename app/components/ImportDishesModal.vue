@@ -18,8 +18,8 @@
       class="relative border-2 border-dashed rounded-[16px] p-8 text-center transition-all"
       :class="
         isDragging
-          ? 'border-pink-400 bg-pink-50/30'
-          : 'border-gray-300 glass-nested hover:border-pink-300'
+          ? 'border-green-400 bg-green-50/30'
+          : 'border-gray-300 glass-nested hover:border-green-300'
       "
       @drop="handleDrop"
       @dragover.prevent="isDragging = true"
@@ -89,13 +89,13 @@
     <template #footer>
       <div class="flex items-center gap-3 p-4 sm:p-6">
         <button
-          class="flex-1 px-4 py-2.5 rounded-[12px] glass-nested text-gray-700 font-medium hover:bg-white/50 transition-colors"
+          class="flex-1 px-4 py-2.5 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all"
           @click="closeModal"
         >
           Cancel
         </button>
         <button
-          class="flex-1 px-4 py-2.5 rounded-[12px] bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          class="flex-1 px-4 py-2.5 rounded-[12px] bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="isLoading || !selectedFile"
           @click="handleImport"
         >

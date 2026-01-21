@@ -1,8 +1,8 @@
 <template>
   <div
-    class="flex flex-col lg:flex-row lg:items-stretch gap-4 md:gap-6 min-w-0"
+    class="grid grid-cols-1 lg:grid-cols-[0.75fr_2.25fr] auto-rows-auto gap-4 md:gap-6 min-w-0"
   >
-    <div class="flex-shrink-0 lg:w-1/3 lg:max-w-[400px]">
+    <div class="min-h-0 order-4 lg:order-1">
       <menu-overview-skeleton v-if="isLoading || !menuData" />
       <menu-overview
         v-else
@@ -12,9 +12,7 @@
       />
     </div>
 
-    <div
-      class="flex-1 flex flex-col gap-4 md:gap-6 h-full min-w-0 overflow-hidden"
-    >
+    <div class="min-h-0 order-1 lg:order-2">
       <week-selector-skeleton v-if="isLoading || !menuData" />
       <week-selector
         v-else
@@ -28,7 +26,13 @@
         @select-day="focusDay"
         @week-input-change="onWeekInputChange"
       />
+    </div>
 
+    <div class="min-h-0 order-3 lg:order-3">
+      <shopping-list-preview :week-start="weekStart || null" />
+    </div>
+
+    <div class="min-h-0 order-2 lg:order-4">
       <day-card-skeleton
         v-if="isLoading || !menuData || !weekDays[activeDayIndex]"
       />
@@ -43,7 +47,9 @@
           (category, value) => handleMenuUpdate(activeDayIndex, category, value)
         "
       />
+    </div>
 
+    <div class="lg:col-span-2 order-5">
       <message-toast :message="message" :message-type="messageType" />
     </div>
   </div>
@@ -53,6 +59,7 @@
 import { computed, onMounted, provide, watch } from 'vue'
 import MenuOverviewSkeleton from '@/components/MenuOverviewSkeleton.vue'
 import MenuOverview from '@/components/MenuOverview.vue'
+import ShoppingListPreview from '@/components/ShoppingListPreview.vue'
 import WeekSelectorSkeleton from '@/components/WeekSelectorSkeleton.vue'
 import WeekSelector from '@/components/WeekSelector.vue'
 import DayCardSkeleton from '@/components/DayCardSkeleton.vue'

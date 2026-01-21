@@ -4,7 +4,7 @@
     style="bottom: max(0.5rem, env(safe-area-inset-bottom))"
   >
     <div
-      class="glass rounded-full px-4 py-2.5 flex items-center gap-3 text-sm font-medium"
+      class="glass border border-gray-300/60 rounded-full px-4 py-2.5 flex items-center gap-3 text-sm font-medium"
     >
       <button
         class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"

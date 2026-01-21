@@ -9,14 +9,14 @@
       </div>
       <div class="flex items-center gap-2">
         <button
-          class="flex items-center gap-2 px-4 py-2 rounded-full glass text-gray-900 font-medium transition-opacity hover:opacity-70 active:scale-95"
+          class="flex items-center gap-2 px-4 py-2 rounded-full glass border border-gray-300/60 text-gray-900 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all active:scale-95"
           @click="openImportModal"
         >
           <Icon name="heroicons:arrow-down-tray" class="w-4 h-4" />
           <span class="hidden sm:inline">Import</span>
         </button>
         <button
-          class="flex items-center gap-2 px-4 py-2 rounded-full glass text-gray-900 font-medium transition-opacity hover:opacity-70 active:scale-95"
+          class="flex items-center gap-2 px-4 py-2 rounded-full glass border border-gray-300/60 text-gray-900 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all active:scale-95"
           @click="$router.push('/')"
         >
           <Icon name="heroicons:arrow-left" class="w-4 h-4" />
@@ -29,7 +29,7 @@
       <div
         v-for="category in CATEGORIES"
         :key="category.key"
-        class="glass rounded-[20px] px-6 py-4 flex-1 min-w-0"
+        class="glass border border-gray-300/60 rounded-[20px] px-6 py-4 flex-1 min-w-0"
       >
         <div class="flex items-center justify-between mb-4">
           <div class="flex items-center gap-3">
@@ -43,7 +43,7 @@
             </span>
           </div>
           <button
-            class="flex items-center gap-2 px-4 py-2 rounded-full glass-nested text-gray-900 font-medium transition-opacity hover:opacity-70 active:scale-95"
+            class="flex items-center gap-2 px-4 py-2 rounded-full glass-nested border border-gray-200/50 text-gray-900 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all active:scale-95"
             @click="openAddDishModal(category.key)"
           >
             <Icon name="heroicons:plus" class="w-4 h-4" />
@@ -70,7 +70,7 @@
           <div
             v-for="dish in userDishes[category.key]"
             :key="dish.id"
-            class="flex items-center justify-between p-4 glass-nested rounded-[12px] hover:bg-white/50 transition-colors"
+            class="flex items-center justify-between p-4 glass-nested border border-gray-200/50 rounded-[12px] hover:border-green-300/60 hover:bg-green-50/40 transition-all"
           >
             <div class="flex items-center gap-3 flex-1 min-w-0">
               <span class="text-sm font-semibold text-gray-900 truncate">{{
@@ -85,7 +85,7 @@
             </div>
             <div class="flex items-center gap-2">
               <button
-                class="p-2 rounded-[8px] hover:bg-white/50 transition-colors"
+                class="p-2 rounded-[8px] hover:bg-green-50/40 transition-colors"
                 @click="openEditDishModal(dish)"
               >
                 <Icon name="heroicons:pencil" class="w-4 h-4 text-gray-600" />

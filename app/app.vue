@@ -20,7 +20,7 @@ useHead({
     },
     { name: 'author', content: 'Taste of Us' },
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-    { name: 'theme-color', content: '#f8b4d9' },
+    { name: 'theme-color', content: '#22c55e' },
 
     { property: 'og:title', content: 'Taste of Us - Weekly Menu Planner' },
     {

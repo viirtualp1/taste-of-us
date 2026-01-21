@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex items-center gap-3 p-3 glass-nested rounded-[12px] transition-all"
+    class="flex items-center gap-3 p-3 glass-nested border border-gray-200/50 rounded-[12px] hover:border-green-300/60 hover:bg-green-50/40 transition-all"
     :class="item.is_checked && 'opacity-60'"
   >
     <button

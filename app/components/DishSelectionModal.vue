@@ -28,8 +28,8 @@
             class="px-4 py-2 rounded-[12px] text-sm font-medium transition-all whitespace-nowrap flex-shrink-0"
             :class="
               selectedCuisine === cuisine.key
-                ? 'bg-pink-500 text-white shadow-md'
-                : 'glass-nested text-gray-700 hover:bg-white/50'
+                ? 'bg-green-500 text-white shadow-md'
+                : 'glass-nested border border-gray-200/50 text-gray-700 hover:border-green-300/60 hover:bg-green-50/40'
             "
             @click="selectedCuisine = cuisine.key"
           >
@@ -52,8 +52,8 @@
               class="p-4 rounded-[16px] text-left transition-all border glass-nested flex flex-col gap-1"
               :class="
                 selectedDish === dish.name
-                  ? 'border-pink-500/60 bg-pink-50/60 shadow-lg'
-                  : 'border-white/40 hover:border-pink-300/60 hover:bg-pink-50/40'
+                  ? 'border-green-500/60 bg-green-50/60 shadow-lg'
+                  : 'border-white/40 hover:border-green-300/60 hover:bg-green-50/40'
               "
               @click="selectDish(dish.name)"
             >
@@ -76,8 +76,8 @@
                 class="w-full px-4 py-3 rounded-[12px] text-sm font-medium transition-all text-left"
                 :class="
                   selectedCuisine === cuisine.key
-                    ? 'bg-pink-500 text-white shadow-md'
-                    : 'glass-nested text-gray-700 hover:bg-white/50'
+                    ? 'bg-green-500 text-white shadow-md'
+                    : 'glass-nested border border-gray-200/50 text-gray-700 hover:border-green-300/60 hover:bg-green-50/40'
                 "
                 @click="selectedCuisine = cuisine.key"
               >
@@ -101,8 +101,8 @@
                 class="p-5 rounded-[16px] text-left transition-all border glass-nested flex flex-col gap-2 min-h-[100px]"
                 :class="
                   selectedDish === dish.name
-                    ? 'border-pink-500/60 bg-pink-50/60 shadow-lg scale-[1.02]'
-                    : 'border-white/40 hover:border-pink-300/60 hover:bg-pink-50/40 hover:shadow-md'
+                    ? 'border-green-500/60 bg-green-50/60 shadow-lg scale-[1.02]'
+                    : 'border-white/40 hover:border-green-300/60 hover:bg-green-50/40 hover:shadow-md'
                 "
                 @click="selectDish(dish.name)"
               >

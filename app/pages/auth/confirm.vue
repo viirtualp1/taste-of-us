@@ -29,7 +29,7 @@
         <h2 class="text-xl font-bold text-gray-900">Confirmation Failed</h2>
         <p class="text-sm text-gray-600">{{ error }}</p>
         <button
-          class="mt-4 px-6 py-2 rounded-[12px] bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:from-purple-700 hover:to-pink-700 transition-all"
+          class="mt-4 px-6 py-2 rounded-[12px] bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium hover:from-green-700 hover:to-emerald-700 transition-all"
           @click="$router.push('/')"
         >
           Go to Home

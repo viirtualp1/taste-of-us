@@ -11,7 +11,7 @@
       </div>
       <div class="flex items-center gap-2">
         <button
-          class="flex items-center gap-2 px-4 py-2 rounded-full glass text-gray-900 font-medium transition-opacity hover:opacity-70 active:scale-95"
+          class="flex items-center gap-2 px-4 py-2 rounded-full glass border border-gray-300/60 text-gray-900 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all active:scale-95"
           @click="$router.push('/')"
         >
           <Icon name="heroicons:arrow-left" class="w-4 h-4" />
@@ -23,13 +23,13 @@
     <div class="flex items-center justify-between gap-2 sm:gap-4">
       <div class="flex items-center gap-1.5 sm:gap-2">
         <button
-          class="h-[34px] w-[34px] flex items-center justify-center rounded-full glass hover:opacity-70 transition-opacity"
+          class="h-[34px] w-[34px] flex items-center justify-center rounded-full glass border border-gray-300/60 hover:border-green-300/60 hover:bg-green-50/40 transition-all"
           @click="goPrevWeek"
         >
           <Icon name="heroicons:chevron-left" class="w-4 h-4" />
         </button>
         <button
-          class="h-[34px] w-[34px] flex items-center justify-center rounded-full glass hover:opacity-70 transition-opacity"
+          class="h-[34px] w-[34px] flex items-center justify-center rounded-full glass border border-gray-300/60 hover:border-green-300/60 hover:bg-green-50/40 transition-all"
           @click="goNextWeek"
         >
           <Icon name="heroicons:chevron-right" class="w-4 h-4" />
@@ -38,7 +38,7 @@
 
       <div class="flex items-center gap-2">
         <button
-          class="h-[34px] flex items-center gap-2 px-3 sm:px-4 rounded-full glass text-gray-900 font-medium transition-opacity hover:opacity-70 active:scale-95 disabled:opacity-50"
+          class="h-[34px] flex items-center gap-2 px-3 sm:px-4 rounded-full glass border border-gray-300/60 text-gray-900 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all active:scale-95 disabled:opacity-50"
           :disabled="isGenerating"
           @click="generateFromMenu"
         >
@@ -52,7 +52,7 @@
         </button>
         <button
           v-if="checkedCount > 0"
-          class="h-[34px] flex items-center gap-2 px-3 sm:px-4 rounded-full glass text-red-600 font-medium transition-opacity hover:opacity-70 active:scale-95"
+          class="h-[34px] flex items-center gap-2 px-3 sm:px-4 rounded-full glass border border-gray-300/60 text-red-600 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all active:scale-95"
           @click="clearChecked"
         >
           <Icon name="heroicons:trash" class="w-4 h-4" />
@@ -63,24 +63,24 @@
       </div>
     </div>
 
-    <div class="glass rounded-[20px] p-4 sm:p-6">
+    <div class="glass border border-gray-300/60 rounded-[20px] p-4 sm:p-6">
       <div class="flex gap-2 mb-4">
         <input
           v-model="newItemName"
           type="text"
           placeholder="Add item..."
-          class="flex-1 min-w-0 px-3 sm:px-4 py-2.5 rounded-[12px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
+          class="flex-1 min-w-0 px-3 sm:px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
           @keydown.enter="addItem"
         />
         <input
           v-model="newItemQuantity"
           type="text"
           placeholder="Qty (e.g. 500g)"
-          class="w-20 sm:w-28 px-2 sm:px-4 py-2.5 rounded-[12px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
+          class="w-20 sm:w-[150px] px-2 sm:px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
           @keydown.enter="addItem"
         />
         <button
-          class="px-3 sm:px-4 py-2.5 flex items-center justify-center rounded-[12px] glass-nested text-gray-700 hover:bg-white/50 transition-colors disabled:opacity-50 shrink-0"
+          class="px-3 sm:px-4 py-2.5 flex items-center justify-center rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 hover:border-green-300/60 hover:bg-green-50/40 transition-all disabled:opacity-50 shrink-0"
           :disabled="!newItemName.trim() || isAddingItem"
           @click="addItem"
         >
@@ -167,14 +167,14 @@
       </div>
     </div>
 
-    <div class="glass rounded-[20px] p-4 sm:p-6">
+    <div class="glass border border-gray-300/60 rounded-[20px] p-4 sm:p-6">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
           <Icon name="heroicons:bookmark" class="w-5 h-5" />
           Quick Add
         </h3>
         <button
-          class="px-4 py-1.5 text-sm font-medium text-gray-700 rounded-full glass-nested hover:bg-white/50 transition-colors"
+          class="px-4 py-1.5 text-sm font-medium text-gray-700 rounded-full glass-nested border border-gray-200/50 hover:border-green-300/60 hover:bg-green-50/40 transition-all"
           @click="showCommonItemsManager = !showCommonItemsManager"
         >
           {{ showCommonItemsManager ? 'Done' : 'Edit' }}
@@ -195,18 +195,18 @@
             v-model="newCommonItemName"
             type="text"
             placeholder="Item name"
-            class="flex-1 min-w-0 px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
+            class="flex-1 min-w-0 px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
             @keydown.enter="addCommonItem"
           />
           <input
             v-model="newCommonItemQuantity"
             type="text"
             placeholder="Qty (e.g. 500g)"
-            class="w-20 sm:w-28 px-2 sm:px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
+            class="w-20 sm:w-[150px] px-2 sm:px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
             @keydown.enter="addCommonItem"
           />
           <button
-            class="w-9 h-9 flex items-center justify-center rounded-[10px] glass-nested text-gray-700 hover:bg-white/50 transition-colors disabled:opacity-50 shrink-0"
+            class="w-9 h-9 flex items-center justify-center rounded-[10px] glass-nested border border-gray-200/50 text-gray-700 hover:border-green-300/60 hover:bg-green-50/40 transition-all disabled:opacity-50 shrink-0"
             :disabled="!newCommonItemName.trim()"
             @click="addCommonItem"
           >
@@ -217,7 +217,7 @@
           <div
             v-for="item in commonItems"
             :key="item.id"
-            class="flex items-center gap-1 px-3 py-1.5 rounded-full glass-nested text-sm"
+            class="flex items-center gap-1 px-3 py-1.5 rounded-full glass-nested border border-gray-200/50 text-sm hover:border-green-300/60 hover:bg-green-50/40 transition-all"
           >
             <span>{{ item.name }}</span>
             <button
@@ -237,7 +237,7 @@
         <button
           v-for="item in commonItems"
           :key="item.id"
-          class="px-4 py-2 rounded-full glass-nested text-sm font-medium text-gray-700 hover:bg-white/50 transition-colors active:scale-95"
+          class="px-4 py-2 rounded-full glass-nested border border-gray-200/50 text-sm font-medium text-gray-700 hover:border-green-300/60 hover:bg-green-50/40 transition-all active:scale-95"
           @click="addCommonItemToList(item)"
         >
           + {{ item.name }}

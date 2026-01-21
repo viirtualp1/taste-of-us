@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="cn('glass rounded-[20px]', props.class)"
+    :class="cn('glass border border-gray-300/60 rounded-[20px]', props.class)"
     style="border-radius: 20px"
   >
     <slot />

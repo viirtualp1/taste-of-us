@@ -1,6 +1,6 @@
 <template>
-  <tou-card class="overflow-hidden flex-shrink-0 min-w-0">
-    <tou-card-content class="space-y-4 md:space-y-5">
+  <tou-card class="overflow-hidden flex-shrink-0 min-w-0 h-full">
+    <tou-card-content class="space-y-5 md:space-y-6">
       <div
         class="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between"
       >
@@ -19,7 +19,7 @@
         </div>
         <div class="flex items-center gap-2 sm:gap-3 shrink-0 w-full sm:w-auto">
           <button
-            class="w-9 h-9 sm:w-auto sm:h-9 sm:px-3 flex items-center justify-center gap-1.5 rounded-[18px] text-sm font-semibold text-gray-800 bg-white/50 hover:bg-white/70 border border-white/60 transition-all"
+            class="w-10 h-[42px] sm:w-auto sm:px-3 flex items-center justify-center gap-1.5 rounded-[18px] text-sm font-semibold text-gray-800 bg-white/50 border border-gray-200/50 hover:border-green-300/60 hover:bg-green-50/40 transition-all"
             @click="$emit('prev-week')"
           >
             <Icon name="heroicons:chevron-left" class="w-4 h-4 shrink-0" />
@@ -36,7 +36,7 @@
             />
           </div>
           <button
-            class="w-9 h-9 sm:w-auto sm:h-9 sm:px-3 flex items-center justify-center gap-1.5 rounded-[18px] text-sm font-semibold text-gray-800 bg-white/50 hover:bg-white/70 border border-white/60 transition-all"
+            class="w-10 h-[42px] sm:w-auto sm:px-3 flex items-center justify-center gap-1.5 rounded-[18px] text-sm font-semibold text-gray-800 bg-white/50 border border-gray-200/50 hover:border-green-300/60 hover:bg-green-50/40 transition-all"
             @click="$emit('next-week')"
           >
             <span class="hidden sm:inline">Next</span>
@@ -46,16 +46,16 @@
       </div>
 
       <div
-        class="flex items-center gap-2 sm:gap-3 overflow-x-auto scrollbar-hide rounded-[20px] py-2 -mx-2 px-2"
+        class="flex items-center gap-2 sm:gap-3 overflow-x-auto scrollbar-hide rounded-[20px] py-3 -mx-2 px-2"
       >
         <button
           v-for="(day, dayIndex) in weekDays"
           :key="day.date"
-          class="min-w-[100px] sm:min-w-[120px] lg:min-w-[110px] xl:min-w-[140px] flex-shrink-0 rounded-[16px] px-2 sm:px-3 lg:px-2 xl:px-4 py-2 sm:py-3 text-left transition-all flex flex-col gap-1"
+          class="min-w-[100px] sm:min-w-[120px] lg:min-w-[110px] xl:min-w-[140px] flex-shrink-0 rounded-[16px] px-2 sm:px-3 lg:px-2 xl:px-4 py-3 sm:py-4 text-left transition-all flex flex-col gap-1.5"
           :class="
             dayIndex === activeDayIndex
-              ? 'glass border border-pink-400/60 ring-2 ring-pink-200/50 bg-pink-50/60'
-              : 'glass border border-white/40 hover:border-pink-300/60 hover:bg-pink-50/40'
+              ? 'glass border border-green-400/60 ring-2 ring-green-200/50 bg-green-50/60'
+              : 'glass border border-gray-200/50 hover:border-green-300/60 hover:bg-green-50/40'
           "
           @click="$emit('select-day', dayIndex)"
         >

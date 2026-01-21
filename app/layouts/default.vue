@@ -1,7 +1,7 @@
 <template>
   <div>
     <div
-      class="fixed inset-0 gradient-bg -z-10"
+      class="fixed inset-0 gradient-bg-accent -z-10"
       style="
         will-change: auto;
         transform: translateZ(0);

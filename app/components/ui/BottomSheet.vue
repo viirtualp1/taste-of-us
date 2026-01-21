@@ -11,7 +11,6 @@
       <div
         v-if="isOpen"
         class="fixed inset-0 z-50"
-        @keydown.esc="handleClose"
       >
         <div
           class="fixed inset-0 bg-black/50 transition-opacity"
@@ -23,6 +22,7 @@
           v-if="isMobile"
           class="fixed inset-x-0 bottom-0 z-50 flex flex-col touch-none select-none"
           :style="sheetStyle"
+          @click.stop
         >
           <div
             class="flex justify-center py-3 cursor-grab active:cursor-grabbing"
@@ -35,14 +35,14 @@
 
           <div
             v-if="customLayout"
-            class="flex-1 flex flex-col glass rounded-t-[20px] shadow-2xl overflow-hidden"
+            class="flex-1 flex flex-col glass border border-gray-300/60 rounded-t-[20px] shadow-2xl overflow-hidden"
           >
             <slot name="custom" :is-mobile="true" />
           </div>
 
           <div
             v-else
-            class="flex-1 flex flex-col glass rounded-t-[20px] shadow-2xl overflow-hidden"
+            class="flex-1 flex flex-col glass border border-gray-300/60 rounded-t-[20px] shadow-2xl overflow-hidden"
           >
             <div
               v-if="title"
@@ -83,24 +83,27 @@
           <div
             v-if="isOpen"
             class="fixed inset-0 z-50 flex items-center justify-center p-4"
+            @click="handleClose"
           >
             <div
               v-if="customLayout"
-              class="relative z-50 glass rounded-[20px] shadow-2xl w-full overflow-hidden flex flex-col"
+              class="relative z-50 glass border border-gray-300/60 rounded-[20px] shadow-2xl w-full overflow-hidden flex flex-col"
               :class="desktopMaxWidth"
               :style="{ height: desktopHeight }"
+              @click.stop
             >
               <slot name="custom" :is-mobile="false" />
             </div>
 
             <div
               v-else
-              class="relative z-50 glass rounded-[20px] shadow-2xl w-full overflow-hidden max-h-[90vh] flex flex-col"
+              class="relative z-50 glass border border-gray-300/60 rounded-[20px] shadow-2xl w-full overflow-hidden max-h-[90vh] flex flex-col"
               :class="desktopMaxWidth"
+              @click.stop
             >
               <div
                 v-if="title"
-                class="flex items-center justify-between p-6 border-b border-white/20 shrink-0"
+                class="flex items-center justify-between px-4 py-3 border-b border-white/20 shrink-0"
               >
                 <h2 class="text-xl font-bold text-gray-900">{{ title }}</h2>
                 <button
@@ -234,14 +237,22 @@ const handleClose = () => {
   emit('close')
 }
 
+const handleEscape = (e: KeyboardEvent) => {
+  if (e.key === 'Escape' && props.isOpen) {
+    handleClose()
+  }
+}
+
 watch(() => props.isOpen, (open) => {
   if (open) {
     currentHeight.value = initialHeight.value
     document.body.style.overflow = 'hidden'
     checkMobile()
+    document.addEventListener('keydown', handleEscape)
   } else {
     document.body.style.overflow = ''
     currentHeight.value = 0
+    document.removeEventListener('keydown', handleEscape)
   }
 })
 
@@ -256,6 +267,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener('resize', checkMobile)
+  document.removeEventListener('keydown', handleEscape)
   document.body.style.overflow = ''
 })
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <tou-card class="overflow-hidden h-full flex flex-col">
+  <tou-card class="overflow-hidden flex flex-col h-full">
     <tou-card-content class="flex-1 flex flex-col">
       <div class="space-y-2 flex-1">
         <p class="text-xs sm:text-sm uppercase tracking-[0.25em] text-gray-500">
@@ -28,9 +28,9 @@
         </div>
       </div>
       <div class="mt-4 sm:mt-6">
-        <div class="h-2 rounded-full bg-white/40 overflow-hidden">
+        <div class="h-2 rounded-full bg-white/40 border border-gray-200/50 overflow-hidden">
           <div
-            class="h-full bg-gradient-to-r from-purple-600 via-pink-500 to-indigo-500 transition-all duration-500"
+            class="h-full bg-gradient-to-r from-green-500 via-emerald-500 to-green-600 transition-all duration-500"
             :style="{ width: `${completion}%` }"
           />
         </div>

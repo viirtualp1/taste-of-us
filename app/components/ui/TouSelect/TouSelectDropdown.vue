@@ -4,8 +4,8 @@
       type="button"
       :class="
         cn(
-          'glass flex h-12 w-full items-center justify-between rounded-[12px] border border-white/40 px-4 py-3 text-sm font-medium text-gray-800 transition-all duration-300 hover:bg-white/30 hover:border-white/50 focus:outline-none focus:ring-2 focus:ring-pink-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-          isOpen && 'ring-2 ring-pink-400 border-pink-300',
+          'glass flex h-12 w-full items-center justify-between rounded-[12px] border border-white/40 px-4 py-3 text-sm font-medium text-gray-800 transition-all duration-300 hover:bg-white/30 hover:border-white/50 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+          isOpen && 'ring-2 ring-green-400 border-green-300',
           props.class,
         )
       "
@@ -60,7 +60,7 @@
                 cn(
                   'w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 hover:bg-white/30 border-b border-white/10 last:border-b-0',
                   modelValue === option.value &&
-                    'bg-pink-100/50 text-pink-700 font-semibold',
+                    'bg-green-100/50 text-green-700 font-semibold',
                 )
               "
               @click="selectOption(option.value)"

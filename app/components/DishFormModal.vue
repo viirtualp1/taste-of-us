@@ -24,7 +24,7 @@
         v-model="dishName"
         type="text"
         placeholder="Enter dish name"
-        class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
+        class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
       />
     </div>
 
@@ -39,7 +39,7 @@
         <select
           id="dish-cuisine"
           v-model="dishCuisine"
-          class="w-full px-4 py-2.5 pr-10 rounded-[12px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all appearance-none cursor-pointer"
+          class="w-full px-4 py-2.5 pr-10 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all appearance-none cursor-pointer"
         >
           <option value="">None</option>
           <option value="asian">Asian</option>
@@ -116,18 +116,18 @@
           v-model="newIngredientName"
           type="text"
           placeholder="Ingredient name"
-          class="flex-1 min-w-0 px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
+          class="flex-1 min-w-0 px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
           @keydown.enter="addIngredient"
         />
         <input
           v-model="newIngredientQuantity"
           type="text"
           placeholder="Qty (e.g. 500g, 1kg)"
-          class="w-24 sm:w-32 px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-pink-400/60 focus:outline-none focus:ring-2 focus:ring-pink-200/50 transition-all"
+          class="w-24 sm:w-32 px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
           @keydown.enter="addIngredient"
         />
         <button
-          class="w-9 h-9 flex items-center justify-center rounded-[10px] glass-nested text-gray-700 hover:bg-white/50 transition-colors disabled:opacity-50 shrink-0"
+          class="w-9 h-9 flex items-center justify-center rounded-[10px] glass-nested border border-gray-200/50 text-gray-700 hover:border-green-300/60 hover:bg-green-50/40 transition-all disabled:opacity-50 shrink-0"
           :disabled="!newIngredientName.trim() || isAddingIngredient"
           @click="addIngredient"
         >
@@ -148,13 +148,13 @@
     <template #footer>
       <div class="flex gap-3 p-4 sm:p-6">
         <button
-          class="flex-1 px-4 py-2.5 rounded-[12px] glass-nested text-gray-700 font-medium hover:bg-white/50 transition-colors"
+          class="flex-1 px-4 py-2.5 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all"
           @click="closeModal"
         >
           Cancel
         </button>
         <button
-          class="flex-1 px-4 py-2.5 rounded-[12px] bg-gradient-to-r from-purple-600 to-pink-600 text-white font-medium hover:from-purple-700 hover:to-pink-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+          class="flex-1 px-4 py-2.5 rounded-[12px] bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="isLoading || !dishName.trim()"
           @click="handleSave"
         >

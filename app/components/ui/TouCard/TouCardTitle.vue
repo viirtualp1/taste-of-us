@@ -2,7 +2,7 @@
   <h3
     :class="
       cn(
-        'text-2xl font-semibold leading-none tracking-tight bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent',
+        'text-2xl font-semibold leading-none tracking-tight bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent',
         props.class,
       )
     "

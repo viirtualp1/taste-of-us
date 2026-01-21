@@ -486,7 +486,7 @@ async function generateMenuPDF(menu: MenuDay[]) {
 
             body {
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-              background: linear-gradient(135deg, #f8b4d9 0%, #fbcfe8 30%, #fce7f3 50%, #f8b4d9 100%);
+              background: linear-gradient(135deg, #f0f9f4 0%, #e8f5ed 30%, #f0f9f4 50%, #e8f5ed 100%);
               min-height: 100vh;
               padding: 20px 20px;
               color: #1f2937;
@@ -647,7 +647,7 @@ async function generateMenuPDF(menu: MenuDay[]) {
 
             @media print {
               body {
-                background: linear-gradient(135deg, #f8b4d9 0%, #fbcfe8 30%, #fce7f3 50%, #f8b4d9 100%);
+                background: linear-gradient(135deg, #f0f9f4 0%, #e8f5ed 30%, #f0f9f4 50%, #e8f5ed 100%);
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
               }
