@@ -44,6 +44,14 @@ export function useWeekNavigation() {
   const initialize = () => {
     isClient.value = true
     weekStart.value = getStartOfWeek(new Date()).toISOString()
+    
+    const today = new Date()
+    const currentWeekStart = getStartOfWeek(today)
+    const dayOfWeek = (today.getDay() + 6) % 7
+    
+    if (weekStart.value === currentWeekStart.toISOString()) {
+      activeDayIndex.value = dayOfWeek
+    }
   }
 
   const focusDay = (index: number) => {

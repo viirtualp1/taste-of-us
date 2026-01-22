@@ -1,103 +1,114 @@
 <template>
   <Teleport to="body">
-    <Transition
-      enter-active-class="transition ease-out duration-300"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition ease-in duration-200"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
+    <div
+      v-if="isOpen"
+      class="fixed inset-0 z-50"
     >
-      <div
-        v-if="isOpen"
-        class="fixed inset-0 z-50"
+      <Transition
+        enter-active-class="transition-opacity duration-300"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-opacity duration-200"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
       >
         <div
-          class="fixed inset-0 bg-black/50 transition-opacity"
-          :style="isMobile ? { opacity: backdropOpacity } : {}"
+          v-if="isOpen"
+          class="fixed inset-0 bg-black/50"
           @click="handleClose"
         />
+      </Transition>
 
+      <Transition
+        v-if="isMobile"
+        enter-active-class="transition-transform duration-300 ease-out"
+        enter-from-class="translate-y-full"
+        enter-to-class="translate-y-0"
+        leave-active-class="transition-transform duration-200 ease-in"
+        leave-from-class="translate-y-0"
+        leave-to-class="translate-y-full"
+      >
         <div
-          v-if="isMobile"
-          class="fixed inset-x-0 bottom-0 z-50 flex flex-col touch-none select-none"
-          :style="sheetStyle"
-          @click.stop
+          v-if="isOpen"
+          class="fixed inset-0 z-50 flex flex-col justify-end pointer-events-none"
         >
-          <div
-            class="flex justify-center py-3 cursor-grab active:cursor-grabbing"
-            @touchstart.prevent="handleTouchStart"
-            @touchmove.prevent="handleTouchMove"
-            @touchend="handleTouchEnd"
-          >
-            <div class="w-10 h-1.5 rounded-full bg-white/80 shadow-sm" />
-          </div>
-
-          <div
-            v-if="customLayout"
-            class="flex-1 flex flex-col glass border border-gray-300/60 rounded-t-[20px] shadow-2xl overflow-hidden"
-          >
-            <slot name="custom" :is-mobile="true" />
-          </div>
-
-          <div
-            v-else
-            class="flex-1 flex flex-col glass border border-gray-300/60 rounded-t-[20px] shadow-2xl overflow-hidden"
-          >
             <div
-              v-if="title"
-              class="flex items-center justify-between px-4 py-3 border-b border-white/20 shrink-0"
+              v-if="customLayout"
+              class="flex flex-col glass border-t border-gray-300/60 rounded-t-[20px] shadow-2xl overflow-hidden transition-all duration-300 pointer-events-auto"
+              :class="isExpanded ? 'h-full' : 'h-[65vh]'"
+              @click.stop
             >
-              <h2 class="text-xl font-bold text-gray-900">{{ title }}</h2>
-              <button
-                v-if="showCloseButton"
-                class="flex items-center rounded-[12px] p-2 hover:bg-white/20 transition-colors"
-                @click="handleClose"
+              <slot name="custom" :is-mobile="true" :is-expanded="isExpanded" :expand="() => { isExpanded = true }" />
+            </div>
+
+            <div
+              v-else
+              class="flex flex-col glass border-t border-gray-300/60 rounded-t-[20px] shadow-2xl overflow-hidden transition-all duration-300 pointer-events-auto"
+              :class="isExpanded ? 'h-full' : 'h-[65vh]'"
+              @click.stop
+            >
+              <div
+                v-if="title"
+                class="flex items-center justify-between px-4 py-3 border-b border-white/20 shrink-0 cursor-pointer"
+                @click="handleHeaderClick"
               >
-                <Icon name="heroicons:x-mark" class="w-5 h-5 text-gray-600" />
-              </button>
-            </div>
+                <h2 class="text-xl font-bold text-gray-900">{{ title }}</h2>
+                <button
+                  v-if="showCloseButton"
+                  class="flex items-center rounded-[12px] p-2 hover:bg-white/20 transition-colors"
+                  @click.stop="handleClose"
+                >
+                  <Icon name="heroicons:x-mark" class="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
 
-            <div
-              class="flex-1 overflow-y-auto overscroll-contain"
-              :class="contentClass"
-            >
-              <slot />
-            </div>
+              <div
+                class="flex-1 overflow-y-auto overscroll-contain"
+                :class="contentClass"
+                @click="handleBodyClick"
+                @scroll="handleBodyScroll"
+              >
+                <slot />
+              </div>
 
-            <div v-if="$slots.footer" class="shrink-0 border-t border-white/20">
-              <slot name="footer" />
+              <div
+                v-if="$slots.footer"
+                class="shrink-0 border-t border-white/20"
+                @click="handleBodyClick"
+              >
+                <slot name="footer" />
+              </div>
             </div>
           </div>
-        </div>
+        </Transition>
 
         <Transition
           v-else
-          enter-active-class="transition ease-out duration-300"
+          enter-active-class="transition-all duration-300 ease-out"
           enter-from-class="opacity-0 scale-95"
           enter-to-class="opacity-100 scale-100"
-          leave-active-class="transition ease-in duration-200"
+          leave-active-class="transition-all duration-200 ease-in"
           leave-from-class="opacity-100 scale-100"
           leave-to-class="opacity-0 scale-95"
         >
           <div
             v-if="isOpen"
-            class="fixed inset-0 z-50 flex items-center justify-center p-4"
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
             @click="handleClose"
           >
             <div
               v-if="customLayout"
-              class="relative z-50 glass border border-gray-300/60 rounded-[20px] shadow-2xl w-full overflow-hidden flex flex-col"
+              class="relative z-50 glass border border-gray-300/60 rounded-[20px] shadow-2xl w-full overflow-hidden flex flex-col pointer-events-auto"
               :class="desktopMaxWidth"
               :style="{ height: desktopHeight }"
               @click.stop
             >
-              <slot name="custom" :is-mobile="false" />
+              <slot name="custom" :is-mobile="false" :is-expanded="false" />
             </div>
 
             <div
               v-else
-              class="relative z-50 glass border border-gray-300/60 rounded-[20px] shadow-2xl w-full overflow-hidden max-h-[90vh] flex flex-col"
+              class="relative z-50 glass border border-gray-300/60 rounded-[20px] shadow-2xl w-full overflow-hidden max-h-[90vh] flex flex-col pointer-events-auto"
               :class="desktopMaxWidth"
               @click.stop
             >
@@ -129,7 +140,6 @@
           </div>
         </Transition>
       </div>
-    </Transition>
   </Teleport>
 </template>
 
@@ -154,87 +164,41 @@ const props = withDefaults(defineProps<Props>(), {
   desktopMaxWidth: 'max-w-md',
   desktopHeight: 'auto',
   customLayout: false,
-  initialHeightRatio: 0.55,
+  initialHeightRatio: 0.65,
 })
 
 const emit = defineEmits<{
   close: []
 }>()
 
-const isDragging = ref(false)
-const dragStartY = ref(0)
-const dragStartHeight = ref(0)
-const currentHeight = ref(0)
 const isMobile = ref(false)
-
-const HANDLE_HEIGHT = 42
-const MIN_HEIGHT = 120
-const TOP_OFFSET = 10
+const isExpanded = ref(false)
+const isClosing = ref(false)
 
 const checkMobile = () => {
   isMobile.value = window.innerWidth < 640
 }
 
-const maxHeight = computed(() => {
-  return window.innerHeight - TOP_OFFSET - HANDLE_HEIGHT
-})
-
-const initialHeight = computed(() => {
-  return Math.min(window.innerHeight * props.initialHeightRatio, 450)
-})
-
-const sheetStyle = computed(() => {
-  const height = isDragging.value ? currentHeight.value : (currentHeight.value || initialHeight.value)
-
-  return {
-    height: `${height + HANDLE_HEIGHT}px`,
-    transition: isDragging.value ? 'none' : 'height 0.3s ease-out',
-  }
-})
-
-const backdropOpacity = computed(() => {
-  if (!isDragging.value) return 1
-  const height = currentHeight.value || initialHeight.value
-  const dismissThreshold = initialHeight.value * 0.3
-  if (height < dismissThreshold) {
-    return Math.max(0, height / dismissThreshold)
-  }
-  return 1
-})
-
-const handleTouchStart = (e: TouchEvent) => {
-  isDragging.value = true
-  dragStartY.value = e.touches[0].clientY
-  dragStartHeight.value = currentHeight.value || initialHeight.value
-}
-
-const handleTouchMove = (e: TouchEvent) => {
-  if (!isDragging.value) return
-
-  const deltaY = dragStartY.value - e.touches[0].clientY
-  const newHeight = Math.max(MIN_HEIGHT, Math.min(maxHeight.value, dragStartHeight.value + deltaY))
-  currentHeight.value = newHeight
-}
-
-const handleTouchEnd = () => {
-  if (!isDragging.value) return
-
-  const height = currentHeight.value
-  const dismissThreshold = initialHeight.value * 0.35
-
-  if (height < dismissThreshold) {
-    handleClose()
-  } else if (height > initialHeight.value * 1.3) {
-    currentHeight.value = maxHeight.value
-  } else {
-    currentHeight.value = initialHeight.value
-  }
-
-  isDragging.value = false
-}
-
 const handleClose = () => {
+  isClosing.value = true
   emit('close')
+}
+
+const handleHeaderClick = (e: MouseEvent) => {
+  if (isClosing.value) return
+  const target = e.target as HTMLElement
+  if (target.closest('button')) return
+  if (isMobile.value && !isExpanded.value) {
+    isExpanded.value = true
+  }
+}
+
+const handleBodyClick = (e: MouseEvent) => {
+  e.stopPropagation()
+}
+
+const handleBodyScroll = () => {
+  if (isExpanded.value) return
 }
 
 const handleEscape = (e: KeyboardEvent) => {
@@ -245,13 +209,15 @@ const handleEscape = (e: KeyboardEvent) => {
 
 watch(() => props.isOpen, (open) => {
   if (open) {
-    currentHeight.value = initialHeight.value
+    isExpanded.value = false
+    isClosing.value = false
     document.body.style.overflow = 'hidden'
     checkMobile()
     document.addEventListener('keydown', handleEscape)
   } else {
+    isExpanded.value = false
+    isClosing.value = false
     document.body.style.overflow = ''
-    currentHeight.value = 0
     document.removeEventListener('keydown', handleEscape)
   }
 })
@@ -261,7 +227,6 @@ onMounted(() => {
   window.addEventListener('resize', checkMobile)
   if (props.isOpen) {
     document.body.style.overflow = 'hidden'
-    currentHeight.value = initialHeight.value
   }
 })
 

@@ -21,26 +21,26 @@ export default defineEventHandler(async (event) => {
 
       console.log(`Processing /start command from chat ${chatId}`)
 
-      const welcomeMessage = `👋 Привет, ${firstName}!
+      const welcomeMessage = `👋 Hello, ${firstName}!
 
-🍽️ Добро пожаловать в *Taste of Us* — приложение для планирования меню на неделю!
+🍽️ Welcome to *Taste of Us* — a weekly menu planning app!
 
-📱 *Как это работает:*
+📱 *How it works:*
 
-1️⃣ *В приложении бота* (открой через кнопку меню или ссылку):
-   • Планируй меню на неделю (brunch, dinner, dessert)
-   • Управляй своей коллекцией блюд
-   • Создавай списки покупок
-   • Отправляй меню партнёру
+1️⃣ *In the bot app* (open via menu button or link):
+   • Plan your weekly menu (brunch, dinner, dessert)
+   • Manage your dish collection
+   • Create shopping lists
+   • Send menu to your partner
 
-2️⃣ *В этом чате* ты будешь получать:
-   • 📄 PDF с меню на неделю
-   • 📋 Текстовое меню
-   • Все сообщения автоматически закрепляются
+2️⃣ *In this chat* you will receive:
+   • 📄 PDF with weekly menu
+   • 📋 Text menu
+   • All messages are automatically pinned
 
-💡 *Совет:* Чтобы получать меню, твой партнёр должен указать твой Chat ID в настройках профиля.
+💡 *Tip:* To receive menus, your partner needs to add your Chat ID in profile settings.
 
-Начни планировать меню прямо сейчас! 🎉`
+Start planning your menu right now! 🎉`
 
       const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`
 
@@ -75,6 +75,9 @@ export default defineEventHandler(async (event) => {
     return { ok: true }
   } catch (error) {
     console.error('Error in webhook handler:', error)
-    return { ok: false, error: error instanceof Error ? error.message : 'Unknown error' }
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    }
   }
 })

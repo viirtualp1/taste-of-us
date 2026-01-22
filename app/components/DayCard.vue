@@ -87,7 +87,7 @@
   <dish-selection-modal
     :is-open="isModalOpen"
     :category="selectedCategory"
-    :dishes="dishesForCategory"
+    :dishes="props.dishes"
     :selected-dish-name="selectedMenu?.[selectedCategory]"
     @close="closeModal"
     @select="(dishName) => $emit('update-menu', selectedCategory, dishName)"
@@ -127,12 +127,6 @@ defineEmits<{
 
 const isModalOpen = ref(false)
 const selectedCategory = ref<MenuCategory>('brunch')
-
-const dishesForCategory = computed(() => {
-  if (!props.dishes || !Array.isArray(props.dishes) || !selectedCategory.value)
-    return []
-  return props.dishes.filter((dish) => dish.category === selectedCategory.value)
-})
 
 const openModal = (category: MenuCategory) => {
   selectedCategory.value = category

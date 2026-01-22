@@ -35,47 +35,60 @@
         />
       </div>
 
-      <div v-else-if="uncheckedItems.length === 0" class="flex-1 flex items-center justify-center py-6">
+      <div v-else-if="items.length === 0" class="flex-1 flex items-center justify-center py-6">
         <div class="text-center">
           <Icon
-            name="heroicons:check-circle"
+            name="heroicons:shopping-cart"
             class="w-8 h-8 text-gray-400 mx-auto mb-2"
           />
-          <p class="text-sm text-gray-500">All items checked!</p>
+          <p class="text-sm text-gray-500">Your shopping list is empty</p>
         </div>
       </div>
 
       <div v-else class="space-y-2 flex-1 overflow-y-auto">
         <div
-          v-for="item in uncheckedItems.slice(0, 5)"
+          v-for="item in items.slice(0, 5)"
           :key="item.id"
-          class="flex items-center gap-2 p-2.5 glass-nested border border-gray-200/50 rounded-[12px]"
+          class="flex items-center gap-2 p-2.5 glass-nested border border-gray-200/50 rounded-[12px] cursor-pointer hover:border-green-300/60 hover:bg-green-50/40 transition-all"
+          :class="item.is_checked && 'opacity-60'"
+          @click="toggleItem(item)"
         >
-          <div class="shrink-0 w-5 h-5 rounded-[6px] border-2 border-gray-300 flex items-center justify-center">
+          <div
+            class="shrink-0 w-5 h-5 rounded-[6px] border-2 flex items-center justify-center transition-all pointer-events-none"
+            :class="
+              item.is_checked
+                ? 'bg-green-500 border-green-500'
+                : 'border-gray-300'
+            "
+          >
             <Icon
               v-if="item.is_checked"
               name="heroicons:check"
-              class="w-3 h-3 text-green-600"
+              class="w-3 h-3 text-white"
             />
           </div>
           <div class="flex-1 min-w-0">
-            <span class="text-sm font-medium text-gray-900 truncate block">
+            <span
+              class="text-sm font-medium truncate block"
+              :class="item.is_checked ? 'line-through text-gray-500' : 'text-gray-900'"
+            >
               {{ item.name }}
             </span>
             <span
               v-if="item.quantity"
-              class="text-xs text-gray-500 truncate block"
+              class="text-xs truncate block"
+              :class="item.is_checked ? 'text-gray-400' : 'text-gray-500'"
             >
               {{ item.quantity }}
             </span>
           </div>
         </div>
         <div
-          v-if="uncheckedItems.length > 5"
+          v-if="items.length > 5"
           class="text-center pt-2"
         >
           <p class="text-xs text-gray-500">
-            +{{ uncheckedItems.length - 5 }} more items
+            +{{ items.length - 5 }} more items
           </p>
         </div>
       </div>
@@ -186,9 +199,6 @@ const weekStartDate = computed(() => {
   return ''
 })
 
-const uncheckedItems = computed(() => {
-  return items.value.filter((item) => !item.is_checked)
-})
 
 const loadItems = async () => {
   if (!isAuthenticated.value || !weekStartDate.value) {
@@ -244,6 +254,22 @@ const closeAddModal = () => {
   isAddModalOpen.value = false
   newItemName.value = ''
   newItemQuantity.value = ''
+}
+
+const toggleItem = async (item: ShoppingListItem) => {
+  const newChecked = !item.is_checked
+  item.is_checked = newChecked
+  hapticFeedback.selection()
+
+  try {
+    await apiFetch(`/api/shopping-list/${item.id}`, {
+      method: 'PATCH',
+      body: { is_checked: newChecked },
+    })
+  } catch (error) {
+    console.error('Error toggling item:', error)
+    item.is_checked = !newChecked
+  }
 }
 
 watch([weekStartDate, isAuthenticated], () => {

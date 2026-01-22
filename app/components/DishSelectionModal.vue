@@ -7,14 +7,17 @@
     :initial-height-ratio="0.7"
     @close="closeModal"
   >
-    <template #custom="{ isMobile }">
-      <div class="flex items-center justify-between px-4 py-3 border-b border-white/20 shrink-0">
+    <template #custom="{ isMobile, isExpanded, expand }">
+      <div
+        class="flex items-center justify-between px-4 py-3 border-b border-white/20 shrink-0 cursor-pointer"
+        @click="isMobile && !isExpanded ? expand() : null"
+      >
         <h2 class="text-lg sm:text-xl font-bold text-gray-900">
           Select {{ categoryLabel }}
         </h2>
         <button
           class="flex items-center rounded-[12px] p-2 hover:bg-white/20 transition-colors"
-          @click="closeModal"
+          @click.stop="closeModal"
         >
           <Icon name="heroicons:x-mark" class="w-5 h-5 text-gray-600" />
         </button>
@@ -23,17 +26,17 @@
       <template v-if="isMobile">
         <div class="flex items-center gap-2 p-3 border-b border-white/20 overflow-x-auto flex-nowrap shrink-0">
           <button
-            v-for="cuisine in CUISINES"
-            :key="cuisine.key"
+            v-for="category in CATEGORIES"
+            :key="category.key"
             class="px-4 py-2 rounded-[12px] text-sm font-medium transition-all whitespace-nowrap flex-shrink-0"
             :class="
-              selectedCuisine === cuisine.key
+              selectedCategory === category.key
                 ? 'bg-green-500 text-white shadow-md'
                 : 'glass-nested border border-gray-200/50 text-gray-700 hover:border-green-300/60 hover:bg-green-50/40'
             "
-            @click="selectedCuisine = cuisine.key"
+            @click="selectedCategory = category.key"
           >
-            {{ cuisine.label }}
+            {{ category.label }}
           </button>
         </div>
 
@@ -43,7 +46,7 @@
             class="text-center py-12 text-gray-500"
           >
             <p class="text-lg font-medium">No dishes found</p>
-            <p class="text-sm mt-2">Try selecting a different cuisine</p>
+            <p class="text-sm mt-2">Try selecting a different category</p>
           </div>
           <div v-else class="grid grid-cols-1 gap-3">
             <button
@@ -58,9 +61,12 @@
               @click="selectDish(dish.name)"
             >
               <span class="font-semibold text-gray-900">{{ dish.name }}</span>
-              <span v-if="dish.cuisine" class="text-xs text-gray-500">
-                {{ getCuisineLabel(dish.cuisine) }}
-              </span>
+              <div
+                v-if="dishIngredients[dish.id] && dishIngredients[dish.id].length > 0"
+                class="text-xs text-gray-500 mt-1 line-clamp-2"
+              >
+                {{ dishIngredients[dish.id].map(i => i.name).join(', ') }}
+              </div>
             </button>
           </div>
         </div>
@@ -71,17 +77,17 @@
           <div class="flex flex-col w-48 border-r border-white/30 shrink-0 bg-white/20">
             <div class="p-4 space-y-2 overflow-y-auto">
               <button
-                v-for="cuisine in CUISINES"
-                :key="cuisine.key"
+                v-for="category in CATEGORIES"
+                :key="category.key"
                 class="w-full px-4 py-3 rounded-[12px] text-sm font-medium transition-all text-left"
                 :class="
-                  selectedCuisine === cuisine.key
+                  selectedCategory === category.key
                     ? 'bg-green-500 text-white shadow-md'
                     : 'glass-nested border border-gray-200/50 text-gray-700 hover:border-green-300/60 hover:bg-green-50/40'
                 "
-                @click="selectedCuisine = cuisine.key"
+                @click="selectedCategory = category.key"
               >
-                {{ cuisine.label }}
+                {{ category.label }}
               </button>
             </div>
           </div>
@@ -92,7 +98,7 @@
               class="text-center py-12 text-gray-500"
             >
               <p class="text-lg font-medium">No dishes found</p>
-              <p class="text-sm mt-2">Try selecting a different cuisine</p>
+              <p class="text-sm mt-2">Try selecting a different category</p>
             </div>
             <div v-else class="grid grid-cols-2 lg:grid-cols-3 gap-4">
               <button
@@ -107,9 +113,12 @@
                 @click="selectDish(dish.name)"
               >
                 <span class="font-semibold text-gray-900 text-base">{{ dish.name }}</span>
-                <span v-if="dish.cuisine" class="text-xs text-gray-500 mt-auto">
-                  {{ getCuisineLabel(dish.cuisine) }}
-                </span>
+                <div
+                  v-if="dishIngredients[dish.id] && dishIngredients[dish.id].length > 0"
+                  class="text-xs text-gray-500 mt-1 line-clamp-2"
+                >
+                  {{ dishIngredients[dish.id].map(i => i.name).join(', ') }}
+                </div>
               </button>
             </div>
           </div>
@@ -121,9 +130,10 @@
 
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
-import type { MenuCategory, CuisineType, Dish } from '@/utils/menu'
-import { CUISINES } from '@/utils/menu'
+import type { MenuCategory, Dish, Ingredient } from '@/utils/menu'
+import { CATEGORIES } from '@/utils/menu'
 import BottomSheet from '@/components/ui/BottomSheet.vue'
+import { useApiFetch } from '@/composables/useApiFetch'
 
 interface Props {
   isOpen: boolean
@@ -139,8 +149,10 @@ const emit = defineEmits<{
   select: [dishName: string]
 }>()
 
-const selectedCuisine = ref<CuisineType>('all')
+const { apiFetch } = useApiFetch()
+const selectedCategory = ref<MenuCategory>(props.category)
 const selectedDish = ref<string | undefined>(props.selectedDishName)
+const dishIngredients = ref<Record<string, Ingredient[]>>({})
 
 const categoryLabel = computed(() => {
   if (props.category === 'brunch') return 'Brunch'
@@ -149,15 +161,59 @@ const categoryLabel = computed(() => {
 })
 
 const filteredDishes = computed(() => {
-  if (selectedCuisine.value === 'all') {
-    return props.dishes
-  }
-  return props.dishes.filter((dish) => dish.cuisine === selectedCuisine.value)
+  if (!props.dishes || !Array.isArray(props.dishes)) return []
+  return props.dishes.filter((dish) => dish.category === selectedCategory.value)
 })
 
-const getCuisineLabel = (cuisine: CuisineType) => {
-  return CUISINES.find((c) => c.key === cuisine)?.label || cuisine
+const loadIngredients = async () => {
+  if (!props.dishes || !Array.isArray(props.dishes)) return
+
+  const dishIds = props.dishes
+    .filter((dish) => dish.id)
+    .map((dish) => dish.id)
+
+  if (dishIds.length === 0) return
+
+  try {
+    const data = await apiFetch<Record<string, Ingredient[]>>(
+      '/api/dishes/ingredients',
+      {
+        method: 'POST',
+        body: { dish_ids: dishIds },
+      },
+    )
+    dishIngredients.value = data || {}
+  } catch (error) {
+    console.error('Error loading ingredients:', error)
+    dishIngredients.value = {}
+  }
 }
+
+watch(
+  () => props.category,
+  (newCategory) => {
+    selectedCategory.value = newCategory
+  },
+)
+
+watch(
+  () => props.isOpen,
+  (isOpen) => {
+    if (isOpen) {
+      loadIngredients()
+    }
+  },
+  { immediate: true },
+)
+
+watch(
+  () => props.dishes,
+  () => {
+    if (props.isOpen) {
+      loadIngredients()
+    }
+  },
+)
 
 const selectDish = (dishName: string) => {
   selectedDish.value = dishName

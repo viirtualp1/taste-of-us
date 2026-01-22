@@ -28,30 +28,6 @@
       />
     </div>
 
-    <div>
-      <label
-        for="dish-cuisine"
-        class="block text-sm font-medium text-gray-700 mb-2"
-      >
-        Cuisine (Optional)
-      </label>
-      <div class="relative">
-        <select
-          id="dish-cuisine"
-          v-model="dishCuisine"
-          class="w-full px-4 py-2.5 pr-10 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all appearance-none cursor-pointer"
-        >
-          <option value="">None</option>
-          <option value="asian">Asian</option>
-          <option value="european">European</option>
-          <option value="slavic">Slavic</option>
-        </select>
-        <Icon
-          name="heroicons:chevron-down"
-          class="w-4 h-4 text-gray-500 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none"
-        />
-      </div>
-    </div>
 
     <div v-if="dish" class="pt-2">
       <div class="flex items-center justify-between mb-3">
@@ -169,7 +145,7 @@
 import { ref, watch } from 'vue'
 import { useApiFetch } from '@/composables/useApiFetch'
 import BottomSheet from '@/components/ui/BottomSheet.vue'
-import type { MenuCategory, Dish, CuisineType, Ingredient } from '@/utils/menu'
+import type { MenuCategory, Dish, Ingredient } from '@/utils/menu'
 
 interface Props {
   isOpen: boolean
@@ -186,7 +162,6 @@ const emit = defineEmits<{
 
 const { apiFetch } = useApiFetch()
 const dishName = ref('')
-const dishCuisine = ref<CuisineType | ''>('')
 const error = ref('')
 const isLoading = ref(false)
 
@@ -266,11 +241,9 @@ watch(
   (dish) => {
     if (dish) {
       dishName.value = dish.name
-      dishCuisine.value = dish.cuisine || ''
       loadIngredients(dish.id)
     } else {
       dishName.value = ''
-      dishCuisine.value = ''
       ingredients.value = []
     }
     error.value = ''
@@ -283,7 +256,6 @@ watch(
   (isOpen) => {
     if (!isOpen) {
       dishName.value = ''
-      dishCuisine.value = ''
       error.value = ''
       ingredients.value = []
       newIngredientName.value = ''
@@ -305,7 +277,7 @@ const handleSave = async () => {
     const payload = {
       name: dishName.value.trim(),
       category: props.category,
-      cuisine: dishCuisine.value || null,
+      cuisine: null,
     }
 
     if (props.dish) {

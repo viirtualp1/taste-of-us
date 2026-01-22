@@ -16,11 +16,15 @@
           <span class="hidden sm:inline">Import</span>
         </button>
         <button
-          class="flex items-center gap-2 px-4 py-2 rounded-full glass border border-gray-300/60 text-gray-900 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all active:scale-95"
-          @click="$router.push('/')"
+          class="flex items-center gap-2 px-4 py-2 rounded-full glass border border-gray-300/60 text-gray-900 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all active:scale-95 disabled:opacity-50"
+          :disabled="isNavigating"
+          @click="handleBack"
         >
-          <Icon name="heroicons:arrow-left" class="w-4 h-4" />
-          <span class="hidden sm:inline">Back</span>
+          <Icon
+            :name="isNavigating ? 'heroicons:arrow-path' : 'heroicons:arrow-left'"
+            :class="['w-4 h-4', isNavigating && 'animate-spin']"
+          />
+          <span class="hidden sm:inline">{{ isNavigating ? 'Loading...' : 'Back' }}</span>
         </button>
       </div>
     </div>
@@ -68,7 +72,7 @@
 
         <div v-else class="space-y-2">
           <div
-            v-for="dish in userDishes[category.key]"
+            v-for="dish in displayedDishes(category.key)"
             :key="dish.id"
             class="flex items-center justify-between p-4 glass-nested border border-gray-200/50 rounded-[12px] hover:border-green-300/60 hover:bg-green-50/40 transition-all"
           >
@@ -76,12 +80,6 @@
               <span class="text-sm font-semibold text-gray-900 truncate">{{
                 dish.name
               }}</span>
-              <span
-                v-if="dish.cuisine"
-                class="hidden sm:inline-block px-2 py-0.5 rounded-[8px] text-xs font-medium bg-white/60 text-gray-600"
-              >
-                {{ getCuisineLabel(dish.cuisine) }}
-              </span>
             </div>
             <div class="flex items-center gap-2">
               <button
@@ -98,6 +96,20 @@
               </button>
             </div>
           </div>
+          <button
+            v-if="userDishes[category.key]?.length > 5 && !expandedCategories[category.key]"
+            class="w-full p-3 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all text-sm"
+            @click="expandedCategories[category.key] = true"
+          >
+            Show All ({{ userDishes[category.key].length - 5 }} more)
+          </button>
+          <button
+            v-if="userDishes[category.key]?.length > 5 && expandedCategories[category.key]"
+            class="w-full p-3 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all text-sm"
+            @click="expandedCategories[category.key] = false"
+          >
+            Show Less
+          </button>
         </div>
       </div>
     </div>
@@ -120,6 +132,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useAuth } from '@/composables/useAuth'
+import { useApiFetch } from '@/composables/useApiFetch'
 import { useRouter } from 'vue-router'
 import DishFormModal from '@/components/DishFormModal.vue'
 import ImportDishesModal from '@/components/ImportDishesModal.vue'
@@ -127,12 +140,7 @@ import {
   CATEGORIES,
   type MenuCategory,
   type Dish,
-  CUISINES,
 } from '@/utils/menu'
-
-const getCuisineLabel = (cuisine: string) => {
-  return CUISINES.find((c) => c.key === cuisine)?.label || cuisine
-}
 
 definePageMeta({
   layout: 'default',
@@ -143,6 +151,7 @@ const { isAuthenticated, isLoading: authLoading, authenticate } = useAuth()
 const { apiFetch } = useApiFetch()
 
 const isLoading = ref(false)
+const isNavigating = ref(false)
 const userDishes = ref<Record<MenuCategory, Dish[]>>({
   brunch: [],
   dinner: [],
@@ -153,6 +162,19 @@ const isDishModalOpen = ref(false)
 const isImportModalOpen = ref(false)
 const editingDish = ref<Dish | null>(null)
 const selectedCategory = ref<MenuCategory>('brunch')
+const expandedCategories = ref<Record<MenuCategory, boolean>>({
+  brunch: false,
+  dinner: false,
+  dessert: false,
+})
+
+const displayedDishes = (category: MenuCategory) => {
+  const dishes = userDishes.value[category] || []
+  if (dishes.length <= 5 || expandedCategories.value[category]) {
+    return dishes
+  }
+  return dishes.slice(0, 5)
+}
 
 const loadUserDishes = async () => {
   if (!isAuthenticated.value) {
@@ -208,6 +230,12 @@ const closeImportModal = () => {
 
 const handleImportComplete = async () => {
   await loadUserDishes()
+}
+
+const handleBack = () => {
+  if (isNavigating.value) return
+  isNavigating.value = true
+  router.push('/')
 }
 
 const confirmDeleteDish = async (dish: Dish) => {

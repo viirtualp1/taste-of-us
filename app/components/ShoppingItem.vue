@@ -1,23 +1,23 @@
 <template>
   <div
-    class="flex items-center gap-3 p-3 glass-nested border border-gray-200/50 rounded-[12px] hover:border-green-300/60 hover:bg-green-50/40 transition-all"
+    class="flex items-center gap-3 p-3 glass-nested border border-gray-200/50 rounded-[12px] hover:border-green-300/60 hover:bg-green-50/40 transition-all cursor-pointer"
     :class="item.is_checked && 'opacity-60'"
+    @click="handleItemClick"
   >
-    <button
-      class="shrink-0 w-6 h-6 rounded-[8px] border-2 flex items-center justify-center transition-all"
+    <div
+      class="shrink-0 w-6 h-6 rounded-[8px] border-2 flex items-center justify-center transition-all pointer-events-none"
       :class="
         item.is_checked
           ? 'bg-green-500 border-green-500'
-          : 'border-gray-300 hover:border-green-400'
+          : 'border-gray-300'
       "
-      @click="$emit('toggle')"
     >
       <Icon
         v-if="item.is_checked"
         name="heroicons:check"
         class="w-4 h-4 text-white"
       />
-    </button>
+    </div>
 
     <div class="flex-1 min-w-0">
       <span
@@ -40,7 +40,7 @@
 
     <button
       class="shrink-0 p-1.5 rounded-[8px] hover:bg-red-50/50 transition-colors"
-      @click="$emit('delete')"
+      @click.stop="$emit('delete')"
     >
       <Icon name="heroicons:x-mark" class="w-4 h-4 text-red-500" />
     </button>
@@ -64,8 +64,14 @@ interface Props {
 
 defineProps<Props>()
 
-defineEmits<{
+const emit = defineEmits<{
   toggle: []
   delete: []
 }>()
+
+const handleItemClick = (e: MouseEvent) => {
+  const target = e.target as HTMLElement
+  if (target.closest('button')) return
+  emit('toggle')
+}
 </script>

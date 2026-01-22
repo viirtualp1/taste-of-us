@@ -135,17 +135,14 @@ const jsonExample = computed(() => {
       {
         name: 'Eggs Benedict',
         category: 'brunch',
-        cuisine: 'european',
       },
       {
         name: 'Shawarma',
         category: 'dinner',
-        cuisine: 'asian',
       },
       {
         name: 'Chocolate Brownie',
         category: 'dessert',
-        cuisine: 'european',
       },
     ],
     null,
@@ -216,21 +213,12 @@ const handleImport = async () => {
         )
       }
 
-      if (
-        dish.cuisine &&
-        !['asian', 'european', 'slavic'].includes(dish.cuisine)
-      ) {
-        throw new Error(
-          `Invalid cuisine: ${dish.cuisine}. Must be asian, european, or slavic`,
-        )
-      }
-
       await apiFetch('/api/user/dishes', {
         method: 'POST',
         body: {
           name: dish.name.trim(),
           category: dish.category,
-          cuisine: dish.cuisine || null,
+          cuisine: null,
         },
       })
     }

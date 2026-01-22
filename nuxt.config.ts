@@ -30,6 +30,7 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || '',
+    cronSecretToken: process.env.CRON_SECRET_TOKEN || '',
     // OLD SUPABASE CONFIG - COMMENTED OUT FOR TELEGRAM WEB APP MIGRATION
     // public: {
     //   supabaseUrl: process.env.SUPABASE_URL || '',
