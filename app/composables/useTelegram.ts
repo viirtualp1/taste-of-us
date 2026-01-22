@@ -1,5 +1,15 @@
-import { ref, computed } from 'vue'
+import { ref, computed, markRaw } from 'vue'
 import WebApp from '@twa-dev/sdk'
+
+function safeHaptic(fn: () => void): () => void {
+  return () => {
+    try {
+      fn()
+    } catch {
+      /* no-op when outside Telegram or SDK throws (e.g. Proxy) */
+    }
+  }
+}
 
 interface TelegramUser {
   id: number
@@ -247,17 +257,29 @@ export function useTelegram() {
     }
   }
 
-  const hapticFeedback = {
-    light: () => webApp.value?.HapticFeedback?.impactOccurred('light'),
-    medium: () => webApp.value?.HapticFeedback?.impactOccurred('medium'),
-    heavy: () => webApp.value?.HapticFeedback?.impactOccurred('heavy'),
-    success: () =>
+  const hapticFeedback = markRaw({
+    light: safeHaptic(() =>
+      webApp.value?.HapticFeedback?.impactOccurred('light'),
+    ),
+    medium: safeHaptic(() =>
+      webApp.value?.HapticFeedback?.impactOccurred('medium'),
+    ),
+    heavy: safeHaptic(() =>
+      webApp.value?.HapticFeedback?.impactOccurred('heavy'),
+    ),
+    success: safeHaptic(() =>
       webApp.value?.HapticFeedback?.notificationOccurred('success'),
-    error: () => webApp.value?.HapticFeedback?.notificationOccurred('error'),
-    warning: () =>
+    ),
+    error: safeHaptic(() =>
+      webApp.value?.HapticFeedback?.notificationOccurred('error'),
+    ),
+    warning: safeHaptic(() =>
       webApp.value?.HapticFeedback?.notificationOccurred('warning'),
-    selection: () => webApp.value?.HapticFeedback?.selectionChanged(),
-  }
+    ),
+    selection: safeHaptic(() =>
+      webApp.value?.HapticFeedback?.selectionChanged(),
+    ),
+  })
 
   const showAlert = (message: string) => {
     return new Promise<void>((resolve) => {

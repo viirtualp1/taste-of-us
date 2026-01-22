@@ -52,11 +52,27 @@
     <div class="lg:col-span-2 order-5">
       <message-toast :message="message" :message-type="messageType" />
     </div>
+    <action-buttons
+      :is-sending="isSending"
+      @reset="handleReset"
+      @send="handleShowConfirm"
+      @open-dishes="handleOpenDishes"
+      @open-shopping="handleOpenShopping"
+      @open-profile="$emit('open-profile')"
+    />
+    <confirm-menu-modal
+      :is-open="isConfirmModalOpen"
+      :week-days="weekDays"
+      :selected-menu="selectedMenu"
+      :is-sending="isSending"
+      @edit="closeConfirmModal"
+      @confirm="handleConfirmSend"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, provide, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import MenuOverviewSkeleton from '@/components/MenuOverviewSkeleton.vue'
 import MenuOverview from '@/components/MenuOverview.vue'
 import ShoppingListPreview from '@/components/ShoppingListPreview.vue'
@@ -65,13 +81,18 @@ import WeekSelector from '@/components/WeekSelector.vue'
 import DayCardSkeleton from '@/components/DayCardSkeleton.vue'
 import DayCard from '@/components/DayCard.vue'
 import MessageToast from '@/components/MessageToast.vue'
+import ActionButtons from '@/components/ActionButtons.vue'
+import ConfirmMenuModal from '@/components/ConfirmMenuModal.vue'
 import { useWeekNavigation } from '@/composables/useWeekNavigation'
+import { useTelegram } from '@/composables/useTelegram'
 import { useMenuSchedule } from '@/composables/useMenuSchedule'
 import { useApiFetch } from '@/composables/useApiFetch'
 import { useMenuSelection } from '@/composables/useMenuSelection'
 import { useMenuState } from '@/composables/useMenuState'
 import { calculateStats, CATEGORIES, findNextIncompleteDay } from '@/utils/menu'
 import type { MenuData, Dish, MenuCategory } from '@/utils/menu'
+
+defineEmits<{ 'open-profile': [] }>()
 
 const { data: menuData } = await useFetch<MenuData>('/api/dishes', {
   default: () => ({
@@ -125,6 +146,39 @@ const { isSending, message, messageType, updateMenu, resetMenu, sendMenu } =
   useMenuSelection(selectedMenu, weekDays)
 
 const { setWeekDays, setSelectedMenu, setIsSending } = useMenuState()
+const { hapticFeedback } = useTelegram()
+
+const isConfirmModalOpen = ref(false)
+
+const handleReset = () => {
+  resetMenu()
+  hapticFeedback.light()
+}
+
+const handleShowConfirm = () => {
+  isConfirmModalOpen.value = true
+  hapticFeedback.light()
+}
+
+const closeConfirmModal = () => {
+  isConfirmModalOpen.value = false
+}
+
+const handleConfirmSend = async () => {
+  isConfirmModalOpen.value = false
+  await sendMenu(saveSchedule)
+  hapticFeedback.success()
+}
+
+const handleOpenDishes = () => {
+  navigateTo('/dishes')
+  hapticFeedback.light()
+}
+
+const handleOpenShopping = () => {
+  navigateTo('/shopping')
+  hapticFeedback.light()
+}
 
 watch(
   weekDays,
@@ -149,12 +203,6 @@ watch(
   },
   { immediate: true },
 )
-
-provide('menuActions', {
-  resetMenu: () => resetMenu(),
-  sendMenu: () => sendMenu(saveSchedule),
-  isSending,
-})
 
 const handleMenuUpdate = (
   dayIndex: number,

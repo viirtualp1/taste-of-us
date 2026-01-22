@@ -68,45 +68,26 @@ export default defineEventHandler(async (event) => {
   const body = await readBody<{
     telegram_chat_id?: string | null
   }>(event)
+  const value = (body.telegram_chat_id ?? '').trim() || null
 
   const supabase = createSupabaseClient()
-
-  const { data: telegramUser } = await supabase
-    .from('telegram_users')
-    .select('user_id')
-    .eq('telegram_id', telegramUserId)
-    .single()
-
-  if (!telegramUser) {
-    throw createError({
-      statusCode: 404,
-      message: 'User not found',
-    })
-  }
-
   const { data, error } = await supabase
-    .from('user_settings')
-    .upsert(
-      {
-        user_id: telegramUser.user_id,
-        telegram_chat_id: body.telegram_chat_id || String(telegramUserId),
-      },
-      {
-        onConflict: 'user_id',
-      },
-    )
-    .select()
+    .from('telegram_users')
+    .update({ recipient_telegram_chat_id: value })
+    .eq('telegram_id', telegramUserId)
+    .select('recipient_telegram_chat_id')
     .single()
 
   if (error) {
+    console.error('Settings POST:', error.message, error.code, error.details)
     throw createError({
       statusCode: 500,
-      message: 'Failed to save settings',
+      message: error.message || 'Failed to save settings',
     })
   }
 
   return {
     success: true,
-    settings: data,
+    settings: { telegram_chat_id: data?.recipient_telegram_chat_id ?? '' },
   }
 })

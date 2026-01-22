@@ -47,6 +47,29 @@ export async function getUserIdFromTelegram(
   return data.user_id
 }
 
+export async function getTelegramUserPk(event: any): Promise<string | null> {
+  const telegramUserId = await getTelegramUserIdFromHeader(event)
+
+  if (!telegramUserId) {
+    return null
+  }
+
+  const supabase = createSupabaseClient()
+
+  const { data, error } = await supabase
+    .from('telegram_users')
+    .select('id, user_id')
+    .eq('telegram_id', telegramUserId)
+    .single()
+
+  if (error || !data) {
+    return null
+  }
+
+  const row = data as { id?: string; user_id?: string }
+  return row.id ?? row.user_id ?? null
+}
+
 export async function requireTelegramAuth(event: any): Promise<number> {
   const telegramUserId = await getTelegramUserIdFromHeader(event)
 

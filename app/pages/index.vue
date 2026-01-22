@@ -24,25 +24,7 @@
       </div>
     </div>
 
-    <menu-planner v-else />
-    <action-buttons
-      v-if="isAuthenticated && menuActions"
-      :is-sending="isSending"
-      @reset="handleReset"
-      @send="handleShowConfirm"
-      @open-dishes="handleOpenDishes"
-      @open-shopping="handleOpenShopping"
-      @open-profile="handleOpenProfile"
-    />
-    <confirm-menu-modal
-      v-if="isAuthenticated"
-      :is-open="isConfirmModalOpen"
-      :week-days="weekDays"
-      :selected-menu="selectedMenu"
-      :is-sending="isSending"
-      @edit="closeConfirmModal"
-      @confirm="handleConfirmSend"
-    />
+    <menu-planner v-else @open-profile="handleOpenProfile" />
     <profile-settings-modal
       :is-open="isProfileModalOpen"
       @close="closeProfileModal"
@@ -52,13 +34,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, computed, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useTelegram } from '@/composables/useTelegram'
-import { useMenuState } from '@/composables/useMenuState'
 import MenuPlanner from '../components/MenuPlanner.vue'
-import ActionButtons from '../components/ActionButtons.vue'
 import ProfileSettingsModal from '../components/ProfileSettingsModal.vue'
-import ConfirmMenuModal from '../components/ConfirmMenuModal.vue'
 
 definePageMeta({
   layout: 'default',
@@ -121,23 +100,6 @@ const { isAuthenticated, isLoading, authenticate, hapticFeedback } =
   useTelegram()
 const authError = ref('')
 const isProfileModalOpen = ref(false)
-const isConfirmModalOpen = ref(false)
-
-const menuActions = inject<{
-  resetMenu: () => void
-  sendMenu: () => Promise<void>
-  isSending: { value: boolean }
-}>('menuActions', {
-  resetMenu: () => {},
-  sendMenu: async () => {},
-  isSending: { value: false },
-})
-
-const { weekDays, selectedMenu, isSending: isSendingState } = useMenuState()
-
-const isSending = computed(
-  () => isSendingState.value || (menuActions?.isSending?.value ?? false),
-)
 
 onMounted(async () => {
   if (!isAuthenticated.value && !isLoading.value) {
@@ -156,26 +118,6 @@ onMounted(async () => {
   }
 })
 
-const handleReset = () => {
-  menuActions?.resetMenu()
-  hapticFeedback.light()
-}
-
-const handleShowConfirm = () => {
-  isConfirmModalOpen.value = true
-  hapticFeedback.light()
-}
-
-const closeConfirmModal = () => {
-  isConfirmModalOpen.value = false
-}
-
-const handleConfirmSend = async () => {
-  isConfirmModalOpen.value = false
-  await menuActions?.sendMenu()
-  hapticFeedback.success()
-}
-
 const handleOpenProfile = () => {
   isProfileModalOpen.value = true
   hapticFeedback.light()
@@ -188,15 +130,5 @@ const closeProfileModal = () => {
 const handleSaveProfileSettings = () => {
   closeProfileModal()
   hapticFeedback.success()
-}
-
-const handleOpenDishes = () => {
-  navigateTo('/dishes')
-  hapticFeedback.light()
-}
-
-const handleOpenShopping = () => {
-  navigateTo('/shopping')
-  hapticFeedback.light()
 }
 </script>

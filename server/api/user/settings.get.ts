@@ -52,21 +52,21 @@ export default defineEventHandler(async (event) => {
   const telegramUserId = await requireTelegramAuth(event)
 
   const supabase = createSupabaseClient()
-
-  const { data: userSettings, error: settingsError } = await supabase
-    .from('user_settings')
-    .select('telegram_chat_id')
-    .eq('telegram_chat_id', String(telegramUserId))
+  const { data, error } = await supabase
+    .from('telegram_users')
+    .select('recipient_telegram_chat_id')
+    .eq('telegram_id', telegramUserId)
     .single()
 
-  if (settingsError && settingsError.code !== 'PGRST116') {
+  if (error && error.code !== 'PGRST116') {
+    console.error('Settings GET:', error)
     throw createError({
       statusCode: 500,
-      message: 'Failed to fetch user settings',
+      message: 'Failed to fetch settings',
     })
   }
 
   return {
-    telegram_chat_id: userSettings?.telegram_chat_id || String(telegramUserId),
+    telegram_chat_id: (data?.recipient_telegram_chat_id ?? '').trim() || '',
   }
 })

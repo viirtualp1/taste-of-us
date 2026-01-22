@@ -13,6 +13,7 @@ export function useMenuSelection(
   const isSending = ref(false)
   const message = ref('')
   const messageType = ref<'success' | 'error'>('success')
+  let successToastTimer: ReturnType<typeof setTimeout> | null = null
 
   const updateMenu = (
     dayIndex: number,
@@ -33,6 +34,10 @@ export function useMenuSelection(
       dessert: '',
     }))
 
+    if (successToastTimer) {
+      clearTimeout(successToastTimer)
+      successToastTimer = null
+    }
     message.value = ''
   }
 
@@ -45,6 +50,10 @@ export function useMenuSelection(
 
     isSending.value = true
     message.value = ''
+    if (successToastTimer) {
+      clearTimeout(successToastTimer)
+      successToastTimer = null
+    }
 
     try {
       await saveSchedule()
@@ -59,13 +68,35 @@ export function useMenuSelection(
         },
       }))
 
-      await apiFetch('/api/send-menu', {
+      const response = await apiFetch<{
+        success: boolean
+        message: string
+        pdfSent: boolean
+        pinned: boolean
+        pdfError?: string
+      }>('/api/send-menu', {
         method: 'POST',
         body: { menu: menuPayload },
       })
 
-      message.value = 'Menu sent successfully!'
-      messageType.value = 'success'
+      if (response.pdfSent) {
+        message.value = 'Меню успешно отправлено!'
+        messageType.value = 'success'
+      } else if (response.pdfError) {
+        message.value = `Меню отправлено, но PDF не создан: ${response.pdfError}`
+        messageType.value = 'error'
+      } else {
+        message.value = 'Меню успешно отправлено!'
+        messageType.value = 'success'
+      }
+
+      successToastTimer = setTimeout(
+        () => {
+          message.value = ''
+          successToastTimer = null
+        },
+        response.pdfError ? 8000 : 4000,
+      )
     } catch (error: unknown) {
       console.error('Error sending menu:', error)
       const apiError = error as {

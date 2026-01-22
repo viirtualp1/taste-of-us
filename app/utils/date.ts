@@ -10,11 +10,13 @@ export function getStartOfWeek(date: Date): Date {
   const day = (copy.getDay() + 6) % 7
   copy.setDate(copy.getDate() - day)
   copy.setHours(0, 0, 0, 0)
+
   return copy
 }
 
 export function buildWeekDays(startDate: Date): WeekDay[] {
   const days: WeekDay[] = []
+
   for (let i = 0; i < 7; i++) {
     const date = new Date(startDate)
     date.setDate(startDate.getDate() + i)
@@ -29,7 +31,7 @@ export function buildWeekDays(startDate: Date): WeekDay[] {
         month: 'short',
         day: 'numeric',
       }),
-      date: date.toISOString().split('T')[0],
+      date: date.toISOString().split('T')[0] ?? '',
     })
   }
   return days
@@ -47,5 +49,6 @@ export function formatWeekLabel(startDate: Date): string {
     month: 'short',
     day: 'numeric',
   })
+
   return `${startLabel} – ${endLabel}`
 }

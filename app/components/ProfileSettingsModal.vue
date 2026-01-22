@@ -104,6 +104,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useAuth } from '@/composables/useAuth'
+import { useApiFetch } from '@/composables/useApiFetch'
 import BottomSheet from '@/components/ui/BottomSheet.vue'
 
 interface Props {
@@ -117,29 +118,23 @@ const emit = defineEmits<{
   save: [telegramId: string]
 }>()
 
-const { getAuthHeaders, isAuthenticated } = useAuth()
+const { isAuthenticated } = useAuth()
+const { apiFetch } = useApiFetch()
 const telegramId = ref('')
 const isLoading = ref(false)
 const error = ref('')
 
 const loadSettings = async () => {
-  if (!isAuthenticated.value) {
-    return
-  }
+  if (!isAuthenticated.value) return
 
   isLoading.value = true
   error.value = ''
 
   try {
-    const headers = getAuthHeaders()
-    const response = await $fetch<{ telegram_chat_id: string | null }>(
+    const response = await apiFetch<{ telegram_chat_id: string | null }>(
       '/api/user/settings',
-      {
-        headers,
-      },
     )
-
-    telegramId.value = response.telegram_chat_id || ''
+    telegramId.value = response?.telegram_chat_id ?? ''
   } catch (err: any) {
     error.value =
       err?.data?.message || err?.message || 'Failed to load settings'
@@ -159,15 +154,10 @@ const saveSettings = async () => {
   error.value = ''
 
   try {
-    const headers = getAuthHeaders()
-    await $fetch('/api/user/settings', {
+    await apiFetch('/api/user/settings', {
       method: 'POST',
-      headers,
-      body: {
-        telegram_chat_id: telegramId.value || null,
-      },
+      body: { telegram_chat_id: telegramId.value || null },
     })
-
     emit('save', telegramId.value)
     closeModal()
   } catch (err: any) {

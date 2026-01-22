@@ -2,6 +2,19 @@ import puppeteer from 'puppeteer'
 import { readFile } from 'fs/promises'
 import { join } from 'path'
 
+async function checkChromeAvailable(): Promise<boolean> {
+  try {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    })
+    await browser.close()
+    return true
+  } catch {
+    return false
+  }
+}
+
 interface MenuDay {
   day: string
   date: string
@@ -33,101 +46,106 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // OLD SUPABASE AUTH - COMMENTED OUT FOR TELEGRAM WEB APP MIGRATION
-  /*
-  const authHeader = getHeader(event, 'authorization')
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    throw createError({
-      statusCode: 401,
-      message: 'Unauthorized. Please log in.',
-    })
-  }
+  const { requireTelegramAuth } = await import('../utils/auth')
+  const { createSupabaseClient } = await import('../utils/supabase')
 
-  const token = authHeader.replace('Bearer ', '')
+  const telegramUserId = await requireTelegramAuth(event)
+
   const supabase = createSupabaseClient()
-
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser(token)
-
-  if (authError || !user) {
-    throw createError({
-      statusCode: 401,
-      message: 'Invalid or expired token. Please log in again.',
-    })
-  }
-
-  const { data: userSettings, error: settingsError } = await supabase
-    .from('user_settings')
-    .select('telegram_chat_id')
-    .eq('user_id', user.id)
+  const { data: row, error: fetchErr } = await supabase
+    .from('telegram_users')
+    .select('recipient_telegram_chat_id')
+    .eq('telegram_id', telegramUserId)
     .single()
 
-  if (settingsError && settingsError.code !== 'PGRST116') {
-    console.error('Error fetching user settings:', settingsError)
+  if (fetchErr && fetchErr.code !== 'PGRST116') {
+    throw createError({
+      statusCode: 500,
+      message: 'Failed to load settings. Please try again.',
+    })
   }
 
-  const telegramChatId = userSettings?.telegram_chat_id
-
+  const telegramChatId = (row?.recipient_telegram_chat_id ?? '').trim() || null
   if (!telegramChatId) {
     throw createError({
       statusCode: 400,
       message:
-        'Telegram Chat ID is required. Please set it in your profile settings.',
+        'Set recipient Telegram Chat ID in Profile settings to send the menu.',
     })
   }
-  */
-
-  const { requireTelegramAuth } = await import('../utils/auth')
-  const telegramUserId = await requireTelegramAuth(event)
-  const telegramChatId = String(telegramUserId)
 
   try {
     const menuText = formatMenuForTelegram(body.menu)
 
     let messageId: number | null = null
     let pdfSent = false
+    let pdfError: string | null = null
 
-    try {
-      const pdfBuffer = await generateMenuPDF(body.menu)
+    const chromeAvailable = await checkChromeAvailable()
 
-      const result = await sendTelegramDocument(
-        telegramBotToken,
-        telegramChatId,
-        pdfBuffer,
-        'menu.pdf',
-        menuText,
-      )
-      pdfSent = true
+    if (chromeAvailable) {
+      try {
+        const pdfBuffer = await generateMenuPDF(body.menu)
 
-      if (result && result.result && result.result.message_id) {
-        messageId = result.result.message_id
+        const result = await sendTelegramDocument(
+          telegramBotToken,
+          telegramChatId,
+          pdfBuffer,
+          'menu.pdf',
+          menuText,
+        )
+        pdfSent = true
 
-        if (!messageId) return
+        if (result && result.result && result.result.message_id) {
+          messageId = result.result.message_id
 
-        try {
-          await pinTelegramMessage(telegramBotToken, telegramChatId, messageId)
-        } catch (pinError) {
-          console.error('Error pinning message:', pinError)
+          if (!messageId) return
+
+          try {
+            await pinTelegramMessage(
+              telegramBotToken,
+              telegramChatId,
+              messageId,
+            )
+          } catch {
+            // Ignore pin errors
+          }
+        }
+      } catch (pdfErrorCaught: any) {
+        const errorMessage =
+          pdfErrorCaught instanceof Error
+            ? pdfErrorCaught.message
+            : String(pdfErrorCaught)
+
+        if (errorMessage !== 'CHROME_NOT_AVAILABLE') {
+          pdfError = errorMessage
         }
       }
-    } catch (pdfError: any) {
-      console.error('Error generating/sending PDF:', pdfError)
-      console.error(
-        'PDF error details:',
-        pdfError instanceof Error ? pdfError.stack : String(pdfError),
-      )
+    }
 
+    if (!pdfSent) {
       try {
-        await sendTelegramMessage(telegramBotToken, telegramChatId, menuText)
+        const textResult = await sendTelegramMessage(
+          telegramBotToken,
+          telegramChatId,
+          menuText,
+        )
+        const textMessageId = textResult?.result?.message_id
+        if (textMessageId) {
+          try {
+            await pinTelegramMessage(
+              telegramBotToken,
+              telegramChatId,
+              textMessageId,
+            )
+            messageId = textMessageId
+          } catch {
+            // Ignore pin errors
+          }
+        }
       } catch (textError: any) {
         const textErrorMessage =
           textError?.message || String(textError) || 'Unknown error'
-        console.error(
-          'Failed to send text message as fallback:',
-          textErrorMessage,
-        )
 
         if (
           textErrorMessage.includes('chat not found') ||
@@ -160,14 +178,11 @@ export default defineEventHandler(async (event) => {
         : 'Menu sent successfully (PDF generation failed)',
       pdfSent,
       pinned: messageId !== null,
+      pdfError: pdfError || undefined,
     }
   } catch (error) {
-    console.error('Error sending menu:', error)
     const errorMessage =
       error instanceof Error ? error.message : 'Unknown error'
-    const errorDetails =
-      error instanceof Error && error.stack ? error.stack : String(error)
-    console.error('Error details:', errorDetails)
     throw createError({
       statusCode: 500,
       message: `Failed to send menu: ${errorMessage}`,
@@ -176,16 +191,10 @@ export default defineEventHandler(async (event) => {
 })
 
 function formatMenuForTelegram(menu: MenuDay[]) {
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-  }
-
   let text = '🍽️ *Weekly Menu Plan*\n\n'
 
   menu.forEach((day) => {
-    const date = formatDate(day.date)
-    text += `📅 *${day.day}* (${date})\n`
+    text += `📅 *${day.day}*\n`
     if (day.meals.brunch) text += `🌅 Brunch: ${day.meals.brunch}\n`
     if (day.meals.dinner) text += `🌙 Dinner: ${day.meals.dinner}\n`
     if (day.meals.dessert) text += `🍰 Dessert: ${day.meals.dessert}\n`
@@ -205,51 +214,39 @@ async function sendTelegramMessage(
 ) {
   const url = `https://api.telegram.org/bot${token}/sendMessage`
 
-  try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        chat_id: chatId,
-        text: text,
-        parse_mode: 'Markdown',
-      }),
-    })
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      chat_id: chatId,
+      text: text,
+      parse_mode: 'Markdown',
+    }),
+  })
 
-    const responseText = await response.text()
+  const responseText = await response.text()
 
-    if (!response.ok) {
-      let errorMessage = `Telegram API error: ${responseText}`
+  if (!response.ok) {
+    let errorMessage = `Telegram API error: ${responseText}`
 
-      try {
-        const errorJson = JSON.parse(responseText)
-        if (errorJson.description) {
-          errorMessage = `Telegram API error: ${errorJson.description}`
-        }
-        if (errorJson.error_code) {
-          errorMessage += ` (Error code: ${errorJson.error_code})`
-        }
-      } catch (err) {
-        console.error('Error parsing error JSON:', err)
+    try {
+      const errorJson = JSON.parse(responseText)
+      if (errorJson.description) {
+        errorMessage = `Telegram API error: ${errorJson.description}`
       }
-
-      console.error('Telegram message send error:', {
-        status: response.status,
-        statusText: response.statusText,
-        error: responseText,
-        chatId: chatId,
-      })
-
-      throw new Error(errorMessage)
+      if (errorJson.error_code) {
+        errorMessage += ` (Error code: ${errorJson.error_code})`
+      }
+    } catch {
+      // Ignore parse errors
     }
 
-    return JSON.parse(responseText)
-  } catch (error) {
-    console.error('Error in sendTelegramMessage:', error)
-    throw error
+    throw new Error(errorMessage)
   }
+
+  return JSON.parse(responseText)
 }
 
 async function pinTelegramMessage(
@@ -257,49 +254,38 @@ async function pinTelegramMessage(
   chatId: string,
   messageId: number,
 ) {
-  try {
-    const url = `https://api.telegram.org/bot${token}/pinChatMessage`
+  const url = `https://api.telegram.org/bot${token}/pinChatMessage`
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        chat_id: chatId,
-        message_id: messageId,
-        disable_notification: false,
-      }),
-    })
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      chat_id: chatId,
+      message_id: messageId,
+      disable_notification: false,
+    }),
+  })
 
-    const responseText = await response.text()
+  const responseText = await response.text()
 
-    if (!response.ok) {
-      let errorMessage = `Telegram API error: ${responseText}`
+  if (!response.ok) {
+    let errorMessage = `Telegram API error: ${responseText}`
 
-      try {
-        const errorJson = JSON.parse(responseText)
-        if (errorJson.description) {
-          errorMessage = `Telegram API error: ${errorJson.description}`
-        }
-      } catch (err) {
-        console.error('Error parsing error JSON:', err)
+    try {
+      const errorJson = JSON.parse(responseText)
+      if (errorJson.description) {
+        errorMessage = `Telegram API error: ${errorJson.description}`
       }
-
-      console.error('Error pinning message:', {
-        status: response.status,
-        statusText: response.statusText,
-        error: responseText,
-      })
-
-      throw new Error(errorMessage)
+    } catch {
+      // Ignore parse errors
     }
 
-    return JSON.parse(responseText)
-  } catch (error) {
-    console.error('Error in pinTelegramMessage:', error)
-    throw error
+    throw new Error(errorMessage)
   }
+
+  return JSON.parse(responseText)
 }
 
 async function sendTelegramDocument(
@@ -309,114 +295,111 @@ async function sendTelegramDocument(
   filename: string,
   caption?: string,
 ) {
-  try {
-    if (document.length > 50 * 1024 * 1024) {
-      throw new Error('PDF file is too large (max 50MB for Telegram Bot API)')
-    }
-
-    const FormDataModule = await import('form-data')
-    const FormDataClass = FormDataModule.default
-    const https = await import('https')
-    const { URL } = await import('url')
-
-    const form = new FormDataClass()
-
-    form.append('chat_id', String(chatId))
-    form.append('document', document, {
-      filename: filename,
-      contentType: 'application/pdf',
-      knownLength: document.length,
-    })
-
-    if (caption) {
-      form.append('caption', caption)
-      form.append('parse_mode', 'Markdown')
-    }
-
-    const apiUrl = new URL(`https://api.telegram.org/bot${token}/sendDocument`)
-    const headers = form.getHeaders()
-
-    const response = await new Promise<{
-      statusCode: number
-      statusMessage: string
-      data: string
-    }>((resolve, reject) => {
-      const req = https.request(
-        {
-          hostname: apiUrl.hostname,
-          path: apiUrl.pathname + apiUrl.search,
-          method: 'POST',
-          headers: headers,
-        },
-        (res) => {
-          let data = ''
-          res.on('data', (chunk) => {
-            data += chunk.toString()
-          })
-          res.on('end', () => {
-            resolve({
-              statusCode: res.statusCode || 500,
-              statusMessage: res.statusMessage || 'Unknown',
-              data,
-            })
-          })
-        },
-      )
-
-      req.on('error', (error) => {
-        reject(error)
-      })
-
-      form.pipe(req)
-    })
-
-    const responseText = response.data
-    if (response.statusCode !== 200) {
-      let errorMessage = `Telegram API error (${response.statusCode}): ${responseText || 'Empty response'}`
-
-      try {
-        if (responseText) {
-          const errorJson = JSON.parse(responseText)
-          if (errorJson.description) {
-            errorMessage = `Telegram API error: ${errorJson.description}`
-          }
-          if (errorJson.error_code) {
-            errorMessage += ` (Error code: ${errorJson.error_code})`
-          }
-        }
-      } catch (err) {
-        console.error('Error parsing error JSON:', err)
-      }
-
-      console.error('Telegram document send error:', {
-        status: response.statusCode,
-        statusText: response.statusMessage,
-        error: responseText || 'Empty response',
-      })
-
-      throw new Error(errorMessage)
-    }
-
-    if (!responseText) {
-      throw new Error('Empty response from Telegram API')
-    }
-
-    const result = JSON.parse(responseText)
-    if (!result.ok) {
-      throw new Error(
-        `Telegram API error: ${result.description || 'Unknown error'}`,
-      )
-    }
-
-    return result
-  } catch (error) {
-    console.error('Error in sendTelegramDocument:', error)
-    if (error instanceof Error) {
-      console.error('Error message:', error.message)
-      console.error('Error stack:', error.stack)
-    }
-    throw error
+  if (document.length > 50 * 1024 * 1024) {
+    throw new Error('PDF file is too large (max 50MB for Telegram Bot API)')
   }
+
+  const FormDataModule = await import('form-data')
+  const FormDataClass = FormDataModule.default
+  const https = await import('https')
+  const { URL } = await import('url')
+
+  const form = new FormDataClass()
+
+  form.append('chat_id', String(chatId))
+  form.append('document', document, {
+    filename: filename,
+    contentType: 'application/pdf',
+    knownLength: document.length,
+  })
+
+  if (caption) {
+    form.append('caption', caption)
+    form.append('parse_mode', 'Markdown')
+  }
+
+  const apiUrl = new URL(`https://api.telegram.org/bot${token}/sendDocument`)
+  const headers = form.getHeaders()
+
+  const response = await new Promise<{
+    statusCode: number
+    statusMessage: string
+    data: string
+  }>((resolve, reject) => {
+    const req = https.request(
+      {
+        hostname: apiUrl.hostname,
+        path: apiUrl.pathname + apiUrl.search,
+        method: 'POST',
+        headers: headers,
+      },
+      (res) => {
+        let data = ''
+        res.on('data', (chunk) => {
+          data += chunk.toString()
+        })
+        res.on('end', () => {
+          resolve({
+            statusCode: res.statusCode || 500,
+            statusMessage: res.statusMessage || 'Unknown',
+            data,
+          })
+        })
+      },
+    )
+
+    req.on('error', (error) => {
+      reject(error)
+    })
+
+    form.pipe(req)
+  })
+
+  const responseText = response.data
+  if (response.statusCode !== 200) {
+    let errorMessage = `Telegram API error (${response.statusCode}): ${responseText || 'Empty response'}`
+
+    try {
+      if (responseText) {
+        const errorJson = JSON.parse(responseText)
+        if (errorJson.description) {
+          errorMessage = `Telegram API error: ${errorJson.description}`
+        }
+        if (errorJson.error_code) {
+          errorMessage += ` (Error code: ${errorJson.error_code})`
+        }
+      }
+    } catch {
+      // Ignore parse errors
+    }
+
+    throw new Error(errorMessage)
+  }
+
+  if (!responseText) {
+    throw new Error('Empty response from Telegram API')
+  }
+
+  const result = JSON.parse(responseText)
+  if (!result.ok) {
+    throw new Error(
+      `Telegram API error: ${result.description || 'Unknown error'}`,
+    )
+  }
+
+  return result
+}
+
+function isChromeError(error: unknown): boolean {
+  const errorMessage = error instanceof Error ? error.message : String(error)
+  const lowerMessage = errorMessage.toLowerCase()
+  return (
+    lowerMessage.includes('chrome') ||
+    lowerMessage.includes('chromium') ||
+    lowerMessage.includes('browser') ||
+    lowerMessage.includes('executable') ||
+    lowerMessage.includes('could not find')
+  )
 }
 
 async function generateMenuPDF(menu: MenuDay[]) {
@@ -428,13 +411,17 @@ async function generateMenuPDF(menu: MenuDay[]) {
         '--no-sandbox',
         '--disable-setuid-sandbox',
         '--disable-dev-shm-usage',
+        '--disable-gpu',
+        '--single-process',
       ],
     })
   } catch (error) {
-    console.error('Error launching browser:', error)
-    throw new Error(
-      `Failed to launch browser: ${error instanceof Error ? error.message : 'Unknown error'}`,
-    )
+    if (isChromeError(error)) {
+      throw new Error('CHROME_NOT_AVAILABLE')
+    }
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error'
+    throw new Error(`Failed to launch browser: ${errorMessage}`)
   }
 
   try {
@@ -445,8 +432,8 @@ async function generateMenuPDF(menu: MenuDay[]) {
       const faviconPath = join(process.cwd(), 'public', 'favicon.jpg')
       const faviconBuffer = await readFile(faviconPath)
       faviconBase64 = `data:image/jpeg;base64,${faviconBuffer.toString('base64')}`
-    } catch (error) {
-      console.warn('Could not load favicon:', error)
+    } catch {
+      // Favicon is optional
     }
 
     const formatDate = (dateString: string) => {
@@ -486,10 +473,10 @@ async function generateMenuPDF(menu: MenuDay[]) {
 
             body {
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-              background: linear-gradient(135deg, #f0f9f4 0%, #e8f5ed 30%, #f0f9f4 50%, #e8f5ed 100%);
+              background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 30%, #f0fdf4 50%, #dcfce7 100%);
               min-height: 100vh;
-              padding: 20px 20px;
-              color: #1f2937;
+              padding: 20px;
+              color: #111827;
             }
 
             .container {
@@ -500,12 +487,11 @@ async function generateMenuPDF(menu: MenuDay[]) {
             .header {
               text-align: center;
               margin-bottom: 20px;
-              background: rgba(255, 240, 245, 0.95);
-              backdrop-filter: blur(20px);
+              background: #ffffff;
               padding: 20px;
               border-radius: 16px;
-              box-shadow: 0 8px 32px rgba(251, 113, 133, 0.4);
-              border: 1px solid rgba(255, 192, 203, 0.3);
+              box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+              border: 1px solid #bbf7d0;
               position: relative;
               display: flex;
               align-items: center;
@@ -529,7 +515,7 @@ async function generateMenuPDF(menu: MenuDay[]) {
             .header h1 {
               font-size: 32px;
               font-weight: 800;
-              color: #ec4899;
+              color: #15803d;
               margin-bottom: 4px;
             }
 
@@ -547,12 +533,11 @@ async function generateMenuPDF(menu: MenuDay[]) {
             }
 
             .day-card {
-              background: rgba(255, 245, 250, 0.9);
-              backdrop-filter: blur(20px);
+              background: #ffffff;
               border-radius: 12px;
               padding: 16px;
-              box-shadow: 0 8px 32px rgba(251, 113, 133, 0.3);
-              border: 1px solid rgba(255, 192, 203, 0.4);
+              box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+              border: 1px solid #e5e7eb;
               page-break-inside: avoid;
               margin-bottom: 0;
             }
@@ -563,13 +548,13 @@ async function generateMenuPDF(menu: MenuDay[]) {
               align-items: center;
               margin-bottom: 12px;
               padding-bottom: 8px;
-              border-bottom: 2px solid rgba(251, 113, 133, 0.4);
+              border-bottom: 2px solid #bbf7d0;
             }
 
             .day-title {
               font-size: 16px;
               font-weight: 700;
-              color: #1f2937;
+              color: #111827;
             }
 
             .day-date {
@@ -591,24 +576,23 @@ async function generateMenuPDF(menu: MenuDay[]) {
               align-items: flex-start;
               gap: 8px;
               padding: 10px;
-              background: rgba(255, 240, 245, 0.7);
-              border-radius: 10px;
-              border-left: 3px solid;
+              border-radius: 12px;
+              border-left: 4px solid;
             }
 
             .meal-item.brunch {
-              border-left-color: #fbcfe8;
-              background: rgba(255, 228, 240, 0.7);
+              border-left-color: #86efac;
+              background: #f0fdf4;
             }
 
             .meal-item.dinner {
-              border-left-color: #f472b6;
-              background: rgba(255, 200, 225, 0.7);
+              border-left-color: #4ade80;
+              background: #f0fdf4;
             }
 
             .meal-item.dessert {
-              border-left-color: #fbbf24;
-              background: rgba(255, 237, 213, 0.7);
+              border-left-color: #22c55e;
+              background: #dcfce7;
             }
 
             .meal-icon {
@@ -632,22 +616,23 @@ async function generateMenuPDF(menu: MenuDay[]) {
             .meal-name {
               font-size: 13px;
               font-weight: 600;
-              color: #1f2937;
+              color: #111827;
             }
 
             .empty-meal {
               font-size: 11px;
-              color: #fb7185;
+              color: #6b7280;
               font-style: italic;
               padding: 8px;
               text-align: center;
-              background: rgba(255, 228, 240, 0.5);
-              border-radius: 10px;
+              background: #f9fafb;
+              border-radius: 12px;
+              border: 1px dashed #e5e7eb;
             }
 
             @media print {
               body {
-                background: linear-gradient(135deg, #f0f9f4 0%, #e8f5ed 30%, #f0f9f4 50%, #e8f5ed 100%);
+                background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 30%, #f0fdf4 50%, #dcfce7 100%);
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
               }
@@ -709,8 +694,7 @@ async function generateMenuPDF(menu: MenuDay[]) {
     `
 
     await page.setContent(html, {
-      waitUntil: 'domcontentloaded',
-      timeout: 20000,
+      waitUntil: 'networkidle0',
     })
 
     await new Promise((resolve) => setTimeout(resolve, 500))
@@ -725,7 +709,6 @@ async function generateMenuPDF(menu: MenuDay[]) {
         left: '0',
       },
       preferCSSPageSize: true,
-      timeout: 20000,
     })
 
     if (!pdfBuffer || pdfBuffer.length === 0) {
@@ -734,21 +717,17 @@ async function generateMenuPDF(menu: MenuDay[]) {
 
     return Buffer.from(pdfBuffer)
   } catch (error) {
-    console.error('Error generating PDF:', error)
-    console.error(
-      'Error stack:',
-      error instanceof Error ? error.stack : 'No stack trace',
-    )
-    throw new Error(
-      `Failed to generate PDF: ${error instanceof Error ? error.message : 'Unknown error'}`,
-    )
+    if (isChromeError(error)) {
+      throw new Error('CHROME_NOT_AVAILABLE')
+    }
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error'
+    throw new Error(`Failed to generate PDF: ${errorMessage}`)
   } finally {
     if (browser) {
-      try {
-        await browser.close()
-      } catch (err) {
-        console.error('Error closing browser:', err)
-      }
+      await browser.close().catch(() => {
+        // Ignore close errors
+      })
     }
   }
 }
