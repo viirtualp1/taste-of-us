@@ -34,10 +34,11 @@
                 <slot name="title">Select a dish</slot>
               </h2>
               <button
-                class="rounded-[12px] p-2 hover:bg-white/20 transition-colors"
+                class="w-10 h-10 shrink-0 flex items-center justify-center rounded-[12px] text-gray-600 hover:bg-white/20 transition-colors"
+                aria-label="Close"
                 @click="$emit('update:modelValue', false)"
               >
-                <Icon name="heroicons:x-mark" class="w-5 h-5 text-gray-600" />
+                <Icon name="heroicons:x-mark" class="w-5 h-5" />
               </button>
             </div>
             <div class="flex-1 overflow-y-auto p-6">

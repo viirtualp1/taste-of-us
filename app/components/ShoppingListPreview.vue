@@ -82,6 +82,24 @@
               {{ item.quantity }}
             </span>
           </div>
+          <div class="shrink-0 w-8 h-8 flex items-center justify-center">
+            <button
+              class="w-8 h-8 flex items-center justify-center rounded-[8px] hover:bg-red-50/50 transition-colors text-red-500 disabled:opacity-50"
+              :disabled="deletingId === item.id"
+              @click.stop="deleteItem(item)"
+            >
+              <Icon
+                v-if="deletingId === item.id"
+                name="heroicons:arrow-path"
+                class="w-4 h-4 animate-spin"
+              />
+              <Icon
+                v-else
+                name="heroicons:x-mark"
+                class="w-4 h-4"
+              />
+            </button>
+          </div>
         </div>
         <div
           v-if="items.length > 5"
@@ -190,6 +208,7 @@ const isAddModalOpen = ref(false)
 const newItemName = ref('')
 const newItemQuantity = ref('')
 const isAddingItem = ref(false)
+const deletingId = ref<string | null>(null)
 
 const weekStartDate = computed(() => {
   if (!props.weekStart) return ''
@@ -269,6 +288,19 @@ const toggleItem = async (item: ShoppingListItem) => {
   } catch (error) {
     console.error('Error toggling item:', error)
     item.is_checked = !newChecked
+  }
+}
+
+const deleteItem = async (item: ShoppingListItem) => {
+  deletingId.value = item.id
+  hapticFeedback.light()
+  try {
+    await apiFetch(`/api/shopping-list/${item.id}`, { method: 'DELETE' })
+    items.value = items.value.filter((i) => i.id !== item.id)
+  } catch (error) {
+    console.error('Error deleting item:', error)
+  } finally {
+    deletingId.value = null
   }
 }
 

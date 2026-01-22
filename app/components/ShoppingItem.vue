@@ -38,12 +38,24 @@
       </span>
     </div>
 
-    <button
-      class="shrink-0 p-1.5 rounded-[8px] hover:bg-red-50/50 transition-colors"
-      @click.stop="$emit('delete')"
-    >
-      <Icon name="heroicons:x-mark" class="w-4 h-4 text-red-500" />
-    </button>
+    <div class="shrink-0 w-9 h-9 flex items-center justify-center">
+      <button
+        class="w-9 h-9 flex items-center justify-center rounded-[8px] hover:bg-red-50/50 transition-colors text-red-500 disabled:opacity-50"
+        :disabled="isDeleting"
+        @click.stop="$emit('delete')"
+      >
+        <Icon
+          v-if="isDeleting"
+          name="heroicons:arrow-path"
+          class="w-4 h-4 animate-spin"
+        />
+        <Icon
+          v-else
+          name="heroicons:x-mark"
+          class="w-4 h-4"
+        />
+      </button>
+    </div>
   </div>
 </template>
 
@@ -60,9 +72,12 @@ interface ShoppingListItem {
 
 interface Props {
   item: ShoppingListItem
+  isDeleting?: boolean
 }
 
-defineProps<Props>()
+withDefaults(defineProps<Props>(), {
+  isDeleting: false,
+})
 
 const emit = defineEmits<{
   toggle: []

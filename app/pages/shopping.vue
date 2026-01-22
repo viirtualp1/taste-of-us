@@ -71,7 +71,7 @@
             v-model="newItemQuantity"
             type="text"
             placeholder="Qty (e.g. 500g)"
-            class="w-20 sm:w-[150px] px-2 sm:px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
+            class="w-28 sm:w-[150px] px-3 sm:px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
             @keydown.enter="addItem"
           />
           <button
@@ -118,6 +118,7 @@
                 v-for="item in dishItems"
                 :key="item.id"
                 :item="item"
+                :is-deleting="deletingId === item.id"
                 @toggle="toggleItem(item)"
                 @delete="deleteItem(item.id)"
               />
@@ -136,6 +137,7 @@
                 v-for="item in commonListItems"
                 :key="item.id"
                 :item="item"
+                :is-deleting="deletingId === item.id"
                 @toggle="toggleItem(item)"
                 @delete="deleteItem(item.id)"
               />
@@ -154,6 +156,7 @@
                 v-for="item in manualItems"
                 :key="item.id"
                 :item="item"
+                :is-deleting="deletingId === item.id"
                 @toggle="toggleItem(item)"
                 @delete="deleteItem(item.id)"
               />
@@ -197,7 +200,7 @@
               v-model="newCommonItemQuantity"
               type="text"
               placeholder="Qty (e.g. 500g)"
-              class="w-20 sm:w-[150px] px-2 sm:px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
+              class="w-28 sm:w-[150px] px-3 sm:px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
               @keydown.enter="addCommonItem"
             />
               <button
@@ -296,6 +299,7 @@ const newItemName = ref('')
 const newItemQuantity = ref('')
 const isAddingItem = ref(false)
 const isGenerating = ref(false)
+const deletingId = ref<string | null>(null)
 const isNavigating = ref(false)
 
 const commonItems = ref<CommonItem[]>([])
@@ -391,14 +395,17 @@ const toggleItem = async (item: ShoppingListItem) => {
 }
 
 const deleteItem = async (itemId: string) => {
+  deletingId.value = itemId
+  hapticFeedback.light()
   try {
     await apiFetch(`/api/shopping-list/${itemId}`, {
       method: 'DELETE',
     })
     items.value = items.value.filter((i) => i.id !== itemId)
-    hapticFeedback.light()
   } catch (error) {
     console.error('Error deleting item:', error)
+  } finally {
+    deletingId.value = null
   }
 }
 

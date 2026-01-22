@@ -3,7 +3,6 @@ import withNuxt from './.nuxt/eslint.config.mjs'
 
 export default withNuxt({
   rules: {
-    semi: ['error', 'never'],
     'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 0, maxBOF: 0 }],
     '@typescript-eslint/no-explicit-any': 'off',
     'vue/html-self-closing': 'off',
