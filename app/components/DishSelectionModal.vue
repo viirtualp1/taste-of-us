@@ -22,8 +22,22 @@
       </div>
 
       <template v-if="isMobile">
-        <div class="flex items-center gap-2 p-3 border-b border-gray-200 overflow-x-auto flex-nowrap shrink-0 bg-gray-50">
-          <button
+        <div class="p-3 border-b border-gray-200 shrink-0 bg-white space-y-3">
+          <div class="relative">
+            <Icon
+              name="heroicons:magnifying-glass"
+              class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+            />
+            <input
+              v-model="searchQuery"
+              type="search"
+              placeholder="Search dishes..."
+              class="w-full pl-9 pr-4 py-2.5 rounded-[12px] border border-gray-200 bg-gray-50 focus:bg-white focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-200/50 text-gray-900 placeholder-gray-400"
+              aria-label="Search dishes"
+            />
+          </div>
+          <div class="flex items-center gap-2 overflow-x-auto flex-nowrap pb-0.5 -mx-0.5">
+            <button
             v-for="category in CATEGORIES"
             :key="category.key"
             class="px-4 py-2 rounded-[12px] text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 border"
@@ -36,6 +50,7 @@
           >
             {{ category.label }}
           </button>
+          </div>
         </div>
 
         <div class="flex-1 overflow-y-auto p-4 overscroll-contain min-h-0 bg-white">
@@ -44,7 +59,9 @@
             class="text-center py-12 text-gray-500"
           >
             <p class="text-lg font-medium">No dishes found</p>
-            <p class="text-sm mt-2">Try selecting a different category</p>
+            <p class="text-sm mt-2">
+              {{ searchQuery ? 'Try a different search or category' : 'Try selecting a different category' }}
+            </p>
           </div>
           <div v-else class="grid grid-cols-1 gap-3">
             <button
@@ -73,7 +90,22 @@
       <template v-else>
         <div class="flex-1 flex overflow-hidden min-h-0">
           <div class="flex flex-col w-48 border-r border-gray-200 shrink-0 bg-gray-50">
-            <div class="p-4 space-y-2 overflow-y-auto">
+            <div class="p-4 space-y-3 shrink-0">
+              <div class="relative">
+                <Icon
+                  name="heroicons:magnifying-glass"
+                  class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+                />
+                <input
+                  v-model="searchQuery"
+                  type="search"
+                  placeholder="Search..."
+                  class="w-full pl-9 pr-3 py-2 rounded-[12px] border border-gray-200 bg-white focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-200/50 text-gray-900 placeholder-gray-400 text-sm"
+                  aria-label="Search dishes"
+                />
+              </div>
+            </div>
+            <div class="p-4 pt-0 space-y-2 overflow-y-auto">
               <button
                 v-for="category in CATEGORIES"
                 :key="category.key"
@@ -96,7 +128,9 @@
               class="text-center py-12 text-gray-500"
             >
               <p class="text-lg font-medium">No dishes found</p>
-              <p class="text-sm mt-2">Try selecting a different category</p>
+              <p class="text-sm mt-2">
+                {{ searchQuery ? 'Try a different search or category' : 'Try selecting a different category' }}
+              </p>
             </div>
             <div v-else class="grid grid-cols-2 lg:grid-cols-3 gap-4">
               <button
@@ -150,6 +184,7 @@ const emit = defineEmits<{
 const { apiFetch } = useApiFetch()
 const selectedCategory = ref<MenuCategory>(props.category)
 const selectedDish = ref<string | undefined>(props.selectedDishName)
+const searchQuery = ref('')
 const dishIngredients = ref<Record<string, Ingredient[]>>({})
 
 const categoryLabel = computed(() => {
@@ -160,7 +195,17 @@ const categoryLabel = computed(() => {
 
 const filteredDishes = computed(() => {
   if (!props.dishes || !Array.isArray(props.dishes)) return []
-  return props.dishes.filter((dish) => dish.category === selectedCategory.value)
+  const byCategory = props.dishes.filter((d) => d.category === selectedCategory.value)
+  const q = searchQuery.value.trim().toLowerCase()
+  if (!q) return byCategory
+  return byCategory.filter((dish) => {
+    if (dish.name.toLowerCase().includes(q)) return true
+    const ing = dishIngredients.value[dish.id ?? '']
+    if (ing?.length) {
+      return ing.some((i) => i.name.toLowerCase().includes(q))
+    }
+    return false
+  })
 })
 
 const loadIngredients = async () => {
@@ -198,6 +243,7 @@ watch(
   () => props.isOpen,
   (isOpen) => {
     if (isOpen) {
+      searchQuery.value = ''
       loadIngredients()
     }
   },

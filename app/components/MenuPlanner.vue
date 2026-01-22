@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, provide, watch } from 'vue'
+import { computed, onMounted, provide, ref, watch } from 'vue'
 import MenuOverviewSkeleton from '@/components/MenuOverviewSkeleton.vue'
 import MenuOverview from '@/components/MenuOverview.vue'
 import ShoppingListPreview from '@/components/ShoppingListPreview.vue'
@@ -67,6 +67,7 @@ import DayCard from '@/components/DayCard.vue'
 import MessageToast from '@/components/MessageToast.vue'
 import { useWeekNavigation } from '@/composables/useWeekNavigation'
 import { useMenuSchedule } from '@/composables/useMenuSchedule'
+import { useApiFetch } from '@/composables/useApiFetch'
 import { useMenuSelection } from '@/composables/useMenuSelection'
 import { useMenuState } from '@/composables/useMenuState'
 import { calculateStats, CATEGORIES, findNextIncompleteDay } from '@/utils/menu'
@@ -80,40 +81,25 @@ const { data: menuData } = await useFetch<MenuData>('/api/dishes', {
   }),
 })
 
-const { data: dishesData, error: dishesError } = await useFetch<Dish[]>(
-  '/api/dishes/all',
-  {
-    default: () => [],
-    onResponseError({ response }) {
-      console.error(
-        'Error fetching dishes:',
-        response.status,
-        response.statusText,
-      )
-    },
-  },
-)
+const { apiFetch } = useApiFetch()
+const dishes = ref<Dish[]>([])
 
-const dishes = computed(() => {
-  if (dishesError.value) {
-    console.error('Error loading dishes:', dishesError.value)
-    return []
+const loadUserDishes = async () => {
+  try {
+    const data = await apiFetch<Record<MenuCategory, Dish[]>>('/api/user/dishes')
+    const all: Dish[] = []
+
+    for (const cat of ['brunch', 'dinner', 'dessert'] as const) {
+      const list = data[cat] ?? []
+      all.push(...list)
+    }
+
+    dishes.value = all
+  } catch (e) {
+    console.error('Error loading user dishes:', e)
+    dishes.value = []
   }
-  if (!dishesData.value) return []
-  if (typeof dishesData.value === 'string') {
-    console.error('Received HTML instead of JSON for dishes')
-    return []
-  }
-  if (Array.isArray(dishesData.value)) {
-    return dishesData.value
-  }
-  console.error(
-    'Invalid dishes data type:',
-    typeof dishesData.value,
-    dishesData.value,
-  )
-  return []
-})
+}
 
 const {
   weekStart,
@@ -213,6 +199,6 @@ const completion = computed(() => stats.value.completion)
 
 onMounted(async () => {
   initialize()
-  await loadSchedule()
+  await Promise.all([loadUserDishes(), loadSchedule()])
 })
 </script>
