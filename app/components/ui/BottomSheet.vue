@@ -29,7 +29,7 @@
             v-if="isOpen"
             class="relative z-10 w-full sm:rounded-[20px] rounded-t-[20px] flex flex-col bg-white shadow-2xl border border-gray-200/80 overflow-hidden"
             :class="[
-              customLayout ? desktopMaxWidth : 'sm:max-w-md',
+              desktopMaxWidth && desktopMaxWidth !== 'max-w-md' ? desktopMaxWidth : (customLayout ? '' : 'sm:max-w-md'),
               customLayout && desktopHeight ? '' : 'max-h-[65vh] sm:max-h-[90vh]',
             ]"
             :style="customLayout && desktopHeight ? { maxHeight: desktopHeight } : {}"

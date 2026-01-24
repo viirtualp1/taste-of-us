@@ -88,7 +88,7 @@ export function getDayBadgeClass(
   const count = getDayCount(dayIndex, selectedMenu, categories)
 
   if (count === 0) {
-    return 'bg-white/70 text-gray-600 border border-white/60'
+    return 'bg-white/70 text-gray-600 border border-gray-200/50'
   }
 
   if (count === categories.length) {

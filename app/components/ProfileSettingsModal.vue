@@ -23,7 +23,7 @@
         id="telegram-id"
         v-model="telegramId"
         type="text"
-        placeholder="Enter your girlfriend's Telegram Chat ID"
+        placeholder="Enter your partner's Telegram Chat ID"
         class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
         :disabled="isLoading"
       />

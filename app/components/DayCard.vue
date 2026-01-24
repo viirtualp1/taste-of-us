@@ -147,7 +147,7 @@ const dayLabel = computed(() => {
 
 const badgeClass = computed(() => {
   if (!props.selectedMenu) {
-    return 'bg-white/70 text-gray-600 border border-white/60'
+    return 'bg-white/70 text-gray-600 border border-gray-200/50'
   }
 
   return getDayBadgeClass(props.dayIndex, [props.selectedMenu], CATEGORIES)

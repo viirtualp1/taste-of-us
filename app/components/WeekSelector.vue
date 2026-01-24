@@ -47,13 +47,13 @@
 
       <div
         ref="daysContainerRef"
-        class="flex items-center gap-2 sm:gap-3 overflow-x-auto scrollbar-hide rounded-[20px] py-3 -mx-2 px-2"
+        class="flex items-center gap-2 sm:gap-3 rounded-[20px] py-3 -mx-2 px-2"
       >
         <button
           v-for="(day, dayIndex) in weekDays"
           :key="day.date"
           :ref="(el) => { if (el) dayButtonRefs[dayIndex] = el as HTMLElement }"
-          class="min-w-[100px] sm:min-w-[120px] lg:min-w-[110px] xl:min-w-[140px] flex-shrink-0 rounded-[16px] px-2 sm:px-3 lg:px-2 xl:px-4 py-3 sm:py-4 text-left transition-all flex flex-col gap-1.5"
+          class="flex-1 rounded-[16px] px-2 sm:px-3 lg:px-2 xl:px-4 py-3 sm:py-4 text-left transition-all flex flex-col gap-1.5"
           :class="
             dayIndex === activeDayIndex
               ? 'glass border border-green-400/60 ring-2 ring-green-200/50 bg-green-50/60'
@@ -114,16 +114,16 @@ const dayButtonRefs = ref<Record<number, HTMLElement>>({})
 const scrollToActiveDay = async () => {
   await nextTick()
   if (!daysContainerRef.value) return
-  
+
   const activeButton = dayButtonRefs.value[props.activeDayIndex]
   if (!activeButton) return
 
   const container = daysContainerRef.value
   const buttonRect = activeButton.getBoundingClientRect()
   const containerRect = container.getBoundingClientRect()
-  
+
   const scrollLeft = container.scrollLeft + (buttonRect.left - containerRect.left) - (containerRect.width / 2) + (buttonRect.width / 2)
-  
+
   container.scrollTo({
     left: scrollLeft,
     behavior: 'smooth',

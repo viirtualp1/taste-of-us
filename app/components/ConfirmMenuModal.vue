@@ -3,17 +3,16 @@
     :is-open="isOpen"
     title="Confirm Menu"
     content-class="p-4 sm:p-6 pb-0"
-    desktop-max-width="max-w-3xl"
     @close="handleEdit"
   >
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+    <div class="grid grid-cols-1 gap-3 sm:gap-4">
       <div
         v-for="(day, index) in weekDays"
         :key="day.date"
-        class="glass-nested rounded-[16px] p-3 sm:p-4 border border-white/40"
+        class="glass-nested rounded-[16px] p-3 sm:p-4 border border-gray-200/50"
       >
         <div
-          class="flex items-center justify-between mb-3 pb-2 border-b border-white/30"
+          class="mb-3 pb-2 border-b border-white/30"
         >
           <h3 class="text-sm sm:text-base font-bold text-gray-900">
             {{ day.name }}

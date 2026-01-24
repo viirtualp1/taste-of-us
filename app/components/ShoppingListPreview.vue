@@ -1,7 +1,7 @@
 <template>
   <tou-card class="overflow-hidden flex flex-col h-full">
     <tou-card-content class="flex-1 flex flex-col">
-      <div class="flex items-center justify-between mb-4">
+      <div class="flex items-start justify-between mb-4">
         <div class="space-y-1">
           <p class="text-xs sm:text-sm uppercase tracking-[0.25em] text-gray-500">
             Shopping List
@@ -217,7 +217,6 @@ const weekStartDate = computed(() => {
   }
   return ''
 })
-
 
 const loadItems = async () => {
   if (!isAuthenticated.value || !weekStartDate.value) {
