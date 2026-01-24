@@ -47,13 +47,13 @@
 
       <div
         ref="daysContainerRef"
-        class="flex items-center gap-2 sm:gap-3 rounded-[20px] py-3 -mx-2 px-2"
+        class="flex items-stretch gap-2 sm:gap-3 overflow-x-auto scrollbar-hide rounded-[20px] py-3 -mx-2 px-2"
       >
         <button
           v-for="(day, dayIndex) in weekDays"
           :key="day.date"
           :ref="(el) => { if (el) dayButtonRefs[dayIndex] = el as HTMLElement }"
-          class="flex-1 rounded-[16px] px-2 sm:px-3 lg:px-2 xl:px-4 py-3 sm:py-4 text-left transition-all flex flex-col gap-1.5"
+          class="flex-1 min-w-[100px] sm:min-w-[120px] rounded-[16px] px-2 sm:px-3 lg:px-2 xl:px-4 py-3 sm:py-4 text-left transition-all flex flex-col gap-1.5"
           :class="
             dayIndex === activeDayIndex
               ? 'glass border border-green-400/60 ring-2 ring-green-200/50 bg-green-50/60'
@@ -68,7 +68,7 @@
             {{ day.short }}
           </span>
           <span
-            class="text-xs mt-1 transition-colors"
+            class="text-xs mt-1 transition-colors min-h-[16px] flex items-center"
             :class="getDayLabelColorClass(dayIndex)"
           >
             {{ getDayLabel(dayIndex) }}
@@ -130,33 +130,15 @@ const scrollToActiveDay = async () => {
   })
 }
 
-const isMobile = () => {
-  if (typeof window === 'undefined') return false
-  return window.innerWidth < 640
+const tryScrollToActive = () => {
+  nextTick(() => {
+    if (!daysContainerRef.value) return
+    const container = daysContainerRef.value
+    if (container.scrollWidth > container.clientWidth) {
+      scrollToActiveDay()
+    }
+  })
 }
-
-watch(() => props.activeDayIndex, () => {
-  if (isMobile()) {
-    scrollToActiveDay()
-  }
-})
-
-watch(() => props.weekDays, () => {
-  if (isMobile()) {
-    nextTick(() => {
-      scrollToActiveDay()
-    })
-  }
-})
-
-onMounted(() => {
-  if (isMobile()) {
-    nextTick(() => {
-      scrollToActiveDay()
-    })
-  }
-})
-
 const onInputChange = (event: Event) => {
   emit('week-input-change', event)
 }
@@ -168,4 +150,9 @@ const getDayLabel = (dayIndex: number) => {
 const getDayLabelColorClass = (dayIndex: number) => {
   return getDayLabelColor(dayIndex, props.selectedMenu, CATEGORIES)
 }
+
+watch(() => props.activeDayIndex, tryScrollToActive)
+
+onMounted(tryScrollToActive)
+
 </script>
