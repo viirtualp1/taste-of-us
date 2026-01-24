@@ -429,7 +429,7 @@ async function generateMenuPDF(menu: MenuDay[]) {
 
     let faviconBase64 = ''
     try {
-      const faviconPath = join(process.cwd(), 'public', 'favicon.jpg')
+      const faviconPath = join(process.cwd(), 'public', 'favicon.png')
       const faviconBuffer = await readFile(faviconPath)
       faviconBase64 = `data:image/jpeg;base64,${faviconBuffer.toString('base64')}`
     } catch {

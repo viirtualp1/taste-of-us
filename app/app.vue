@@ -29,7 +29,7 @@ useHead({
         'Plan your weekly meals together with Taste of Us. Create and share your meal plan with your partner.',
     },
     { property: 'og:type', content: 'website' },
-    { property: 'og:image', content: '/favicon.jpg' },
+    { property: 'og:image', content: '/favicon.png' },
     { property: 'og:url', content: 'https://taste-of-us.com' },
     { property: 'og:site_name', content: 'Taste of Us' },
 
@@ -40,10 +40,10 @@ useHead({
       content:
         'Plan your weekly meals together with Taste of Us. Create and share your meal plan with your partner.',
     },
-    { name: 'twitter:image', content: '/favicon.jpg' },
+    { name: 'twitter:image', content: '/favicon.png' },
   ],
   link: [
-    { rel: 'icon', type: 'image/jpg', href: '/favicon.jpg' },
+    { rel: 'icon', type: 'image/jpg', href: '/favicon.png' },
     { rel: 'canonical', href: 'https://taste-of-us.com' },
   ],
   script: [
@@ -61,12 +61,12 @@ useSeoMeta({
   ogTitle: 'Taste of Us - Weekly Menu Planner',
   ogDescription:
     'Plan your weekly meals together with Taste of Us. Create and share your meal plan with your partner.',
-  ogImage: '/favicon.jpg',
+  ogImage: '/favicon.png',
   ogUrl: 'https://taste-of-us.com',
   twitterCard: 'summary',
   twitterTitle: 'Taste of Us - Weekly Menu Planner',
   twitterDescription:
     'Plan your weekly meals together with Taste of Us. Create and share your meal plan with your partner.',
-  twitterImage: '/favicon.jpg',
+  twitterImage: '/favicon.png',
 })
 </script>
