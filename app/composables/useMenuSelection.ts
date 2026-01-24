@@ -114,37 +114,23 @@ export function useMenuSelection(
       const response = await apiFetch<{
         success: boolean
         message: string
-        pdfSent: boolean
         pinned: boolean
-        pdfError?: string
       }>('/api/send-menu', {
         method: 'POST',
         body: { menu: menuPayload },
       })
 
-      if (response.pdfSent) {
-        message.value = 'Меню успешно отправлено!'
-        messageType.value = 'success'
-      } else if (response.pdfError) {
-        message.value = `Меню отправлено, но PDF не создан: ${response.pdfError}`
-        messageType.value = 'error'
-      } else {
-        message.value = 'Меню успешно отправлено!'
-        messageType.value = 'success'
-      }
+      message.value = 'Меню успешно отправлено!'
+      messageType.value = 'success'
 
-      posthog?.capture('menu_sent', {
-        pdf_sent: response.pdfSent,
-        pinned: response.pinned,
-        pdf_error: response.pdfError ?? undefined,
-      })
+      posthog?.capture('menu_sent', { pinned: response.pinned })
 
       successToastTimer = setTimeout(
         () => {
           message.value = ''
           successToastTimer = null
         },
-        response.pdfError ? 8000 : 4000,
+        4000,
       )
     } catch (error: unknown) {
       console.error('Error sending menu:', error)

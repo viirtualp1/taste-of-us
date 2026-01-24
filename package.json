@@ -36,7 +36,8 @@
     "nuxt": "^4.2.2",
     "postcss": "^8.4.47",
     "posthog-js": "^1.335.2",
-    "puppeteer": "^23.11.1",
+    "@sparticuz/chromium": "^131.0.1",
+    "puppeteer-core": "^23.11.1",
     "tailwindcss": "^3.4.17",
     "vue": "^3.5.26",
     "vue-router": "^4.6.4"

@@ -34,7 +34,6 @@ export default defineEventHandler(async (event) => {
    • Send menu to your partner
 
 2️⃣ *In this chat* you will receive:
-   • 📄 PDF with weekly menu
    • 📋 Text menu
    • All messages are automatically pinned
 

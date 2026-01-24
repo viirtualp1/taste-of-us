@@ -313,11 +313,6 @@ watch(
 
 function setWholeDay(v: boolean) {
   assignByWholeDay.value = v
-  if (v) {
-    mealCookFields.forEach((m) => emit('update-cook', m.key, ''))
-  } else {
-    emit('update-cook', 'cook_day', '')
-  }
 }
 
 function mealIcon(key: CookField): string {
