@@ -46,6 +46,9 @@
         @update-menu="
           (category, value) => handleMenuUpdate(activeDayIndex, category, value)
         "
+        @update-cook="
+          (field, value) => updateCook(activeDayIndex, field, value)
+        "
       />
     </div>
 
@@ -142,8 +145,15 @@ const { selectedMenu, isLoading, loadSchedule, saveSchedule } = useMenuSchedule(
   weekDays,
 )
 
-const { isSending, message, messageType, updateMenu, resetMenu, sendMenu } =
-  useMenuSelection(selectedMenu, weekDays)
+const {
+  isSending,
+  message,
+  messageType,
+  updateMenu,
+  updateCook,
+  resetMenu,
+  sendMenu,
+} = useMenuSelection(selectedMenu, weekDays)
 
 const { setWeekDays, setSelectedMenu, setIsSending } = useMenuState()
 const { hapticFeedback } = useTelegram()

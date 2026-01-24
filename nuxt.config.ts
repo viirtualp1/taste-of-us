@@ -3,7 +3,18 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
-  modules: ['@nuxt/eslint', '@nuxt/fonts', '@nuxt/icon', '@nuxt/image'],
+  modules: [
+    '@nuxt/eslint',
+    '@nuxt/fonts',
+    '@nuxt/icon',
+    '@nuxt/image',
+    '@posthog/nuxt',
+  ],
+
+  posthogConfig: {
+    publicKey: process.env.NUXT_PUBLIC_POSTHOG_KEY || '',
+    host: process.env.NUXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
+  },
 
   css: ['~/assets/css/main.css'],
 
@@ -31,12 +42,6 @@ export default defineNuxtConfig({
   runtimeConfig: {
     telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || '',
     cronSecretToken: process.env.CRON_SECRET_TOKEN || '',
-    // OLD SUPABASE CONFIG - COMMENTED OUT FOR TELEGRAM WEB APP MIGRATION
-    // public: {
-    //   supabaseUrl: process.env.SUPABASE_URL || '',
-    //   supabaseAnonKey: process.env.SUPABASE_ANON_KEY || '',
-    // },
-    // Still using Supabase for database, but not for auth
     supabaseUrl: process.env.SUPABASE_URL || '',
     supabaseServiceKey: process.env.SUPABASE_SERVICE_ROLE_KEY || '',
   },

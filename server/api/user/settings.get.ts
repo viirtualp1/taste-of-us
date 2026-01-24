@@ -54,7 +54,9 @@ export default defineEventHandler(async (event) => {
   const supabase = createSupabaseClient()
   const { data, error } = await supabase
     .from('telegram_users')
-    .select('recipient_telegram_chat_id')
+    .select(
+      'recipient_telegram_chat_id, second_member_telegram_chat_id, cook_rotation_mode, cook_rotation_first',
+    )
     .eq('telegram_id', telegramUserId)
     .single()
 
@@ -68,5 +70,11 @@ export default defineEventHandler(async (event) => {
 
   return {
     telegram_chat_id: (data?.recipient_telegram_chat_id ?? '').trim() || '',
+    second_member_telegram_chat_id:
+      (data?.second_member_telegram_chat_id ?? '').trim() || '',
+    cook_rotation_mode:
+      (data?.cook_rotation_mode as 'none' | 'by_day' | 'by_week') || 'none',
+    cook_rotation_first:
+      (data?.cook_rotation_first as 'me' | 'partner') || 'me',
   }
 })

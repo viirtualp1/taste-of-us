@@ -1,7 +1,10 @@
 import { ref, watch } from 'vue'
 import { getStartOfWeek } from '@/utils/date'
+import { debounce } from '@/utils/debounce'
 import type { MenuSelection } from '@/utils/menu'
 import type { WeekDay } from '@/utils/date'
+
+const SAVE_DEBOUNCE_MS = 1500
 
 interface Schedule {
   id: string
@@ -48,11 +51,18 @@ export function useMenuSchedule(
             const dayData = day as Partial<
               MenuSelection & { breakfast?: string; lunch?: string }
             >
+            const base = {
+              cook_day: (dayData.cook_day as MenuSelection['cook_day']) || '',
+              cook_brunch: (dayData.cook_brunch as MenuSelection['cook_brunch']) || '',
+              cook_dinner: (dayData.cook_dinner as MenuSelection['cook_dinner']) || '',
+              cook_dessert: (dayData.cook_dessert as MenuSelection['cook_dessert']) || '',
+            }
             if (dayData.brunch !== undefined && dayData.dinner !== undefined) {
               return {
                 brunch: dayData.brunch || '',
                 dinner: dayData.dinner || '',
                 dessert: dayData.dessert || '',
+                ...base,
               }
             }
             if (
@@ -64,9 +74,10 @@ export function useMenuSchedule(
                 brunch,
                 dinner: dayData.dinner || '',
                 dessert: dayData.dessert || '',
+                ...base,
               }
             }
-            return { brunch: '', dinner: '', dessert: '' }
+            return { brunch: '', dinner: '', dessert: '', ...base }
           })
           isLoading.value = false
           return
@@ -78,6 +89,10 @@ export function useMenuSchedule(
           brunch: '',
           dinner: '',
           dessert: '',
+          cook_day: '',
+          cook_brunch: '',
+          cook_dinner: '',
+          cook_dessert: '',
         }))
       }
     } catch (error) {
@@ -87,6 +102,10 @@ export function useMenuSchedule(
           brunch: '',
           dinner: '',
           dessert: '',
+          cook_day: '',
+          cook_brunch: '',
+          cook_dinner: '',
+          cook_dessert: '',
         }))
       }
     } finally {
@@ -134,6 +153,8 @@ export function useMenuSchedule(
     { immediate: false },
   )
 
+  const debouncedSave = debounce(saveSchedule, SAVE_DEBOUNCE_MS)
+
   watch(
     selectedMenu,
     () => {
@@ -143,10 +164,8 @@ export function useMenuSchedule(
         Array.isArray(weekDays.value) &&
         weekDays.value.length > 0
       ) {
-        const timeoutId = setTimeout(() => {
-          saveSchedule()
-        }, 1000)
-        return () => clearTimeout(timeoutId)
+        debouncedSave()
+        return () => debouncedSave.cancel()
       }
     },
     { deep: true },
@@ -166,6 +185,10 @@ export function useMenuSchedule(
           brunch: '',
           dinner: '',
           dessert: '',
+          cook_day: '',
+          cook_brunch: '',
+          cook_dinner: '',
+          cook_dessert: '',
         }))
       }
     },

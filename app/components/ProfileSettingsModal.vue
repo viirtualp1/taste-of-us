@@ -28,8 +28,61 @@
         :disabled="isLoading"
       />
       <p class="mt-2 text-xs text-gray-500">
-        This ID will be used to send her weekly menu plan.
+        Recipient of the weekly menu plan and “you’re responsible” DMs.
       </p>
+    </div>
+
+    <div>
+      <label
+        for="second-member-id"
+        class="block text-sm font-medium text-gray-700 mb-2"
+      >
+        Second member Chat ID
+        <span class="text-gray-400 font-normal">(optional)</span>
+      </label>
+      <input
+        id="second-member-id"
+        v-model="secondMemberId"
+        type="text"
+        placeholder="Partner’s Chat ID for rotation & responsibility"
+        class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
+        :disabled="isLoading"
+      />
+      <p class="mt-2 text-xs text-gray-500">
+        Used for “me vs partner” and responsibility DMs. Defaults to recipient
+        if empty.
+      </p>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">
+        Cook rotation
+      </label>
+      <div class="space-y-3">
+        <div>
+          <span class="text-xs text-gray-500 block mb-1">Mode</span>
+          <select
+            v-model="cookRotationMode"
+            class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
+            :disabled="isLoading"
+          >
+            <option value="none">Off (assign manually per day/meal)</option>
+            <option value="by_day">By day (alternate each day)</option>
+            <option value="by_week">By week (same person all week)</option>
+          </select>
+        </div>
+        <div v-if="cookRotationMode !== 'none'">
+          <span class="text-xs text-gray-500 block mb-1">First in rotation</span>
+          <select
+            v-model="cookRotationFirst"
+            class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
+            :disabled="isLoading"
+          >
+            <option value="me">Me</option>
+            <option value="partner">Partner</option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <div class="bg-blue-50/80 border border-blue-200 rounded-[12px] p-4">
@@ -121,8 +174,18 @@ const emit = defineEmits<{
 const { isAuthenticated } = useAuth()
 const { apiFetch } = useApiFetch()
 const telegramId = ref('')
+const secondMemberId = ref('')
+const cookRotationMode = ref<'none' | 'by_day' | 'by_week'>('none')
+const cookRotationFirst = ref<'me' | 'partner'>('me')
 const isLoading = ref(false)
 const error = ref('')
+
+interface SettingsResponse {
+  telegram_chat_id: string
+  second_member_telegram_chat_id?: string
+  cook_rotation_mode?: 'none' | 'by_day' | 'by_week'
+  cook_rotation_first?: 'me' | 'partner'
+}
 
 const loadSettings = async () => {
   if (!isAuthenticated.value) return
@@ -131,10 +194,11 @@ const loadSettings = async () => {
   error.value = ''
 
   try {
-    const response = await apiFetch<{ telegram_chat_id: string | null }>(
-      '/api/user/settings',
-    )
+    const response = await apiFetch<SettingsResponse>('/api/user/settings')
     telegramId.value = response?.telegram_chat_id ?? ''
+    secondMemberId.value = response?.second_member_telegram_chat_id ?? ''
+    cookRotationMode.value = response?.cook_rotation_mode ?? 'none'
+    cookRotationFirst.value = response?.cook_rotation_first ?? 'me'
   } catch (err: any) {
     error.value =
       err?.data?.message || err?.message || 'Failed to load settings'
@@ -156,7 +220,12 @@ const saveSettings = async () => {
   try {
     await apiFetch('/api/user/settings', {
       method: 'POST',
-      body: { telegram_chat_id: telegramId.value || null },
+      body: {
+        telegram_chat_id: telegramId.value || null,
+        second_member_telegram_chat_id: secondMemberId.value || null,
+        cook_rotation_mode: cookRotationMode.value,
+        cook_rotation_first: cookRotationFirst.value,
+      },
     })
     emit('save', telegramId.value)
     closeModal()
@@ -171,6 +240,9 @@ const saveSettings = async () => {
 
 const closeModal = () => {
   telegramId.value = ''
+  secondMemberId.value = ''
+  cookRotationMode.value = 'none'
+  cookRotationFirst.value = 'me'
   error.value = ''
   emit('close')
 }

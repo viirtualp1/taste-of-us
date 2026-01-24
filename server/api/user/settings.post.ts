@@ -67,15 +67,29 @@ export default defineEventHandler(async (event) => {
 
   const body = await readBody<{
     telegram_chat_id?: string | null
+    second_member_telegram_chat_id?: string | null
+    cook_rotation_mode?: 'none' | 'by_day' | 'by_week'
+    cook_rotation_first?: 'me' | 'partner'
   }>(event)
-  const value = (body.telegram_chat_id ?? '').trim() || null
+
+  const recipient = (body.telegram_chat_id ?? '').trim() || null
+  const secondMember = (body.second_member_telegram_chat_id ?? '').trim() || null
+  const rotationMode = body.cook_rotation_mode ?? 'none'
+  const rotationFirst = body.cook_rotation_first ?? 'me'
 
   const supabase = createSupabaseClient()
   const { data, error } = await supabase
     .from('telegram_users')
-    .update({ recipient_telegram_chat_id: value })
+    .update({
+      recipient_telegram_chat_id: recipient,
+      second_member_telegram_chat_id: secondMember,
+      cook_rotation_mode: rotationMode,
+      cook_rotation_first: rotationFirst,
+    })
     .eq('telegram_id', telegramUserId)
-    .select('recipient_telegram_chat_id')
+    .select(
+      'recipient_telegram_chat_id, second_member_telegram_chat_id, cook_rotation_mode, cook_rotation_first',
+    )
     .single()
 
   if (error) {
@@ -88,6 +102,14 @@ export default defineEventHandler(async (event) => {
 
   return {
     success: true,
-    settings: { telegram_chat_id: data?.recipient_telegram_chat_id ?? '' },
+    settings: {
+      telegram_chat_id: (data?.recipient_telegram_chat_id ?? '').trim() || '',
+      second_member_telegram_chat_id:
+        (data?.second_member_telegram_chat_id ?? '').trim() || '',
+      cook_rotation_mode:
+        (data?.cook_rotation_mode as string) || 'none',
+      cook_rotation_first:
+        (data?.cook_rotation_first as string) || 'me',
+    },
   }
 })

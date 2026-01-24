@@ -15,14 +15,16 @@ async function checkChromeAvailable(): Promise<boolean> {
   }
 }
 
+type CookSlot = 'me' | 'partner'
+
 interface MenuDay {
   day: string
   date: string
-  meals: {
-    brunch: string
-    dinner: string
-    dessert: string
-  }
+  meals: { brunch: string; dinner: string; dessert: string }
+  cook_day?: CookSlot
+  cook_brunch?: CookSlot
+  cook_dinner?: CookSlot
+  cook_dessert?: CookSlot
 }
 
 export default defineEventHandler(async (event) => {
@@ -54,7 +56,9 @@ export default defineEventHandler(async (event) => {
   const supabase = createSupabaseClient()
   const { data: row, error: fetchErr } = await supabase
     .from('telegram_users')
-    .select('recipient_telegram_chat_id')
+    .select(
+      'recipient_telegram_chat_id, second_member_telegram_chat_id, cook_rotation_mode, cook_rotation_first',
+    )
     .eq('telegram_id', telegramUserId)
     .single()
 
@@ -74,8 +78,26 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const secondMember =
+    (row?.second_member_telegram_chat_id ?? '').trim() || null
+  const rotationMode = (row?.cook_rotation_mode as string) || 'none'
+  const rotationFirst = (row?.cook_rotation_first as 'me' | 'partner') || 'me'
+  const partnerChatId = secondMember || telegramChatId
+  const meChatId = String(telegramUserId)
+
+  const chatIdBySlot: Record<CookSlot, string> = {
+    me: meChatId,
+    partner: partnerChatId,
+  }
+
+  const { effectiveMenu, responsibleLines } = computeCookAndResponsible(
+    body.menu,
+    rotationMode,
+    rotationFirst,
+  )
+
   try {
-    const menuText = formatMenuForTelegram(body.menu)
+    const menuText = formatMenuForTelegram(effectiveMenu)
 
     let messageId: number | null = null
     let pdfSent = false
@@ -85,7 +107,7 @@ export default defineEventHandler(async (event) => {
 
     if (chromeAvailable) {
       try {
-        const pdfBuffer = await generateMenuPDF(body.menu)
+        const pdfBuffer = await generateMenuPDF(effectiveMenu)
 
         const result = await sendTelegramDocument(
           telegramBotToken,
@@ -171,6 +193,13 @@ export default defineEventHandler(async (event) => {
       }
     }
 
+    for (const [slot, lines] of Object.entries(responsibleLines)) {
+      if (lines.length === 0) continue
+      const chatId = chatIdBySlot[slot as CookSlot]
+      const msg = formatResponsibleMessage(slot as CookSlot, lines)
+      await sendTelegramMessageSafe(telegramBotToken, chatId, msg)
+    }
+
     return {
       success: true,
       message: pdfSent
@@ -190,14 +219,91 @@ export default defineEventHandler(async (event) => {
   }
 })
 
-function formatMenuForTelegram(menu: MenuDay[]) {
+interface DayWithCook extends MenuDay {
+  _cook?: { brunch?: CookSlot; dinner?: CookSlot; dessert?: CookSlot }
+}
+
+function computeCookAndResponsible(
+  menu: MenuDay[],
+  rotationMode: string,
+  rotationFirst: 'me' | 'partner',
+): {
+  effectiveMenu: DayWithCook[]
+  responsibleLines: Record<CookSlot, string[]>
+} {
+  const effectiveMenu: DayWithCook[] = []
+  const responsibleLines: Record<CookSlot, string[]> = { me: [], partner: [] }
+
+  for (let i = 0; i < menu.length; i++) {
+    const day = menu[i]
+    const cook: { brunch?: CookSlot; dinner?: CookSlot; dessert?: CookSlot } =
+      {}
+
+    const useRotation =
+      rotationMode === 'by_day' || rotationMode === 'by_week'
+    const rotationByDay = rotationMode === 'by_day'
+    const firstMe = rotationFirst === 'me'
+
+    const slotForDay = (dayIndex: number): CookSlot => {
+      if (!useRotation) return 'me'
+      if (rotationByDay) {
+        const idx = firstMe ? dayIndex % 2 : (dayIndex + 1) % 2
+        return idx === 0 ? 'me' : 'partner'
+      }
+      const weekIdx = firstMe ? 0 : 1
+      return weekIdx === 0 ? 'me' : 'partner'
+    }
+
+    const dayCook = useRotation
+      ? slotForDay(i)
+      : (day.cook_day as CookSlot | undefined)
+    const mealCook = (m: 'brunch' | 'dinner' | 'dessert') => {
+      if (dayCook) return dayCook
+      return (
+        (day[`cook_${m}`] as CookSlot | undefined) ||
+        (useRotation ? slotForDay(i) : undefined)
+      )
+    }
+
+    const meals = ['brunch', 'dinner', 'dessert'] as const
+    for (const m of meals) {
+      const name = day.meals[m]
+      if (!name) continue
+      const who = mealCook(m)
+      if (who) {
+        cook[m] = who
+        responsibleLines[who].push(`${day.day} — ${m}: ${name}`)
+      }
+    }
+
+    if (
+      !useRotation &&
+      dayCook &&
+      !day.meals.brunch &&
+      !day.meals.dinner &&
+      !day.meals.dessert
+    ) {
+      responsibleLines[dayCook].push(`${day.day} — whole day (no meals yet)`)
+    }
+
+    effectiveMenu.push({ ...day, _cook: Object.keys(cook).length ? cook : undefined })
+  }
+
+  return { effectiveMenu, responsibleLines }
+}
+
+function formatMenuForTelegram(menu: DayWithCook[]) {
   let text = '🍽️ *Weekly Menu Plan*\n\n'
 
   menu.forEach((day) => {
     text += `📅 *${day.day}*\n`
-    if (day.meals.brunch) text += `🌅 Brunch: ${day.meals.brunch}\n`
-    if (day.meals.dinner) text += `🌙 Dinner: ${day.meals.dinner}\n`
-    if (day.meals.dessert) text += `🍰 Dessert: ${day.meals.dessert}\n`
+    const c = day._cook
+    if (day.meals.brunch)
+      text += `🌅 Brunch: ${day.meals.brunch}${c?.brunch ? ` 👤 ${c.brunch}` : ''}\n`
+    if (day.meals.dinner)
+      text += `🌙 Dinner: ${day.meals.dinner}${c?.dinner ? ` 👤 ${c.dinner}` : ''}\n`
+    if (day.meals.dessert)
+      text += `🍰 Dessert: ${day.meals.dessert}${c?.dessert ? ` 👤 ${c.dessert}` : ''}\n`
     if (!day.meals.brunch && !day.meals.dinner && !day.meals.dessert) {
       text += `_No meals planned_\n`
     }
@@ -205,6 +311,27 @@ function formatMenuForTelegram(menu: MenuDay[]) {
   })
 
   return text
+}
+
+function formatResponsibleMessage(_slot: CookSlot, lines: string[]): string {
+  let text = `👨‍🍳 *You're responsible for cooking:*\n\n`
+  lines.forEach((l) => {
+    text += `• ${l}\n`
+  })
+  return text
+}
+
+async function sendTelegramMessageSafe(
+  token: string,
+  chatId: string,
+  text: string,
+): Promise<boolean> {
+  try {
+    const res = await sendTelegramMessage(token, chatId, text)
+    return !!res?.ok
+  } catch {
+    return false
+  }
 }
 
 async function sendTelegramMessage(
@@ -402,7 +529,7 @@ function isChromeError(error: unknown): boolean {
   )
 }
 
-async function generateMenuPDF(menu: MenuDay[]) {
+async function generateMenuPDF(menu: DayWithCook[]) {
   let browser
   try {
     browser = await puppeteer.launch({
@@ -619,6 +746,20 @@ async function generateMenuPDF(menu: MenuDay[]) {
               color: #111827;
             }
 
+            .meal-cook {
+              display: inline-block;
+              margin-top: 4px;
+              font-size: 10px;
+              font-weight: 600;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              color: #15803d;
+              background: #f0fdf4;
+              border: 1px solid #bbf7d0;
+              border-radius: 6px;
+              padding: 2px 6px;
+            }
+
             .empty-meal {
               font-size: 11px;
               color: #6b7280;
@@ -652,10 +793,11 @@ async function generateMenuPDF(menu: MenuDay[]) {
             <div class="week-grid">
               ${menu
                 .map((day) => {
+                  const cook = day._cook
                   const meals = [
-                    { type: 'brunch', name: day.meals.brunch },
-                    { type: 'dinner', name: day.meals.dinner },
-                    { type: 'dessert', name: day.meals.dessert },
+                    { type: 'brunch' as const, name: day.meals.brunch },
+                    { type: 'dinner' as const, name: day.meals.dinner },
+                    { type: 'dessert' as const, name: day.meals.dessert },
                   ].filter((meal) => meal.name)
 
                   return `
@@ -668,17 +810,22 @@ async function generateMenuPDF(menu: MenuDay[]) {
                       ${
                         meals.length > 0
                           ? meals
-                              .map(
-                                (meal) => `
+                              .map((meal) => {
+                                const who = cook?.[meal.type]
+                                const cookBadge = who
+                                  ? `<span class="meal-cook">👤 ${who}</span>`
+                                  : ''
+                                return `
                         <div class="meal-item ${meal.type}">
                           <div class="meal-icon">${getMealIcon(meal.type)}</div>
                           <div class="meal-content">
                             <div class="meal-type">${meal.type.charAt(0).toUpperCase() + meal.type.slice(1)}</div>
                             <div class="meal-name">${meal.name}</div>
+                            ${cookBadge}
                           </div>
                         </div>
-                      `,
-                              )
+                      `
+                              })
                               .join('')
                           : '<div class="empty-meal">No meals planned for this day</div>'
                       }
