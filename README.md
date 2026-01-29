@@ -6,40 +6,6 @@ Try it [here](https://t.me/taste_of_us_bot)
 
 ![Taste of Us](https://img.shields.io/badge/Made%20with-Love-ff69b4)
 
-## ✨ Features
-
-### 📅 Weekly Menu Planning
-
-- Plan brunch, dinner, and dessert for each day of the week
-- Navigate between weeks to plan ahead
-- Beautiful, intuitive interface with drag-friendly modals
-
-### 🍳 Dish Management
-
-- Create and organize your personal dish collection
-- Categorize dishes by type (Brunch, Dinner, Dessert)
-- Filter by cuisine (Asian, European, Slavic)
-- Add ingredients to each dish
-- Import dishes from JSON file
-
-### 🛒 Shopping List
-
-- Auto-generate shopping list from your weekly menu
-- Add manual items
-- Create "common items" templates for quick adding
-- Check off items as you shop
-- Organized by source (menu, common, manual)
-
-### 📱 Telegram Integration
-
-- Send your weekly menu to your partner via Telegram bot
-- Beautiful formatted messages
-- **Cook responsibility**: assign “responsible for cooking” per day or per meal (Me / Partner). Optional rotation (by day or by week). The responsible person receives a DM: “You're responsible for cooking: …”
-
-### 🔐 Authentication
-
-- Telegram Web App authentication (when used inside Telegram)
-
 ## 📖 How to Use
 
 ### Planning Your Week
@@ -75,8 +41,6 @@ Try it [here](https://t.me/taste_of_us_bot)
 1. **Profile** → set “Second member Chat ID” (optional; defaults to recipient) and “Cook rotation” (off / by day / by week).
 2. On each day card, use “Responsible for cooking” → **Day** (— / Me / Partner) or, when Day is —, **Brunch** / **Dinner** / **Dessert** per meal.
 3. When you **Send** the menu, the recipient gets the menu; Me and Partner get a “You're responsible for cooking: …” DM when assigned.
-
-**Database**: run `scripts/add-cook-responsibility.sql` in Supabase (adds `second_member_telegram_chat_id`, `cook_rotation_mode`, `cook_rotation_first` to `telegram_users`).
 
 ### Getting Telegram Chat ID
 

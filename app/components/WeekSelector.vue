@@ -53,7 +53,7 @@
           v-for="(day, dayIndex) in weekDays"
           :key="day.date"
           :ref="(el) => { if (el) dayButtonRefs[dayIndex] = el as HTMLElement }"
-          class="flex-1 min-w-[100px] sm:min-w-[120px] rounded-[16px] px-2 sm:px-3 lg:px-2 xl:px-4 py-3 sm:py-4 text-left transition-all flex flex-col gap-1.5"
+          class="flex-1 min-w-[80px] sm:min-w-[100px] lg:min-w-[90px] xl:min-w-[120px] rounded-[16px] px-2 sm:px-3 lg:px-2 xl:px-4 py-3 sm:py-4 text-left transition-all flex flex-col gap-1.5"
           :class="
             dayIndex === activeDayIndex
               ? 'glass border border-green-400/60 ring-2 ring-green-200/50 bg-green-50/60'

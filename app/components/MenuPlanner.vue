@@ -1,8 +1,8 @@
 <template>
   <div
-    class="grid grid-cols-1 lg:grid-cols-[0.75fr_2.25fr] auto-rows-auto gap-4 md:gap-6 min-w-0"
+    class="grid grid-cols-1 lg:grid-cols-[0.75fr_2.25fr] auto-rows-auto gap-4 md:gap-6 min-w-0 w-full overflow-x-hidden"
   >
-    <div class="min-h-0 order-1 lg:order-1">
+    <div class="min-h-0 min-w-0 order-1 lg:order-1">
       <menu-overview-skeleton v-if="isLoading || !menuData" />
       <menu-overview
         v-else
@@ -12,7 +12,7 @@
       />
     </div>
 
-    <div class="min-h-0 order-2 lg:order-2">
+    <div class="min-h-0 min-w-0 order-2 lg:order-2">
       <week-selector-skeleton v-if="isLoading || !menuData" />
       <week-selector
         v-else
@@ -28,11 +28,11 @@
       />
     </div>
 
-    <div class="min-h-0 order-4 lg:order-3">
+    <div class="min-h-0 min-w-0 order-4 lg:order-3">
       <shopping-list-preview :week-start="weekStart || null" />
     </div>
 
-    <div class="min-h-0 order-3 lg:order-4">
+    <div class="min-h-0 min-w-0 order-3 lg:order-4">
       <day-card-skeleton
         v-if="isLoading || !menuData || !weekDays[activeDayIndex]"
       />
