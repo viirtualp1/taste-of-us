@@ -293,7 +293,7 @@ watch(
     const hasAny =
       !!(menu?.cook_day ?? '').trim() ||
       mealCookFields.some((m) => !!(menu?.[m.key] ?? '').trim())
-    if (hasAny) cookSectionEnabled.value = true
+    cookSectionEnabled.value = hasAny
   },
   { immediate: true, deep: true },
 )
@@ -310,6 +310,15 @@ watch(
   },
   { immediate: true },
 )
+
+watch(cookSectionEnabled, (enabled) => {
+  if (!enabled) {
+    emit('update-cook', 'cook_day', '')
+    emit('update-cook', 'cook_brunch', '')
+    emit('update-cook', 'cook_dinner', '')
+    emit('update-cook', 'cook_dessert', '')
+  }
+})
 
 function setWholeDay(v: boolean) {
   assignByWholeDay.value = v

@@ -53,12 +53,12 @@
           v-for="(day, dayIndex) in weekDays"
           :key="day.date"
           :ref="(el) => { if (el) dayButtonRefs[dayIndex] = el as HTMLElement }"
-          class="flex-1 min-w-[80px] sm:min-w-[100px] lg:min-w-[90px] xl:min-w-[120px] rounded-[16px] px-2 sm:px-3 lg:px-2 xl:px-4 py-3 sm:py-4 text-left transition-all flex flex-col gap-1.5"
-          :class="
+          class="flex-1 min-w-[80px] sm:min-w-[100px] lg:min-w-[90px] xl:min-w-[120px] rounded-[16px] px-2 sm:px-3 lg:px-2 xl:px-4 py-3 sm:py-4 text-left transition-all flex flex-col gap-1.5 relative"
+          :class="[
             dayIndex === activeDayIndex
               ? 'glass border border-green-400/60 ring-2 ring-green-200/50 bg-green-50/60'
-              : 'glass border border-gray-200/50 hover:border-green-300/60 hover:bg-green-50/40'
-          "
+              : 'glass border border-gray-200/50 hover:border-green-300/60 hover:bg-green-50/40',
+          ]"
           @click="$emit('select-day', dayIndex)"
         >
           <span class="text-xs text-gray-500 truncate">{{ day.name }}</span>
@@ -66,6 +66,12 @@
             class="text-base lg:text-sm xl:text-lg font-semibold text-gray-900 truncate"
           >
             {{ day.short }}
+          </span>
+          <span
+            v-if="day.isToday"
+            class="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-green-400/60"
+          >
+            Today
           </span>
           <span
             class="text-xs mt-1 transition-colors min-h-[16px] flex items-center"

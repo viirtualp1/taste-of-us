@@ -3,6 +3,21 @@ export interface WeekDay {
   display: string
   short: string
   date: string
+  isToday?: boolean
+}
+
+export function getTodayDateString() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+export function isTodayDate(date: Date) {
+  const t = new Date()
+  return (
+    date.getFullYear() === t.getFullYear() &&
+    date.getMonth() === t.getMonth() &&
+    date.getDate() === t.getDate()
+  )
 }
 
 export function getStartOfWeek(date: Date): Date {
@@ -32,6 +47,7 @@ export function buildWeekDays(startDate: Date): WeekDay[] {
         day: 'numeric',
       }),
       date: date.toISOString().split('T')[0] ?? '',
+      isToday: isTodayDate(date),
     })
   }
   return days
