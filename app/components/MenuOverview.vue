@@ -14,17 +14,17 @@
         </p>
       </div>
       <div class="mt-4 sm:mt-6 flex items-center justify-around gap-2 sm:gap-4">
-        <div class="text-center">
+        <div class="text-center min-w-0">
           <div class="text-2xl font-bold text-gray-900">{{ filledSlots }}</div>
-          <div class="text-xs font-semibold text-gray-500">Selected</div>
+          <div class="text-xs font-semibold text-gray-500 whitespace-nowrap">Selected</div>
         </div>
-        <div class="text-center">
+        <div class="text-center min-w-0">
           <div class="text-2xl font-bold text-gray-900">{{ totalSlots }}</div>
-          <div class="text-xs font-semibold text-gray-500">Total slots</div>
+          <div class="text-xs font-semibold text-gray-500 whitespace-nowrap">Total slots</div>
         </div>
-        <div class="text-center">
+        <div class="text-center min-w-0">
           <div class="text-2xl font-bold text-gray-900">{{ completion }}%</div>
-          <div class="text-xs font-semibold text-gray-500">Completion</div>
+          <div class="text-xs font-semibold text-gray-500 whitespace-nowrap">Completion</div>
         </div>
       </div>
       <div class="mt-4 sm:mt-6">

@@ -1,16 +1,16 @@
 <template>
   <tou-card class="overflow-hidden flex flex-col h-full">
     <tou-card-content class="flex-1 flex flex-col">
-      <div class="flex items-start justify-between mb-4">
-        <div class="space-y-1">
-          <p class="text-xs sm:text-sm uppercase tracking-[0.25em] text-gray-500">
+      <div class="flex items-start justify-between gap-3 mb-4 min-w-0">
+        <div class="space-y-1 min-w-0">
+          <p class="text-xs sm:text-sm uppercase tracking-[0.25em] text-gray-500 whitespace-nowrap">
             Shopping List
           </p>
-          <h3 class="text-xl sm:text-2xl font-bold text-gray-900">
+          <h3 class="text-xl sm:text-2xl font-bold text-gray-900 truncate">
             This Week
           </h3>
         </div>
-        <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 shrink-0">
           <button
             class="flex items-center justify-center w-8 h-8 rounded-full glass-nested border border-gray-200/50 text-gray-700 hover:border-green-300/60 hover:bg-green-50/40 transition-all"
             @click="isAddModalOpen = true"
@@ -18,10 +18,10 @@
             <Icon name="heroicons:plus" class="w-4 h-4" />
           </button>
           <button
-            class="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-nested border border-gray-200/50 text-gray-700 hover:border-green-300/60 hover:bg-green-50/40 transition-all text-xs sm:text-sm font-medium"
+            class="flex items-center gap-1.5 px-3 py-1.5 rounded-full glass-nested border border-gray-200/50 text-gray-700 hover:border-green-300/60 hover:bg-green-50/40 transition-all text-xs sm:text-sm font-medium whitespace-nowrap"
             @click="navigateToShopping"
           >
-            <Icon name="heroicons:arrow-right" class="w-4 h-4" />
+            <Icon name="heroicons:arrow-right" class="w-4 h-4 shrink-0" />
             <span class="hidden sm:inline">View All</span>
           </button>
         </div>

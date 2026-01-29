@@ -49,37 +49,47 @@
         ref="daysContainerRef"
         class="flex items-stretch gap-2 sm:gap-3 overflow-x-auto scrollbar-hide rounded-[20px] py-3 -mx-2 px-2"
       >
-        <button
+        <div
           v-for="(day, dayIndex) in weekDays"
           :key="day.date"
-          :ref="(el) => { if (el) dayButtonRefs[dayIndex] = el as HTMLElement }"
-          class="flex-1 min-w-[80px] sm:min-w-[100px] lg:min-w-[90px] xl:min-w-[120px] rounded-[16px] px-2 sm:px-3 lg:px-2 xl:px-4 py-3 sm:py-4 text-left transition-all flex flex-col gap-1.5 relative"
-          :class="[
-            dayIndex === activeDayIndex
-              ? 'glass border border-green-400/60 ring-2 ring-green-200/50 bg-green-50/60'
-              : 'glass border border-gray-200/50 hover:border-green-300/60 hover:bg-green-50/40',
-          ]"
-          @click="$emit('select-day', dayIndex)"
+          class="flex-1 min-w-[80px] sm:min-w-[100px] lg:min-w-[90px] xl:min-w-[120px] relative flex flex-col"
         >
-          <span class="text-xs text-gray-500 truncate">{{ day.name }}</span>
-          <span
-            class="text-base lg:text-sm xl:text-lg font-semibold text-gray-900 truncate"
-          >
-            {{ day.short }}
-          </span>
           <span
             v-if="day.isToday"
-            class="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-green-400/60"
+            class="xl:hidden absolute left-1/2 -translate-x-1/2 -top-2 z-10 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-400/95 text-amber-950 shadow-sm whitespace-nowrap"
           >
             Today
           </span>
-          <span
-            class="text-xs mt-1 transition-colors min-h-[16px] flex items-center"
-            :class="getDayLabelColorClass(dayIndex)"
+          <button
+            :ref="(el) => { if (el) dayButtonRefs[dayIndex] = el as HTMLElement }"
+            class="flex-1 min-h-0 rounded-[16px] px-2 sm:px-3 lg:px-2 xl:px-4 py-3 sm:py-4 text-left transition-all flex flex-col gap-1.5 relative"
+            :class="[
+              dayIndex === activeDayIndex
+                ? 'glass border border-green-400/60 ring-2 ring-green-200/50 bg-green-50/60'
+                : 'glass border border-gray-200/50 hover:border-green-300/60 hover:bg-green-50/40',
+            ]"
+            @click="$emit('select-day', dayIndex)"
           >
-            {{ getDayLabel(dayIndex) }}
-          </span>
-        </button>
+            <span class="text-xs text-gray-500 truncate">{{ day.name }}</span>
+            <span
+              class="text-base lg:text-sm xl:text-lg font-semibold text-gray-900 truncate"
+            >
+              {{ day.short }}
+            </span>
+            <span
+              v-if="day.isToday"
+              class="hidden xl:inline absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-amber-400/90 text-amber-950"
+            >
+              Today
+            </span>
+            <span
+              class="text-xs mt-1 transition-colors min-h-[16px] flex items-center"
+              :class="getDayLabelColorClass(dayIndex)"
+            >
+              {{ getDayLabel(dayIndex) }}
+            </span>
+          </button>
+        </div>
       </div>
     </tou-card-content>
   </tou-card>
