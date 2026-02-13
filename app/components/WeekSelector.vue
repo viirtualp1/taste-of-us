@@ -56,7 +56,7 @@
         >
           <span
             v-if="day.isToday"
-            class="xl:hidden absolute left-1/2 -translate-x-1/2 -top-2 z-10 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-400/95 text-amber-950 shadow-sm whitespace-nowrap"
+            class="xl:hidden absolute left-1/2 -translate-x-1/2 -top-2 z-10 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-600 text-white shadow-sm whitespace-nowrap"
           >
             Today
           </span>
@@ -78,7 +78,7 @@
             </span>
             <span
               v-if="day.isToday"
-              class="hidden xl:inline absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-amber-400/90 text-amber-950"
+              class="hidden xl:inline absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-600 text-white"
             >
               Today
             </span>
