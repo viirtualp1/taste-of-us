@@ -42,10 +42,10 @@
       </div>
 
       <div v-if="isLoadingIngredients" class="space-y-2">
-        <div
+        <tou-skeleton
           v-for="i in 2"
           :key="i"
-          class="h-10 glass-nested rounded-[10px] animate-pulse"
+          class="h-10 rounded-[10px]"
         />
       </div>
 
@@ -145,6 +145,7 @@
 import { ref, watch } from 'vue'
 import { useApiFetch } from '@/composables/useApiFetch'
 import BottomSheet from '@/components/ui/BottomSheet.vue'
+import TouSkeleton from '@/components/ui/TouSkeleton.vue'
 import type { MenuCategory, Dish, Ingredient } from '@/utils/menu'
 
 interface Props {

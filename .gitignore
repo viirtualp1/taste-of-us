@@ -26,3 +26,5 @@ logs
 
 supabase/
 *.md
+
+.cursor/

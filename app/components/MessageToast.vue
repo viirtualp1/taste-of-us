@@ -1,21 +1,22 @@
 <template>
-  <transition
-    enter-active-class="transition ease-out duration-300"
-    enter-from-class="opacity-0 translate-y-2"
-    enter-to-class="opacity-100 translate-y-0"
-    leave-active-class="transition ease-in duration-200"
-    leave-from-class="opacity-100 translate-y-0"
-    leave-to-class="opacity-0 translate-y-2"
-  >
-    <div
-      v-if="message"
-      :class="[
-        'glass rounded-[16px] p-4 text-center font-medium shadow-lg',
-        messageType === 'success'
-          ? 'text-green-700 bg-green-50/80 border border-green-200/50'
-          : 'text-red-700 bg-red-50/80 border border-red-200/50',
-      ]"
+  <Teleport to="body">
+    <transition
+      enter-active-class="transition ease-out duration-300"
+      enter-from-class="opacity-0 translate-y-2"
+      enter-to-class="opacity-100 translate-y-0"
+      leave-active-class="transition ease-in duration-200"
+      leave-from-class="opacity-100 translate-y-0"
+      leave-to-class="opacity-0 translate-y-2"
     >
+      <div
+        v-if="message"
+        :class="[
+          'fixed left-1/2 -translate-x-1/2 z-[100] bottom-28 mx-4 max-w-[calc(100vw-2rem)] glass rounded-[16px] px-4 py-3 text-center font-medium shadow-lg',
+          messageType === 'success'
+            ? 'text-green-700 bg-green-50/80 border border-green-200/50'
+            : 'text-red-700 bg-red-50/80 border border-red-200/50',
+        ]"
+      >
       <div class="flex items-center justify-center gap-2">
         <svg
           v-if="messageType === 'success'"
@@ -40,6 +41,7 @@
       </div>
     </div>
   </transition>
+  </Teleport>
 </template>
 
 <script setup lang="ts">

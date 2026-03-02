@@ -1,6 +1,6 @@
 <template>
   <div
-    class="grid grid-cols-1 lg:grid-cols-[minmax(260px,0.75fr)_2.25fr] auto-rows-auto lg:grid-rows-[auto_1fr_auto] gap-4 md:gap-6 min-w-0 w-full overflow-x-hidden"
+    class="grid grid-cols-1 lg:grid-cols-[minmax(260px,0.75fr)_2.25fr] auto-rows-auto lg:grid-rows-[auto_1fr] gap-4 md:gap-6 min-w-0 w-full overflow-x-hidden"
   >
     <div
       class="min-h-0 min-w-0 order-4 lg:col-start-1 lg:row-start-1 lg:row-span-2 lg:self-stretch"
@@ -44,9 +44,7 @@
       />
     </div>
 
-    <div class="lg:col-span-2 lg:col-start-1 lg:row-start-3 order-5">
-      <message-toast :message="message" :message-type="messageType" />
-    </div>
+    <TouToast :message="message" :type="messageType" />
     <action-buttons
       :is-sending="isSending"
       @reset="handleReset"
@@ -80,7 +78,7 @@ import WeekSelectorSkeleton from '@/components/WeekSelectorSkeleton.vue'
 import WeekSelector from '@/components/WeekSelector.vue'
 import DayCardSkeleton from '@/components/DayCardSkeleton.vue'
 import DayCard from '@/components/DayCard.vue'
-import MessageToast from '@/components/MessageToast.vue'
+import TouToast from '@/components/ui/TouToast.vue'
 import ActionButtons from '@/components/ActionButtons.vue'
 import ConfirmMenuModal from '@/components/ConfirmMenuModal.vue'
 
@@ -149,6 +147,17 @@ const { hapticFeedback } = useTelegram()
 
 const isConfirmModalOpen = ref(false)
 const initialSelectedMenu = ref<MenuSelection[]>([])
+let toastClearTimer: ReturnType<typeof setTimeout> | null = null
+
+const showToast = (msg: string) => {
+  if (toastClearTimer) clearTimeout(toastClearTimer)
+  message.value = msg
+  messageType.value = 'error'
+  toastClearTimer = setTimeout(() => {
+    message.value = ''
+    toastClearTimer = null
+  }, 4000)
+}
 
 const handleReset = () => {
   resetMenu()
@@ -162,8 +171,7 @@ const handleShowConfirm = () => {
   })
 
   if (!hasAnyDish) {
-    message.value = 'Add at least one dish to the menu before sending.'
-    messageType.value = 'error'
+    showToast('Add at least one dish to the menu before sending.')
     hapticFeedback.light()
     return
   }
@@ -175,8 +183,7 @@ const handleShowConfirm = () => {
   const currentJson = JSON.stringify(selectedMenu.value)
 
   if (initialJson && initialJson === currentJson) {
-    message.value = 'Menu for this week has not changed.'
-    messageType.value = 'error'
+    showToast('Menu for this week has not changed.')
     hapticFeedback.light()
     return
   }

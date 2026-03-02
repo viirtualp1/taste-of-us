@@ -74,10 +74,10 @@
         </div>
 
         <div v-if="isLoading" class="space-y-3">
-          <div
+          <tou-skeleton
             v-for="i in 5"
             :key="i"
-            class="h-12 glass-nested rounded-[12px] animate-pulse"
+            class="h-12 rounded-[12px]"
           />
         </div>
 
@@ -167,10 +167,10 @@
         </div>
 
         <div v-if="isLoadingCommonItems" class="flex gap-2 flex-wrap">
-          <div
+          <tou-skeleton
             v-for="i in 4"
             :key="i"
-            class="h-9 w-20 glass-nested rounded-full animate-pulse"
+            class="h-9 w-20 rounded-full"
           />
         </div>
 
@@ -255,6 +255,7 @@ import { useRouter } from 'vue-router'
 import { useTelegram } from '@/composables/useTelegram'
 import { useWeekNavigation } from '@/composables/useWeekNavigation'
 import ShoppingItem from '@/components/ShoppingItem.vue'
+import TouSkeleton from '@/components/ui/TouSkeleton.vue'
 import FloatingActionsBar from '@/components/FloatingActionsBar.vue'
 
 interface ShoppingListItem {

@@ -26,29 +26,56 @@
               {{ userDishes[category.key]?.length || 0 }}
             </span>
           </div>
-          <button
-            class="flex items-center gap-2 px-4 py-2 rounded-full glass-nested border border-gray-200/50 text-gray-900 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all active:scale-95"
-            @click="openAddDishModal(category.key)"
-          >
-            <Icon name="heroicons:plus" class="w-4 h-4" />
-            <span class="hidden sm:inline">Add Dish</span>
-          </button>
+          <div class="flex items-center gap-2">
+            <button
+              class="h-9 w-9 flex items-center justify-center rounded-full glass-nested border text-gray-600 hover:border-green-300/60 hover:bg-green-50/40 transition-all active:scale-95"
+              :class="
+                activeSearchCategory === category.key
+                  ? 'border-green-400 bg-green-50/70 text-green-700'
+                  : 'border-gray-200/50'
+              "
+              :aria-pressed="activeSearchCategory === category.key"
+              @click="
+                activeSearchCategory =
+                  activeSearchCategory === category.key ? null : category.key
+              "
+            >
+              <Icon
+                name="heroicons:magnifying-glass"
+                class="w-4 h-4"
+              />
+            </button>
+            <button
+              class="flex items-center gap-2 px-4 py-2 rounded-full glass-nested border border-gray-200/50 text-gray-900 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all active:scale-95"
+              @click="openAddDishModal(category.key)"
+            >
+              <Icon name="heroicons:plus" class="w-4 h-4" />
+              <span class="hidden sm:inline">Add Dish</span>
+            </button>
+          </div>
         </div>
 
-        <div class="mb-3">
+        <div v-if="activeSearchCategory === category.key" class="mb-3 relative">
           <input
             v-model="searchQueries[category.key]"
             type="text"
             placeholder="Search dishes in this category..."
-            class="w-full px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
+            class="w-full pr-9 pl-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
           />
+          <button
+            v-if="searchQueries[category.key]"
+            class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-gray-600"
+            @click="searchQueries[category.key] = ''"
+          >
+            <Icon name="heroicons:x-mark" class="w-4 h-4" />
+          </button>
         </div>
 
         <div v-if="isLoading" class="space-y-2">
-          <div
+          <tou-skeleton
             v-for="i in 3"
             :key="i"
-            class="h-12 glass-nested rounded-[12px] animate-pulse"
+            class="h-12 rounded-[12px]"
           />
         </div>
 
@@ -86,14 +113,22 @@
             </div>
           </div>
           <button
-            v-if="userDishes[category.key]?.length > 5 && !expandedCategories[category.key]"
+            v-if="
+              userDishes[category.key]?.length > 5 &&
+              !expandedCategories[category.key] &&
+              !searchQueries[category.key].trim()
+            "
             class="w-full p-3 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all text-sm"
             @click="expandedCategories[category.key] = true"
           >
             Show All ({{ userDishes[category.key].length - 5 }} more)
           </button>
           <button
-            v-if="userDishes[category.key]?.length > 5 && expandedCategories[category.key]"
+            v-if="
+              userDishes[category.key]?.length > 5 &&
+              expandedCategories[category.key] &&
+              !searchQueries[category.key].trim()
+            "
             class="w-full p-3 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all text-sm"
             @click="expandedCategories[category.key] = false"
           >
@@ -146,6 +181,7 @@ import { useApiFetch } from '@/composables/useApiFetch'
 import { useRouter } from 'vue-router'
 import DishFormModal from '@/components/DishFormModal.vue'
 import ImportDishesModal from '@/components/ImportDishesModal.vue'
+import TouSkeleton from '@/components/ui/TouSkeleton.vue'
 import FloatingActionsBar from '@/components/FloatingActionsBar.vue'
 import {
   CATEGORIES,
@@ -184,6 +220,8 @@ const searchQueries = ref<Record<MenuCategory, string>>({
   dinner: '',
   dessert: '',
 })
+
+const activeSearchCategory = ref<MenuCategory | null>(null)
 
 const displayedDishes = (category: MenuCategory) => {
   const q = searchQueries.value[category].trim().toLowerCase()
