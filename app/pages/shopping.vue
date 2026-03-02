@@ -9,19 +9,6 @@
           {{ weekLabel }}
         </p>
       </div>
-      <div class="flex items-center gap-2">
-        <button
-          class="flex items-center gap-2 px-4 py-2 rounded-full glass border border-gray-300/60 text-gray-900 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all active:scale-95 disabled:opacity-50"
-          :disabled="isNavigating"
-          @click="handleBack"
-        >
-          <Icon
-            :name="isNavigating ? 'heroicons:arrow-path' : 'heroicons:arrow-left'"
-            :class="['w-4 h-4', isNavigating && 'animate-spin']"
-          />
-          <span class="hidden sm:inline">{{ isNavigating ? 'Loading...' : 'Back' }}</span>
-        </button>
-      </div>
     </div>
 
     <div class="flex items-center justify-between gap-2 sm:gap-4">
@@ -246,6 +233,19 @@
         </div>
       </div>
     </div>
+    <FloatingActionsBar>
+      <button
+        class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95 whitespace-nowrap"
+        :disabled="isNavigating"
+        @click="handleBack"
+      >
+        <Icon
+          :name="isNavigating ? 'heroicons:arrow-path' : 'heroicons:arrow-left'"
+          :class="['w-5 h-5', isNavigating && 'animate-spin']"
+        />
+        <span class="hidden sm:inline">{{ isNavigating ? 'Loading...' : 'Back' }}</span>
+      </button>
+    </FloatingActionsBar>
   </div>
 </template>
 
@@ -255,6 +255,7 @@ import { useRouter } from 'vue-router'
 import { useTelegram } from '@/composables/useTelegram'
 import { useWeekNavigation } from '@/composables/useWeekNavigation'
 import ShoppingItem from '@/components/ShoppingItem.vue'
+import FloatingActionsBar from '@/components/FloatingActionsBar.vue'
 
 interface ShoppingListItem {
   id: string
@@ -428,7 +429,6 @@ const generateFromMenu = async () => {
     isGenerating.value = false
   }
 }
-
 
 const addCommonItem = async () => {
   if (!newCommonItemName.value.trim()) return

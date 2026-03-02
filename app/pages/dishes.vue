@@ -7,26 +7,6 @@
           Create and manage your custom dishes menu
         </p>
       </div>
-      <div class="flex items-center gap-2">
-        <button
-          class="flex items-center gap-2 px-4 py-2 rounded-full glass border border-gray-300/60 text-gray-900 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all active:scale-95"
-          @click="openImportModal"
-        >
-          <Icon name="heroicons:arrow-down-tray" class="w-4 h-4" />
-          <span class="hidden sm:inline">Import</span>
-        </button>
-        <button
-          class="flex items-center gap-2 px-4 py-2 rounded-full glass border border-gray-300/60 text-gray-900 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all active:scale-95 disabled:opacity-50"
-          :disabled="isNavigating"
-          @click="handleBack"
-        >
-          <Icon
-            :name="isNavigating ? 'heroicons:arrow-path' : 'heroicons:arrow-left'"
-            :class="['w-4 h-4', isNavigating && 'animate-spin']"
-          />
-          <span class="hidden sm:inline">{{ isNavigating ? 'Loading...' : 'Back' }}</span>
-        </button>
-      </div>
     </div>
 
     <div class="flex flex-col lg:flex-row gap-4 lg:gap-6">
@@ -35,7 +15,7 @@
         :key="category.key"
         class="glass border border-gray-300/60 rounded-[20px] px-6 py-4 flex-1 min-w-0"
       >
-        <div class="flex items-center justify-between mb-4">
+        <div class="flex items-center justify-between mb-3 gap-2">
           <div class="flex items-center gap-3">
             <h2 class="text-xl font-bold text-gray-900">
               {{ category.label }}
@@ -53,6 +33,15 @@
             <Icon name="heroicons:plus" class="w-4 h-4" />
             <span class="hidden sm:inline">Add Dish</span>
           </button>
+        </div>
+
+        <div class="mb-3">
+          <input
+            v-model="searchQueries[category.key]"
+            type="text"
+            placeholder="Search dishes in this category..."
+            class="w-full px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
+          />
         </div>
 
         <div v-if="isLoading" class="space-y-2">
@@ -126,6 +115,27 @@
       @close="closeImportModal"
       @imported="handleImportComplete"
     />
+    <FloatingActionsBar>
+      <button
+        class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95 whitespace-nowrap"
+        @click="openImportModal"
+      >
+        <Icon name="heroicons:arrow-down-tray" class="w-5 h-5 shrink-0" />
+        <span class="hidden sm:inline">Import</span>
+      </button>
+      <div class="h-4 w-px bg-gray-300/50 shrink-0" />
+      <button
+        class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95 whitespace-nowrap"
+        :disabled="isNavigating"
+        @click="handleBack"
+      >
+        <Icon
+          :name="isNavigating ? 'heroicons:arrow-path' : 'heroicons:arrow-left'"
+          :class="['w-5 h-5', isNavigating && 'animate-spin']"
+        />
+        <span class="hidden sm:inline">{{ isNavigating ? 'Loading...' : 'Back' }}</span>
+      </button>
+    </FloatingActionsBar>
   </div>
 </template>
 
@@ -136,6 +146,7 @@ import { useApiFetch } from '@/composables/useApiFetch'
 import { useRouter } from 'vue-router'
 import DishFormModal from '@/components/DishFormModal.vue'
 import ImportDishesModal from '@/components/ImportDishesModal.vue'
+import FloatingActionsBar from '@/components/FloatingActionsBar.vue'
 import {
   CATEGORIES,
   type MenuCategory,
@@ -168,12 +179,25 @@ const expandedCategories = ref<Record<MenuCategory, boolean>>({
   dessert: false,
 })
 
+const searchQueries = ref<Record<MenuCategory, string>>({
+  brunch: '',
+  dinner: '',
+  dessert: '',
+})
+
 const displayedDishes = (category: MenuCategory) => {
-  const dishes = userDishes.value[category] || []
-  if (dishes.length <= 5 || expandedCategories.value[category]) {
-    return dishes
+  const q = searchQueries.value[category].trim().toLowerCase()
+  const base = (userDishes.value[category] || []).slice().sort((a, b) =>
+    a.name.localeCompare(b.name),
+  )
+  const filtered = q
+    ? base.filter((dish) => dish.name.toLowerCase().includes(q))
+    : base
+
+  if (filtered.length <= 5 || expandedCategories.value[category]) {
+    return filtered
   }
-  return dishes.slice(0, 5)
+  return filtered.slice(0, 5)
 }
 
 const loadUserDishes = async () => {

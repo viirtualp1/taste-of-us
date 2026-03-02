@@ -84,148 +84,35 @@
           </div>
           </div>
         <div
-          class="pt-4 sm:pt-5 border-t border-gray-200/60 space-y-4 sm:space-y-5"
+          class="pt-4 sm:pt-5 border-t border-gray-200/60"
         >
-          <label
-            class="flex items-center gap-3 cursor-pointer touch-manipulation group"
+          <button
+            type="button"
+            class="w-full flex items-center justify-between gap-3 rounded-[16px] px-3 py-2.5 border border-gray-200/60 bg-white hover:border-green-400 hover:bg-green-50/60 text-gray-800 transition-colors"
+            @click="openCookModal"
           >
+            <div class="flex items-center gap-3">
+              <span class="text-lg select-none" aria-hidden="true">👨‍🍳</span>
+              <span class="text-sm font-semibold">
+                Responsible for cooking
+              </span>
+            </div>
             <span
-              class="relative flex h-5 w-5 shrink-0 items-center justify-center rounded-[10px] border-2 transition-colors"
-              :class="
-                cookSectionEnabled
-                  ? 'border-green-500 bg-green-50'
-                  : 'border-gray-300 bg-white'
-              "
+              class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium border border-gray-300 bg-gray-50 text-gray-700"
             >
-              <input
-                v-model="cookSectionEnabled"
-                type="checkbox"
-                class="absolute inset-0 cursor-pointer opacity-0"
+              <span
+                class="w-1.5 h-1.5 rounded-full"
+                :class="
+                  cookSummary === 'Not set'
+                    ? 'bg-gray-300'
+                    : cookSummary === 'Me'
+                      ? 'bg-green-500'
+                      : 'bg-blue-500'
+                "
               />
-              <Icon
-                v-if="cookSectionEnabled"
-                name="heroicons:check"
-                class="h-3 w-3 text-green-600"
-              />
+              <span>{{ cookSummary }}</span>
             </span>
-            <span class="text-lg select-none" aria-hidden="true">👨‍🍳</span>
-            <span
-              class="text-sm font-semibold text-gray-800 group-hover:text-gray-900"
-            >
-              Responsible for cooking
-            </span>
-          </label>
-
-          <Transition
-            enter-active-class="transition-all duration-200 ease-out"
-            enter-from-class="opacity-0 max-h-0 overflow-hidden"
-            enter-to-class="opacity-100 max-h-[600px]"
-            leave-active-class="transition-all duration-150 ease-in"
-            leave-from-class="opacity-100 max-h-[600px]"
-            leave-to-class="opacity-0 max-h-0 overflow-hidden"
-          >
-            <div
-              v-show="cookSectionEnabled"
-              class="space-y-4 sm:space-y-5 overflow-hidden"
-            >
-          <div
-            role="tablist"
-            aria-label="Assign by whole day or per meal"
-            class="grid grid-cols-2 gap-2 p-1.5 rounded-[14px] bg-gray-100/80 border border-gray-200/60"
-          >
-            <button
-              type="button"
-              role="tab"
-              :aria-selected="isWholeDay"
-              class="min-h-[44px] rounded-[10px] text-sm font-medium transition-all touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/60 focus-visible:ring-offset-1"
-              :class="
-                isWholeDay
-                  ? 'bg-white text-gray-900 shadow-sm border border-gray-200/80'
-                  : 'text-gray-500 hover:text-gray-700 active:bg-gray-200/50'
-              "
-              @click="setWholeDay(true)"
-            >
-              Whole day
-            </button>
-            <button
-              type="button"
-              role="tab"
-              :aria-selected="!isWholeDay"
-              class="min-h-[44px] rounded-[10px] text-sm font-medium transition-all touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/60 focus-visible:ring-offset-1"
-              :class="
-                !isWholeDay
-                  ? 'bg-white text-gray-900 shadow-sm border border-gray-200/80'
-                  : 'text-gray-500 hover:text-gray-700 active:bg-gray-200/50'
-              "
-              @click="setWholeDay(false)"
-            >
-              Per meal
-            </button>
-          </div>
-
-          <div v-if="isWholeDay" class="space-y-2">
-            <p class="text-xs text-gray-500 mb-2">Who cooks this day?</p>
-            <div
-              class="grid grid-cols-3 gap-2"
-              role="group"
-              aria-label="Cook for whole day"
-            >
-              <CookChip
-                :selected="!(selectedMenu?.cook_day ?? '')"
-                label="—"
-                @select="onCookChange('cook_day', '')"
-              />
-              <CookChip
-                :selected="(selectedMenu?.cook_day ?? '') === 'me'"
-                label="Me"
-                @select="onCookChange('cook_day', 'me')"
-              />
-              <CookChip
-                :selected="(selectedMenu?.cook_day ?? '') === 'partner'"
-                label="Partner"
-                @select="onCookChange('cook_day', 'partner')"
-              />
-            </div>
-          </div>
-
-          <template v-else>
-            <p class="text-xs text-gray-500 mb-3">Assign per meal</p>
-            <div class="space-y-4">
-              <div
-                v-for="m in mealCookFields"
-                :key="m.key"
-                class="space-y-2"
-                role="group"
-                :aria-label="`Cook for ${m.label}`"
-              >
-                <span
-                  class="flex items-center gap-1.5 text-sm font-medium text-gray-700"
-                >
-                  <span>{{ mealIcon(m.key) }}</span>
-                  {{ m.label }}
-                </span>
-                <div class="grid grid-cols-3 gap-2">
-                  <CookChip
-                    :selected="!(selectedMenu?.[m.key] ?? '')"
-                    label="—"
-                    @select="onCookChange(m.key, '')"
-                  />
-                  <CookChip
-                    :selected="(selectedMenu?.[m.key] ?? '') === 'me'"
-                    label="Me"
-                    @select="onCookChange(m.key, 'me')"
-                  />
-                  <CookChip
-                    :selected="(selectedMenu?.[m.key] ?? '') === 'partner'"
-                    label="Partner"
-                    @select="onCookChange(m.key, 'partner')"
-                  />
-                </div>
-              </div>
-            </div>
-          </template>
-            </div>
-          </Transition>
+          </button>
         </div>
         </div>
       </transition>
@@ -240,17 +127,22 @@
     @close="closeModal"
     @select="(dishName) => $emit('update-menu', selectedCategory, dishName)"
   />
+  <CookAssignmentModal
+    :is-open="isCookModalOpen"
+    :selected-menu="selectedMenu"
+    @close="closeCookModal"
+    @update-cook="(field, value) => $emit('update-cook', field, value)"
+  />
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import TouCard from '@/components/ui/TouCard/TouCard.vue'
 import TouCardHeader from '@/components/ui/TouCard/TouCardHeader.vue'
 import TouCardTitle from '@/components/ui/TouCard/TouCardTitle.vue'
 import TouCardContent from '@/components/ui/TouCard/TouCardContent.vue'
-import TouLabel from '@/components/ui/TouLabel.vue'
-import CookChip from '@/components/ui/CookChip.vue'
 import DishSelectionModal from '@/components/DishSelectionModal.vue'
+import CookAssignmentModal from '@/components/CookAssignmentModal.vue'
 import type { WeekDay } from '@/utils/date'
 import type { MenuSelection, MenuData, MenuCategory, Dish } from '@/utils/menu'
 import {
@@ -270,83 +162,39 @@ interface Props {
 
 const props = defineProps<Props>()
 
-type CookField =
-  | 'cook_day'
-  | 'cook_brunch'
-  | 'cook_dinner'
-  | 'cook_dessert'
-
-const mealCookFields: { key: CookField; label: string }[] = [
-  { key: 'cook_brunch', label: 'Brunch' },
-  { key: 'cook_dinner', label: 'Dinner' },
-  { key: 'cook_dessert', label: 'Dessert' },
-]
-
-const assignByWholeDay = ref(true)
-const isWholeDay = computed(() => assignByWholeDay.value)
-
-const cookSectionEnabled = ref(false)
-
-watch(
-  () => props.selectedMenu,
-  (menu) => {
-    const hasAny =
-      !!(menu?.cook_day ?? '').trim() ||
-      mealCookFields.some((m) => !!(menu?.[m.key] ?? '').trim())
-    cookSectionEnabled.value = hasAny
-  },
-  { immediate: true, deep: true },
-)
-
-watch(
-  () => props.selectedMenu?.cook_day,
-  (cookDay) => {
-    const hasWhole = !!(cookDay ?? '').trim()
-    const hasPerMeal = mealCookFields.some(
-      (m) => !!(props.selectedMenu?.[m.key] ?? '').trim(),
-    )
-    if (hasWhole) assignByWholeDay.value = true
-    else if (hasPerMeal) assignByWholeDay.value = false
-  },
-  { immediate: true },
-)
-
-watch(cookSectionEnabled, (enabled) => {
-  if (!enabled) {
-    emit('update-cook', 'cook_day', '')
-    emit('update-cook', 'cook_brunch', '')
-    emit('update-cook', 'cook_dinner', '')
-    emit('update-cook', 'cook_dessert', '')
-  }
-})
-
-function setWholeDay(v: boolean) {
-  assignByWholeDay.value = v
-}
-
-function mealIcon(key: CookField): string {
-  const k = key.replace('cook_', '') as MenuCategory
-  return getCategoryIcon(k)
-}
-
-const emit = defineEmits<{
+defineEmits<{
   'update-menu': [category: MenuCategory, value: string]
-  'update-cook': [field: CookField, value: '' | 'me' | 'partner']
+  'update-cook': [
+    field:
+      | 'cook_day'
+      | 'cook_brunch'
+      | 'cook_dinner'
+      | 'cook_dessert',
+    value: '' | 'me' | 'partner',
+  ]
 }>()
-
-function onCookChange(
-  field: CookField,
-  value: string,
-) {
-  const v = (value === 'me' || value === 'partner' ? value : '') as
-    | ''
-    | 'me'
-    | 'partner'
-  emit('update-cook', field, v)
-}
 
 const isModalOpen = ref(false)
 const selectedCategory = ref<MenuCategory>('brunch')
+const isCookModalOpen = ref(false)
+
+const cookSummary = computed(() => {
+  const menu = props.selectedMenu
+  if (!menu) return 'Not set'
+
+  const day = (menu.cook_day ?? '').trim()
+  if (day === 'me') return 'Me'
+  if (day === 'partner') return 'Partner'
+
+  const hasPerMeal =
+    !!(menu.cook_brunch ?? '').trim() ||
+    !!(menu.cook_dinner ?? '').trim() ||
+    !!(menu.cook_dessert ?? '').trim()
+
+  if (hasPerMeal) return 'Per meal'
+
+  return 'Not set'
+})
 
 const openModal = (category: MenuCategory) => {
   selectedCategory.value = category
@@ -355,6 +203,14 @@ const openModal = (category: MenuCategory) => {
 
 const closeModal = () => {
   isModalOpen.value = false
+}
+
+const openCookModal = () => {
+  isCookModalOpen.value = true
+}
+
+const closeCookModal = () => {
+  isCookModalOpen.value = false
 }
 
 const dayLabel = computed(() => {

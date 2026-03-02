@@ -1,7 +1,9 @@
 <template>
   <tou-card class="overflow-hidden flex flex-col h-full">
     <tou-card-content class="flex-1 flex flex-col">
-      <div class="flex items-start justify-between gap-3 mb-4 min-w-0">
+      <div
+        class="flex flex-wrap items-start justify-between gap-3 mb-4 min-w-0"
+      >
         <div class="space-y-1 min-w-0">
           <p class="text-xs sm:text-sm uppercase tracking-[0.25em] text-gray-500 whitespace-nowrap">
             Shopping List
@@ -28,10 +30,10 @@
       </div>
 
       <div v-if="isLoading" class="space-y-2 flex-1">
-        <div
+        <tou-skeleton
           v-for="i in 3"
           :key="i"
-          class="h-10 glass-nested rounded-[12px] animate-pulse"
+          class="h-8"
         />
       </div>
 
@@ -181,6 +183,7 @@ import TouCardContent from '@/components/ui/TouCard/TouCardContent.vue'
 import BottomSheet from '@/components/ui/BottomSheet.vue'
 import { useApiFetch } from '@/composables/useApiFetch'
 import { useTelegram } from '@/composables/useTelegram'
+import TouSkeleton from './ui/TouSkeleton.vue'
 
 interface ShoppingListItem {
   id: string

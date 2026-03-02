@@ -1,11 +1,5 @@
 <template>
-  <div
-    class="fixed bottom-0 left-1/2 -translate-x-1/2 z-40 flex items-center gap-2 px-2 py-2"
-    style="bottom: max(0.5rem, env(safe-area-inset-bottom))"
-  >
-    <div
-      class="glass border border-gray-300/60 rounded-full px-4 py-2.5 flex items-center gap-3 text-sm font-medium"
-    >
+  <FloatingActionsBar>
       <button
         class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
         :disabled="isSending"
@@ -75,11 +69,11 @@
         <Icon name="heroicons:user-circle" class="w-5 h-5 shrink-0" />
         <span class="hidden sm:inline">Settings</span>
       </button>
-    </div>
-  </div>
+  </FloatingActionsBar>
 </template>
 
 <script setup lang="ts">
+import FloatingActionsBar from '@/components/FloatingActionsBar.vue'
 interface Props {
   isSending: boolean
 }

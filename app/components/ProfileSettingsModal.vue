@@ -2,7 +2,7 @@
   <BottomSheet
     :is-open="isOpen"
     title="Profile Settings"
-    content-class="p-4 sm:p-6 space-y-6"
+    content-class="p-4 sm:p-6 space-y-3"
     @close="closeModal"
   >
     <div
@@ -10,79 +10,6 @@
       class="bg-red-50 border border-red-200 rounded-[12px] p-3"
     >
       <p class="text-sm text-red-800">{{ error }}</p>
-    </div>
-
-    <div>
-      <label
-        for="telegram-id"
-        class="block text-sm font-medium text-gray-700 mb-2"
-      >
-        Telegram Chat ID
-      </label>
-      <input
-        id="telegram-id"
-        v-model="telegramId"
-        type="text"
-        placeholder="Enter your partner's Telegram Chat ID"
-        class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
-        :disabled="isLoading"
-      />
-      <p class="mt-2 text-xs text-gray-500">
-        Recipient of the weekly menu plan and “you’re responsible” DMs.
-      </p>
-    </div>
-
-    <div>
-      <label
-        for="second-member-id"
-        class="block text-sm font-medium text-gray-700 mb-2"
-      >
-        Second member Chat ID
-        <span class="text-gray-400 font-normal">(optional)</span>
-      </label>
-      <input
-        id="second-member-id"
-        v-model="secondMemberId"
-        type="text"
-        placeholder="Partner’s Chat ID for rotation & responsibility"
-        class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
-        :disabled="isLoading"
-      />
-      <p class="mt-2 text-xs text-gray-500">
-        Used for “me vs partner” and responsibility DMs. Defaults to recipient
-        if empty.
-      </p>
-    </div>
-
-    <div>
-      <label class="block text-sm font-medium text-gray-700 mb-2">
-        Cook rotation
-      </label>
-      <div class="space-y-3">
-        <div>
-          <span class="text-xs text-gray-500 block mb-1">Mode</span>
-          <select
-            v-model="cookRotationMode"
-            class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
-            :disabled="isLoading"
-          >
-            <option value="none">Off (assign manually per day/meal)</option>
-            <option value="by_day">By day (alternate each day)</option>
-            <option value="by_week">By week (same person all week)</option>
-          </select>
-        </div>
-        <div v-if="cookRotationMode !== 'none'">
-          <span class="text-xs text-gray-500 block mb-1">First in rotation</span>
-          <select
-            v-model="cookRotationFirst"
-            class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
-            :disabled="isLoading"
-          >
-            <option value="me">Me</option>
-            <option value="partner">Partner</option>
-          </select>
-        </div>
-      </div>
     </div>
 
     <div class="bg-blue-50/80 border border-blue-200 rounded-[12px] p-4">
@@ -114,6 +41,25 @@
       </div>
     </div>
 
+    <div>
+      <label
+        for="telegram-id"
+        class="block text-sm font-medium text-gray-700 mb-2"
+      >
+        Telegram Chat ID
+      </label>
+      <input
+        id="telegram-id"
+        v-model="telegramId"
+        type="text"
+        placeholder="Enter your partner's Telegram Chat ID"
+        class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
+        :disabled="isLoading"
+      />
+      <p class="mt-1 text-xs text-gray-500">
+        Recipient of the weekly menu plan and “you’re responsible” DMs.
+      </p>
+    </div>
     <div class="bg-yellow-50/80 border border-yellow-200 rounded-[12px] p-4">
       <div class="flex items-start gap-3">
         <Icon
@@ -129,6 +75,105 @@
             conversation with the bot by sending
             <span class="font-mono font-semibold">/start</span> to the
             bot. Otherwise, the bot cannot send messages to them.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <label
+        for="second-member-id"
+        class="block text-sm font-medium text-gray-700 mb-2"
+      >
+        Second member Chat ID
+        <span class="text-gray-400 font-normal">(optional)</span>
+      </label>
+      <input
+        id="second-member-id"
+        v-model="secondMemberId"
+        type="text"
+        placeholder="Partner’s Chat ID for rotation & responsibility"
+        class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
+        :disabled="isLoading"
+      />
+    </div>
+
+    <div>
+    <label class="block text-sm font-medium text-gray-700 mb-2">
+      Cook assignment
+    </label>
+    <p class="text-xs text-gray-500 mb-3">
+      Automatically pre-fill who cooks in the planner. You can still adjust it per
+      day and meal.
+    </p>
+        <div class="space-y-3">
+        <div class="space-y-2">
+          <span class="text-xs text-gray-500 block">Mode</span>
+          <div class="grid grid-cols-1 gap-2">
+          <button
+            v-for="option in cookModeOptions"
+            :key="option.value"
+            type="button"
+            class="text-left px-3 py-2.5 rounded-[12px] border text-xs cursor-pointer sm:text-sm transition-all"
+            :class="
+              cookRotationMode === option.value
+                ? 'border-green-500 bg-green-50 text-gray-900 shadow-sm'
+                : 'border-gray-200 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50/40'
+            "
+            @click="selectCookMode(option.value)"
+          >
+            <div class="font-semibold mb-0.5">
+              {{ option.label }}
+            </div>
+            <div class="text-[11px] text-gray-500">
+              {{ option.description }}
+            </div>
+          </button>
+        </div>
+        <p
+          v-if="!hasSecondMember"
+          class="text-[11px] text-yellow-700 mt-1 flex items-start gap-1.5"
+        >
+          <Icon
+            name="heroicons:exclamation-triangle"
+            class="w-3.5 h-3.5 mt-0.5 flex-shrink-0"
+          />
+          Add a Second member Chat ID to enable automatic rotation between two people.
+        </p>
+      </div>
+
+      <div v-if="cookRotationMode !== 'none' && hasSecondMember" class="space-y-2">
+          <span class="text-xs text-gray-500 block">First in rotation</span>
+          <div
+            class="inline-flex items-center gap-1 p-1 rounded-full bg-gray-100 border border-gray-200"
+          >
+            <button
+              type="button"
+              class="px-3 py-1.5 text-xs sm:text-sm rounded-full font-medium transition-all"
+              :class="
+                cookRotationFirst === 'me'
+                  ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
+                  : 'text-gray-600 hover:text-gray-800'
+              "
+              @click="cookRotationFirst = 'me'"
+            >
+              Me
+            </button>
+            <button
+              type="button"
+              class="px-3 py-1.5 text-xs sm:text-sm rounded-full font-medium transition-all"
+              :class="
+                cookRotationFirst === 'partner'
+                  ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
+                  : 'text-gray-600 hover:text-gray-800'
+              "
+              @click="cookRotationFirst = 'partner'"
+            >
+              Partner
+            </button>
+          </div>
+          <p class="text-[11px] text-gray-500">
+            {{ rotationSummary }}
           </p>
         </div>
       </div>
@@ -155,7 +200,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useApiFetch } from '@/composables/useApiFetch'
 import BottomSheet from '@/components/ui/BottomSheet.vue'
@@ -185,6 +230,51 @@ interface SettingsResponse {
   second_member_telegram_chat_id?: string
   cook_rotation_mode?: 'none' | 'by_day' | 'by_week'
   cook_rotation_first?: 'me' | 'partner'
+}
+
+const hasSecondMember = computed(
+  () => !!secondMemberId.value && secondMemberId.value.trim().length > 0,
+)
+
+const cookModeOptions = [
+  {
+    value: 'none' as const,
+    label: 'Off',
+    description: 'You choose who cooks for each day and meal.',
+  },
+  {
+    value: 'by_day' as const,
+    label: 'By day',
+    description: 'Alternate Me and Partner every day.',
+  },
+  {
+    value: 'by_week' as const,
+    label: 'By week',
+    description: 'One person cooks this week, the other next week.',
+  },
+] satisfies {
+  value: 'none' | 'by_day' | 'by_week'
+  label: string
+  description: string
+}[]
+
+const rotationSummary = computed(() => {
+  if (cookRotationMode.value === 'none' || !hasSecondMember.value) {
+    return 'Rotation is off. You can still assign cooks in each day card.'
+  }
+
+  const first =
+    cookRotationFirst.value === 'me' ? 'You' : 'Partner'
+
+  if (cookRotationMode.value === 'by_day') {
+    return `${first} cook on day 1, then you alternate each day (Me, Partner, Me, Partner, …).`
+  }
+
+  return `${first} cook this week, the other person cooks next week, and it keeps alternating.`
+})
+
+function selectCookMode(mode: 'none' | 'by_day' | 'by_week') {
+  cookRotationMode.value = mode
 }
 
 const loadSettings = async () => {
