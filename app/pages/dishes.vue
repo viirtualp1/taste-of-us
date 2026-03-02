@@ -64,7 +64,7 @@
           />
           <button
             v-if="searchQueries[category.key]"
-            class="absolute inset-y-0 right-0 px-3 flex items-center text-gray-400 hover:text-gray-600"
+            class="absolute right-0 top-1/2 -translate-y-1/2 px-3 flex items-center text-gray-400 hover:text-gray-600"
             @click="searchQueries[category.key] = ''"
           >
             <Icon name="heroicons:x-mark" class="w-4 h-4" />

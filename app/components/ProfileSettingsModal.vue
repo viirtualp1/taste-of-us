@@ -20,7 +20,7 @@
         />
         <div class="flex-1">
           <h3 class="text-sm font-semibold text-blue-900 mb-2">
-            How to get your Telegram Chat ID?
+            How to get your Your Telegram Chat ID?
           </h3>
           <ol
             class="text-xs text-blue-800 space-y-2 list-decimal list-inside"
@@ -46,18 +46,18 @@
         for="telegram-id"
         class="block text-sm font-medium text-gray-700 mb-2"
       >
-        Telegram Chat ID
+        Your Telegram Chat ID
       </label>
       <input
         id="telegram-id"
         v-model="telegramId"
         type="text"
-        placeholder="Enter your partner's Telegram Chat ID"
+        placeholder="Enter your Telegram Chat ID"
         class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
         :disabled="isLoading"
       />
       <p class="mt-1 text-xs text-gray-500">
-        Recipient of the weekly menu plan and “you’re responsible” DMs.
+        Where you will receive the weekly menu and “you’re responsible” DMs.
       </p>
     </div>
     <div class="bg-yellow-50/80 border border-yellow-200 rounded-[12px] p-4">
@@ -85,7 +85,7 @@
         for="second-member-id"
         class="block text-sm font-medium text-gray-700 mb-2"
       >
-        Second member Chat ID
+        Partner Telegram Chat ID
         <span class="text-gray-400 font-normal">(optional)</span>
       </label>
       <input

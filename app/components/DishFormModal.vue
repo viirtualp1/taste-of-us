@@ -28,7 +28,6 @@
       />
     </div>
 
-
     <div v-if="dish" class="pt-2">
       <div class="flex items-center justify-between mb-3">
         <label class="block text-sm font-medium text-gray-700">
@@ -77,13 +76,6 @@
               class="w-4 h-4 text-red-500"
             />
           </button>
-        </div>
-
-        <div
-          v-if="ingredients.length === 0"
-          class="text-center py-3 text-sm text-gray-500"
-        >
-          No ingredients yet
         </div>
       </div>
 
