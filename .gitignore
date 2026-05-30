@@ -26,5 +26,6 @@ logs
 
 supabase/
 *.md
+!README.md
 
 .cursor/

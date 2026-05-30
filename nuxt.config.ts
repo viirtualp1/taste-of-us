@@ -46,6 +46,9 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    public: {
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://taste-of-us.com',
+    },
     telegramBotToken: process.env.TELEGRAM_BOT_TOKEN || '',
     cronSecretToken: process.env.CRON_SECRET_TOKEN || '',
     supabaseUrl: process.env.SUPABASE_URL || '',

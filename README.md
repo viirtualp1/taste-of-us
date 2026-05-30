@@ -1,55 +1,107 @@
-# 🍽️ Taste of Us
+# Taste of Us
 
-A beautiful meal planning app for couples to plan weekly menus together. Plan your brunch, dinner, and desserts for the whole week, manage your dish collection, generate shopping lists, and send the menu to your partner via Telegram.
+**Plan your week together — menu, dishes, and shopping list in one Telegram app.**
 
-Try it [here](https://t.me/taste_of_us_bot)
-
-![Taste of Us](https://img.shields.io/badge/Made%20with-Love-ff69b4)
-
-## 📖 How to Use
-
-### Planning Your Week
-
-1. **Open the app** — You'll see the current week's menu
-2. **Click on a day** — Select brunch, dinner, or dessert slot
-3. **Choose a dish** — Browse by cuisine or search your collection
-4. **Navigate weeks** — Use arrows to plan future weeks
-
-### Managing Dishes
-
-1. **Go to Dishes page** — Click "Dishes" in the bottom menu
-2. **Add a dish** — Click "+ Add Dish" in any category
-3. **Edit ingredients** — Click on a dish to add ingredients (used for shopping list)
-4. **Import dishes** — Use "Import JSON" to bulk import
-
-### Shopping List
-
-1. **Go to Shopping page** — Click "Shopping" in the bottom menu
-2. **Generate from menu** — Click "Generate from Menu" to auto-populate
-3. **Add common items** — Set up templates for items you buy every week
-4. **Check items** — Tap items to mark as purchased
-5. **Clear checked** — Remove purchased items when done
-
-### Sending to Telegram
-
-1. **Set up recipient** — Go to Profile → Enter Telegram Chat ID
-2. **Plan your menu** — Fill in the week's dishes
-3. **Send** — Click "Send" and confirm
-
-### Cook responsibility & rotation
-
-1. **Profile** → set “Second member Chat ID” (optional; defaults to recipient) and “Cook rotation” (off / by day / by week).
-2. On each day card, use “Responsible for cooking” → **Day** (— / Me / Partner) or, when Day is —, **Brunch** / **Dinner** / **Dessert** per meal.
-3. When you **Send** the menu, the recipient gets the menu; Me and Partner get a “You're responsible for cooking: …” DM when assigned.
-
-### Getting Telegram Chat ID
-
-1. Message [@userinfobot](https://t.me/userinfobot) on Telegram
-2. It will reply with your Chat ID
-3. Enter this ID in Profile Settings
-
-Contributions are welcome! Feel free to open issues or submit pull requests.
+A mini app for couples who want less “what’s for dinner?” and more time eating together. Built as a [Telegram Web App](https://core.telegram.org/bots/webapps).
 
 ---
 
-Made with 💜 for couples who love planning meals together
+## At a glance
+
+
+|           |                                                        |
+| --------- | ------------------------------------------------------ |
+| **Plan**  | Pick brunch, dinner & dessert for each day of the week |
+| **Cook**  | Assign who cooks — by meal, by day, or with rotation   |
+| **Shop**  | Auto-generate a list from the menu + your staples      |
+| **Share** | Send the menu to your partner’s Telegram chat          |
+
+
+Open the app from your Telegram bot → plan → tap **Send Menu** → done.
+
+---
+
+## How it works
+
+```
+┌─────────────┐     ┌──────────────┐     ┌─────────────────┐
+│  Mini App   │────▶│   Your menu  │────▶│ Partner's chat  │
+│  (browser)  │     │   + shopping │     │  (pinned msg)   │
+└─────────────┘     └──────────────┘     └─────────────────┘
+```
+
+1. **Open in Telegram** — the app only works inside Telegram (not in a regular browser tab).
+2. **Fill the week** — choose dishes from your library or add new ones.
+3. **Optional: Settings** — add your Chat ID and your partner’s so menus and cook reminders arrive in DM.
+4. **Send** — confirm and push the menu to Telegram.
+
+> **Partner setup:** both people should send `/start` to the bot. Add Chat IDs in **Settings** (get yours from [@userinfobot](https://t.me/userinfobot)).
+
+---
+
+## Features
+
+- **Weekly planner** — 7-day view with quick day switching
+- **Dish library** — brunch / dinner / dessert, import from JSON
+- **Cook assignment** — manual per meal or rotation (by day / by week)
+- **Shopping list** — manual items, common staples, generate from menu
+- **Telegram delivery** — text menu + optional cook notifications
+
+---
+
+## Tech stack
+
+Nuxt 4 · Vue 3 · TypeScript · Tailwind CSS · Supabase · Telegram Bot API
+
+Architecture follows [Feature-Sliced Design](https://feature-sliced.design/) — see `.cursor/rules/ARCHITECTURE.md` for contributors.
+
+---
+
+## Development
+
+### Prerequisites
+
+- [Bun](https://bun.sh) (or Node 20+)
+- Supabase project
+- Telegram bot ([BotFather](https://t.me/Botfather))
+
+### Quick start
+
+```bash
+git clone <repo-url>
+cd taste-of-us
+bun install
+# create .env with the variables below
+bun dev
+```
+
+App runs at [http://localhost:3000](http://localhost:3000). Use Telegram’s test environment or tunnel (ngrok) for Web App auth locally.
+
+### Environment variables
+
+
+| Variable                    | Required | Description                                                             |
+| --------------------------- | -------- | ----------------------------------------------------------------------- |
+| `TELEGRAM_BOT_TOKEN`        | yes      | Bot token from BotFather                                                |
+| `SUPABASE_URL`              | yes      | Supabase project URL                                                    |
+| `SUPABASE_SERVICE_ROLE_KEY` | yes      | Service role key (server only)                                          |
+| `CRON_SECRET_TOKEN`         | optional | Protects reminder cron endpoints                                        |
+| `NUXT_PUBLIC_POSTHOG_KEY`   | optional | Analytics                                                               |
+| `NUXT_PUBLIC_POSTHOG_HOST`  | optional | PostHog host                                                            |
+| `NUXT_PUBLIC_SITE_URL`      | optional | Web App URL for bot welcome button (default: `https://taste-of-us.com`) |
+
+
+### Scripts
+
+
+| Command             | Description                |
+| ------------------- | -------------------------- |
+| `bun dev`           | Dev server                 |
+| `bun build`         | Production build           |
+| `bun preview`       | Preview production build   |
+| `bun run typecheck` | TypeScript check           |
+| `bun run lint`      | ESLint                     |
+| `bun run lint:fsd`  | FSD architecture (Steiger) |
+| `bun run ci:check`  | typecheck + lint + fsd     |
+
+

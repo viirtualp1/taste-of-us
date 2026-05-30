@@ -21,25 +21,10 @@ export default defineEventHandler(async (event) => {
 
       console.log(`Processing /start command from chat ${chatId}`)
 
-      const welcomeMessage = `👋 Hello, ${firstName}!
-
-🍽️ Welcome to *Taste of Us* — a weekly menu planning app!
-
-📱 *How it works:*
-
-1️⃣ *In the bot app* (open via menu button or link):
-   • Plan your weekly menu (brunch, dinner, dessert)
-   • Manage your dish collection
-   • Create shopping lists
-   • Send menu to your partner
-
-2️⃣ *In this chat* you will receive:
-   • 📋 Text menu
-   • All messages are automatically pinned
-
-💡 *Tip:* To receive menus, your partner needs to add your Chat ID in profile settings.
-
-Start planning your menu right now! 🎉`
+      const welcome = buildWelcomePayload(
+        firstName,
+        config.public.siteUrl as string | undefined,
+      )
 
       const url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage`
 
@@ -51,8 +36,7 @@ Start planning your menu right now! 🎉`
           },
           body: JSON.stringify({
             chat_id: chatId,
-            text: welcomeMessage,
-            parse_mode: 'Markdown',
+            ...welcome,
           }),
         })
 
