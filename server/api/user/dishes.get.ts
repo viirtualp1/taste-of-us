@@ -1,7 +1,7 @@
 // OLD SUPABASE AUTH - COMMENTED OUT FOR TELEGRAM WEB APP MIGRATION
 /*
 import { createSupabaseClient } from '../../utils/supabase'
-import type { Dish, MenuCategory } from '@/utils/menu'
+import type { Dish, MenuCategory } from '@/entities/menu'
 
 export default defineEventHandler(async (event) => {
   try {
@@ -64,7 +64,7 @@ export default defineEventHandler(async (event) => {
 // NEW TELEGRAM AUTH
 import { getUserIdFromTelegram } from '../../utils/auth'
 import { createSupabaseClient } from '../../utils/supabase'
-import type { Dish, MenuCategory } from '@/utils/menu'
+import type { Dish, MenuCategory } from '@/entities/menu'
 
 export default defineEventHandler(async (event) => {
   try {

@@ -1,7 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { fileURLToPath } from 'node:url'
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
+
+  alias: {
+    '@': fileURLToPath(new URL('./src', import.meta.url)),
+  },
 
   modules: [
     '@nuxt/eslint',
@@ -16,9 +22,11 @@ export default defineNuxtConfig({
     host: process.env.NUXT_PUBLIC_POSTHOG_HOST || 'https://us.i.posthog.com',
   },
 
-  css: ['~/assets/css/main.css'],
+  css: ['@/app/styles/main.css'],
 
   ssr: false,
+
+  components: false,
 
   postcss: {
     plugins: {
@@ -26,8 +34,6 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
-
-  components: true,
 
   fonts: {
     families: [

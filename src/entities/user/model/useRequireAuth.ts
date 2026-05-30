@@ -1,0 +1,60 @@
+import { onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useTelegram } from './useTelegram'
+
+interface RequireAuthOptions {
+  redirectTo?: string
+  onFailure?: (error: string) => void
+  onReady?: (context: { didAuthenticate: boolean }) => void | Promise<void>
+}
+
+export function useRequireAuth(options: RequireAuthOptions = {}) {
+  const router = useRouter()
+  const { isAuthenticated, isLoading: authLoading, authenticate } = useTelegram()
+  const isReady = ref(false)
+
+  const markReady = async (didAuthenticate: boolean) => {
+    isReady.value = true
+    await options.onReady?.({ didAuthenticate })
+  }
+
+  onMounted(async () => {
+    if (isAuthenticated.value) {
+      await markReady(false)
+      return
+    }
+
+    if (authLoading.value) {
+      return
+    }
+
+    try {
+      const result = await authenticate()
+      if (!result.success) {
+        const message = result.error || 'Failed to authenticate with Telegram'
+        if (options.onFailure) {
+          options.onFailure(message)
+        } else if (options.redirectTo) {
+          await router.push(options.redirectTo)
+        }
+        return
+      }
+
+      await markReady(true)
+    } catch (error) {
+      console.error('Authentication error:', error)
+      if (options.onFailure) {
+        options.onFailure('Failed to authenticate. Please open this app in Telegram.')
+      } else if (options.redirectTo) {
+        await router.push(options.redirectTo)
+      }
+    }
+  })
+
+  return {
+    isAuthenticated,
+    authLoading,
+    isReady,
+    authenticate,
+  }
+}
