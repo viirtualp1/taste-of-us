@@ -26,7 +26,7 @@
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             />
           </svg>
-          <span class="hidden sm:inline">Sending...</span>
+          <span class="hidden sm:inline">{{ t('common.sending') }}</span>
         </span>
         <span v-else class="flex items-center gap-2 whitespace-nowrap">
           <svg
@@ -42,7 +42,7 @@
               d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
             />
           </svg>
-          <span class="hidden sm:inline">Send Menu</span>
+          <span class="hidden sm:inline">{{ t('nav.sendMenu') }}</span>
         </span>
       </button>
       <div class="h-4 w-px bg-gray-300/50 shrink-0" />
@@ -51,7 +51,7 @@
         @click="$emit('open-dishes')"
       >
         <Icon name="heroicons:pencil-square" class="w-5 h-5 shrink-0" />
-        <span class="hidden sm:inline">Dishes</span>
+        <span class="hidden sm:inline">{{ t('nav.dishes') }}</span>
       </button>
       <div class="h-4 w-px bg-gray-300/50 shrink-0" />
       <button
@@ -59,7 +59,7 @@
         @click="$emit('open-shopping')"
       >
         <Icon name="heroicons:shopping-cart" class="w-5 h-5 shrink-0" />
-        <span class="hidden sm:inline">Shopping</span>
+        <span class="hidden sm:inline">{{ t('nav.shopping') }}</span>
       </button>
       <div class="h-4 w-px bg-gray-300/50 shrink-0" />
       <button
@@ -67,13 +67,14 @@
         @click="$emit('open-profile')"
       >
         <Icon name="heroicons:user-circle" class="w-5 h-5 shrink-0" />
-        <span class="hidden sm:inline">Settings</span>
+        <span class="hidden sm:inline">{{ t('nav.settings') }}</span>
       </button>
   </FloatingActionsBar>
 </template>
 
 <script setup lang="ts">
 import { FloatingActionsBar } from '@/widgets/floating-actions-bar'
+
 interface Props {
   isSending: boolean
 }
@@ -86,4 +87,6 @@ defineEmits<{
   'open-shopping': []
   'open-profile': []
 }>()
+
+const { t } = useI18n()
 </script>

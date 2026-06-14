@@ -1,5 +1,9 @@
 import type { CuisineType, MenuCategory } from '../model/types'
 
+export const CATEGORY_KEYS: MenuCategory[] = ['brunch', 'dinner', 'dessert']
+
+export const CUISINE_KEYS: CuisineType[] = ['all', 'asian', 'european', 'slavic']
+
 export const CATEGORIES: { key: MenuCategory; label: string }[] = [
   { key: 'brunch', label: 'Brunch' },
   { key: 'dinner', label: 'Dinner' },

@@ -3,7 +3,7 @@
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
-          Shopping List
+          {{ t('shopping.title') }}
         </h1>
         <p class="text-sm text-gray-600 mt-1">
           {{ weekLabel }}
@@ -38,7 +38,7 @@
             :class="['w-4 h-4', isGenerating && 'animate-spin']"
           />
           <span class="hidden sm:inline text-sm">{{
-            isGenerating ? 'Generating...' : 'From Menu'
+            isGenerating ? t('common.generating') : t('shopping.fromMenu')
           }}</span>
         </button>
       </div>
@@ -50,14 +50,14 @@
           <input
             v-model="newItemName"
             type="text"
-            placeholder="Add item..."
+            :placeholder="t('shopping.addItem')"
             class="flex-1 min-w-0 px-3 sm:px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
             @keydown.enter="addItem"
           />
           <input
             v-model="newItemQuantity"
             type="text"
-            placeholder="Qty (e.g. 500g)"
+            :placeholder="t('shopping.qtyPlaceholder')"
             class="w-28 sm:w-[150px] px-3 sm:px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
             @keydown.enter="addItem"
           />
@@ -86,9 +86,9 @@
             name="heroicons:shopping-cart"
             class="w-12 h-12 text-gray-400 mx-auto mb-3"
           />
-          <p class="text-gray-500">Your shopping list is empty</p>
+          <p class="text-gray-500">{{ t('shopping.empty') }}</p>
           <p class="text-sm text-gray-400 mt-1">
-            Add items or generate from your menu
+            {{ t('shopping.emptyHint') }}
           </p>
         </div>
 
@@ -98,7 +98,7 @@
               class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"
             >
               <Icon name="heroicons:clipboard-document-list" class="w-4 h-4" />
-              From Menu
+              {{ t('shopping.fromMenu') }}
             </h3>
             <div class="space-y-2">
               <shopping-item
@@ -117,7 +117,7 @@
               class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"
             >
               <Icon name="heroicons:star" class="w-4 h-4" />
-              Common Items
+              {{ t('shopping.commonItems') }}
             </h3>
             <div class="space-y-2">
               <shopping-item
@@ -136,7 +136,7 @@
               class="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2"
             >
               <Icon name="heroicons:pencil" class="w-4 h-4" />
-              Custom Items
+              {{ t('shopping.customItems') }}
             </h3>
             <div class="space-y-2">
               <shopping-item
@@ -156,13 +156,13 @@
         <div class="flex items-center justify-between">
           <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
             <Icon name="heroicons:bookmark" class="w-5 h-5" />
-            Quick Add
+            {{ t('shopping.quickAdd') }}
           </h3>
           <button
             class="px-4 py-1.5 text-sm font-medium text-gray-700 rounded-full glass-nested border border-gray-200/50 hover:border-green-300/60 hover:bg-green-50/40 transition-all"
             @click="showCommonItemsManager = !showCommonItemsManager"
           >
-            {{ showCommonItemsManager ? 'Done' : 'Edit' }}
+            {{ showCommonItemsManager ? t('common.done') : t('common.edit') }}
           </button>
         </div>
 
@@ -179,14 +179,14 @@
             <input
               v-model="newCommonItemName"
               type="text"
-              placeholder="Item name"
+              :placeholder="t('shopping.itemName')"
               class="flex-1 min-w-0 px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
               @keydown.enter="addCommonItem"
             />
             <input
               v-model="newCommonItemQuantity"
               type="text"
-              placeholder="Qty (e.g. 500g)"
+              :placeholder="t('shopping.qtyPlaceholder')"
               class="w-28 sm:w-[150px] px-3 sm:px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
               @keydown.enter="addCommonItem"
             />
@@ -213,7 +213,7 @@
               </button>
             </div>
             <div v-if="commonItems.length === 0" class="text-sm text-gray-500">
-              No saved items. Add your frequently bought items above.
+              {{ t('shopping.noSavedItems') }}
             </div>
           </div>
         </div>
@@ -228,7 +228,7 @@
             + {{ item.name }}
           </button>
           <div v-if="commonItems.length === 0" class="text-sm text-gray-500">
-            Click "Edit" to add frequently bought items
+            {{ t('shopping.editToAddCommon') }}
           </div>
         </div>
       </div>
@@ -244,7 +244,9 @@
           :name="isNavigating ? 'heroicons:arrow-path' : 'heroicons:arrow-left'"
           :class="['w-5 h-5', isNavigating && 'animate-spin']"
         />
-        <span class="hidden sm:inline">{{ isNavigating ? 'Loading...' : 'Back' }}</span>
+        <span class="hidden sm:inline">{{
+          isNavigating ? t('common.loading') : t('common.back')
+        }}</span>
       </button>
     </floating-actions-bar>
   </div>
@@ -268,6 +270,8 @@ definePageMeta({
   layout: 'default',
 })
 
+const { t } = useI18n()
+const localePath = useLocalePath()
 const router = useRouter()
 const { isAuthenticated, hapticFeedback } = useTelegram()
 const { apiFetch } = useApiFetch()
@@ -313,7 +317,7 @@ const newCommonItemName = ref('')
 const newCommonItemQuantity = ref('')
 
 useRequireAuth({
-  redirectTo: '/',
+  redirectTo: localePath('/'),
   onReady: () => loadCommonItems(),
 })
 
@@ -360,7 +364,7 @@ function goNextWeek() {
 function handleBack() {
   if (isNavigating.value) return
   isNavigating.value = true
-  router.push('/')
+  router.push(localePath('/'))
 }
 
 onMounted(() => {

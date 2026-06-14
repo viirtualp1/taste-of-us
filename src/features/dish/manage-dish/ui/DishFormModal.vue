@@ -1,7 +1,7 @@
 <template>
   <BottomSheet
     :is-open="isOpen"
-    :title="dish ? 'Edit Dish' : 'Add Dish'"
+    :title="dish ? t('dishes.editDish') : t('dishes.addDishModal')"
     content-class="p-4 sm:p-6 space-y-4"
     @close="closeModal"
   >
@@ -17,13 +17,13 @@
         for="dish-name"
         class="block text-sm font-medium text-gray-700 mb-2"
       >
-        Dish Name
+        {{ t('dishes.dishName') }}
       </label>
       <input
         id="dish-name"
         v-model="dishName"
         type="text"
-        placeholder="Enter dish name"
+        :placeholder="t('dishes.dishNamePlaceholder')"
         class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
       />
     </div>
@@ -31,12 +31,10 @@
     <div v-if="dish" class="pt-2">
       <div class="flex items-center justify-between mb-3">
         <label class="block text-sm font-medium text-gray-700">
-          Ingredients
+          {{ t('dishes.ingredients') }}
         </label>
         <span class="text-xs text-gray-500">
-          {{ ingredients.length }} item{{
-            ingredients.length !== 1 ? 's' : ''
-          }}
+          {{ t('dishes.itemsCount', ingredients.length) }}
         </span>
       </div>
 
@@ -83,14 +81,14 @@
         <input
           v-model="newIngredientName"
           type="text"
-          placeholder="Ingredient name"
+          :placeholder="t('dishes.ingredientName')"
           class="flex-1 min-w-0 px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
           @keydown.enter="addIngredient"
         />
         <input
           v-model="newIngredientQuantity"
           type="text"
-          placeholder="Qty (e.g. 500g, 1kg)"
+          :placeholder="t('dishes.qtyPlaceholder')"
           class="w-24 sm:w-32 px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
           @keydown.enter="addIngredient"
         />
@@ -110,7 +108,7 @@
     </div>
 
     <p v-else class="text-xs text-gray-500 italic">
-      Save the dish first to add ingredients
+      {{ t('dishes.saveToAddIngredients') }}
     </p>
 
     <template #footer>
@@ -119,14 +117,14 @@
           class="flex-1 px-4 py-2.5 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all"
           @click="closeModal"
         >
-          Cancel
+          {{ t('common.cancel') }}
         </button>
         <button
           class="flex-1 px-4 py-2.5 rounded-[12px] bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="isLoading || !dishName.trim()"
           @click="handleSave"
         >
-          {{ isLoading ? 'Saving...' : 'Save' }}
+          {{ isLoading ? t('common.saving') : t('common.save') }}
         </button>
       </div>
     </template>
@@ -152,6 +150,7 @@ const emit = defineEmits<{
   save: []
 }>()
 
+const { t } = useI18n()
 const { apiFetch } = useApiFetch()
 const dishName = ref('')
 const error = ref('')
@@ -181,7 +180,7 @@ const loadIngredients = async (dishId: string) => {
 
 const addIngredient = async () => {
   if (!props.dish) {
-    error.value = 'Please save the dish first before adding ingredients'
+    error.value = t('dishes.saveDishFirst')
     return
   }
 
@@ -208,7 +207,7 @@ const addIngredient = async () => {
     console.error('Error adding ingredient:', err)
     const apiError = err as { data?: { message?: string }; message?: string }
     error.value =
-      apiError?.data?.message || apiError?.message || 'Failed to add ingredient'
+      apiError?.data?.message || apiError?.message || t('dishes.addIngredientFailed')
   } finally {
     isAddingIngredient.value = false
   }
@@ -258,7 +257,7 @@ watch(
 
 const handleSave = async () => {
   if (!dishName.value.trim()) {
-    error.value = 'Dish name is required'
+    error.value = t('dishes.dishNameRequired')
     return
   }
 
@@ -288,7 +287,7 @@ const handleSave = async () => {
   } catch (err: unknown) {
     const apiError = err as { data?: { message?: string }; message?: string }
     error.value =
-      apiError?.data?.message || apiError?.message || 'Failed to save dish'
+      apiError?.data?.message || apiError?.message || t('dishes.saveFailed')
   } finally {
     isLoading.value = false
   }

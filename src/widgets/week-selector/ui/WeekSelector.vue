@@ -8,13 +8,13 @@
           <p
             class="text-xs sm:text-sm uppercase tracking-[0.25em] text-gray-500"
           >
-            Week selector
+            {{ t('week.selector') }}
           </p>
           <h3 class="text-xl sm:text-2xl font-bold text-gray-900">
-            Week of {{ weekLabel }}
+            {{ t('week.weekOf', { label: weekLabel }) }}
           </h3>
           <p class="text-xs sm:text-sm text-gray-600">
-            Pick a date to jump to that week.
+            {{ t('week.pickDate') }}
           </p>
         </div>
         <div class="flex items-center gap-2 sm:gap-3 shrink-0 w-full sm:w-auto">
@@ -23,7 +23,7 @@
             @click="$emit('prev-week')"
           >
             <Icon name="heroicons:chevron-left" class="w-4 h-4 shrink-0" />
-            <span class="hidden sm:inline">Prev</span>
+            <span class="hidden sm:inline">{{ t('common.prev') }}</span>
           </button>
           <div
             class="flex-1 sm:flex-none glass-nested rounded-[12px] px-2 sm:px-4 py-2 border"
@@ -39,7 +39,7 @@
             class="w-10 h-[42px] sm:w-auto sm:px-3 flex items-center justify-center gap-1.5 rounded-[18px] text-sm font-semibold text-gray-800 bg-white/50 border border-gray-200/50 hover:border-green-300/60 hover:bg-green-50/40 transition-all"
             @click="$emit('next-week')"
           >
-            <span class="hidden sm:inline">Next</span>
+            <span class="hidden sm:inline">{{ t('common.next') }}</span>
             <Icon name="heroicons:chevron-right" class="w-4 h-4 shrink-0" />
           </button>
         </div>
@@ -58,7 +58,7 @@
             v-if="day.isToday"
             class="xl:hidden absolute left-1/2 -translate-x-1/2 -top-2 z-10 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-600 text-white shadow-sm whitespace-nowrap"
           >
-            Today
+            {{ t('common.today') }}
           </span>
           <button
             :ref="(el) => { if (el) dayButtonRefs[dayIndex] = el as HTMLElement }"
@@ -80,13 +80,13 @@
               v-if="day.isToday"
               class="hidden xl:inline absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-600 text-white"
             >
-              Today
+              {{ t('common.today') }}
             </span>
             <span
               class="text-xs mt-1 transition-colors min-h-[16px] flex items-center"
               :class="getDayLabelColorClass(dayIndex)"
             >
-              {{ getDayLabel(dayIndex) }}
+              {{ getDayLabelForIndex(dayIndex) }}
             </span>
           </button>
         </div>
@@ -100,11 +100,7 @@ import { ref, watch, nextTick, onMounted } from 'vue'
 import { TouCard, TouCardContent } from '@/shared/ui'
 import type { WeekDay } from '@/shared/lib/utils/date'
 import type { MenuSelection } from '@/entities/menu'
-import {
-  getDayLabel as getDayLabelUtil,
-  getDayLabelColor,
-  CATEGORIES,
-} from '@/entities/menu'
+import { useMenuTranslations } from '@/shared/i18n'
 
 interface Props {
   weekLabel: string
@@ -115,6 +111,9 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+
+const { t } = useI18n()
+const { getDayLabel, getDayLabelColor } = useMenuTranslations()
 
 const emit = defineEmits<{
   'prev-week': []
@@ -158,12 +157,12 @@ const onInputChange = (event: Event) => {
   emit('week-input-change', event)
 }
 
-const getDayLabel = (dayIndex: number) => {
-  return getDayLabelUtil(dayIndex, props.selectedMenu, CATEGORIES)
+const getDayLabelForIndex = (dayIndex: number) => {
+  return getDayLabel(dayIndex, props.selectedMenu)
 }
 
 const getDayLabelColorClass = (dayIndex: number) => {
-  return getDayLabelColor(dayIndex, props.selectedMenu, CATEGORIES)
+  return getDayLabelColor(dayIndex, props.selectedMenu)
 }
 
 watch(() => props.activeDayIndex, tryScrollToActive)

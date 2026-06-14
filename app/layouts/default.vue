@@ -1,5 +1,7 @@
 <template>
   <div>
+    <LanguageSwitcher />
+    <LocalePickerModal :is-open="isPickerOpen" />
     <div
       class="fixed inset-0 gradient-bg-accent -z-10"
       style="
@@ -18,3 +20,18 @@
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { onMounted } from 'vue'
+import { LanguageSwitcher } from '@/features/i18n/language-switcher'
+import {
+  LocalePickerModal,
+  useLocalePreference,
+} from '@/features/i18n/locale-picker'
+
+const { isPickerOpen, openPickerIfNeeded } = useLocalePreference()
+
+onMounted(() => {
+  openPickerIfNeeded()
+})
+</script>

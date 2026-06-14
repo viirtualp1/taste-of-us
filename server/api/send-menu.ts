@@ -7,6 +7,20 @@
 // async function launchBrowser() { ... }
 // async function checkChromeAvailable(): Promise<boolean> { ... }
 
+import {
+  resolveMealCook,
+  type CookRotationFirst,
+  type CookRotationMode,
+} from '@/entities/menu/lib/cookRotation'
+import {
+  isTelegramDeliveryError,
+  pinChatMessage,
+  sendMenuMessage,
+  sendResponsibleMessage,
+  type MenuDayForTelegram,
+  type ResponsibleItem,
+} from '../utils/telegramMessaging'
+
 type CookSlot = 'me' | 'partner'
 
 interface MenuDay {
@@ -72,13 +86,14 @@ export default defineEventHandler(async (event) => {
 
   const secondMember =
     (row?.second_member_telegram_chat_id ?? '').trim() || null
-  const rotationMode = (row?.cook_rotation_mode as string) || 'none'
-  const rotationFirst = (row?.cook_rotation_first as 'me' | 'partner') || 'me'
-  const partnerChatId = secondMember || telegramChatId
-  const meChatId = String(telegramUserId)
+  const rotationMode = ((row?.cook_rotation_mode as string) ||
+    'none') as CookRotationMode
+  const rotationFirst = ((row?.cook_rotation_first as 'me' | 'partner') ||
+    'me') as CookRotationFirst
+  const partnerChatId = secondMember ?? telegramChatId
 
   const chatIdBySlot: Record<CookSlot, string> = {
-    me: meChatId,
+    me: telegramChatId,
     partner: partnerChatId,
   }
 
@@ -89,39 +104,32 @@ export default defineEventHandler(async (event) => {
   )
 
   try {
-    const menuText = formatMenuForTelegram(effectiveMenu)
-
     let messageId: number | null = null
 
     try {
-      const textResult = await sendTelegramMessage(
+      const menuResult = await sendMenuMessage(
         telegramBotToken,
         telegramChatId,
-        menuText,
+        effectiveMenu,
       )
-      const textMessageId = textResult?.result?.message_id
-      if (textMessageId) {
+      const sentMessageId = menuResult.result?.message_id
+      if (sentMessageId) {
         try {
-          await pinTelegramMessage(
+          await pinChatMessage(
             telegramBotToken,
             telegramChatId,
-            textMessageId,
+            sentMessageId,
           )
-          messageId = textMessageId
+          messageId = sentMessageId
         } catch {
           // Ignore pin errors
         }
       }
-    } catch (textError: unknown) {
-      const textErrorMessage =
-        (textError as Error)?.message || String(textError) || 'Unknown error'
+    } catch (sendError: unknown) {
+      const sendErrorMessage =
+        (sendError as Error)?.message || String(sendError) || 'Unknown error'
 
-      if (
-        textErrorMessage.includes('chat not found') ||
-        textErrorMessage.includes('bot was blocked') ||
-        textErrorMessage.includes('user is deactivated') ||
-        textErrorMessage.includes('Forbidden')
-      ) {
+      if (isTelegramDeliveryError(sendErrorMessage)) {
         throw createError({
           statusCode: 400,
           message:
@@ -129,21 +137,20 @@ export default defineEventHandler(async (event) => {
             '1. The user has started a conversation with the bot (send /start to the bot)\n' +
             '2. The user has not blocked the bot\n' +
             '3. The Telegram Chat ID is correct\n\n' +
-            `Error: ${textErrorMessage}`,
+            `Error: ${sendErrorMessage}`,
         })
       }
 
       throw createError({
         statusCode: 500,
-        message: `Failed to send menu: ${textErrorMessage}`,
+        message: `Failed to send menu: ${sendErrorMessage}`,
       })
     }
 
-    for (const [slot, lines] of Object.entries(responsibleLines)) {
-      if (lines.length === 0) continue
+    for (const [slot, items] of Object.entries(responsibleLines)) {
+      if (items.length === 0) continue
       const chatId = chatIdBySlot[slot as CookSlot]
-      const msg = formatResponsibleMessage(slot as CookSlot, lines)
-      await sendTelegramMessageSafe(telegramBotToken, chatId, msg)
+      await sendResponsibleMessage(telegramBotToken, chatId, items)
     }
 
     return {
@@ -161,62 +168,37 @@ export default defineEventHandler(async (event) => {
   }
 })
 
-interface DayWithCook extends MenuDay {
-  _cook?: { brunch?: CookSlot; dinner?: CookSlot; dessert?: CookSlot }
-}
-
 function computeCookAndResponsible(
   menu: MenuDay[],
-  rotationMode: string,
-  rotationFirst: 'me' | 'partner',
+  rotationMode: CookRotationMode,
+  rotationFirst: CookRotationFirst,
 ): {
-  effectiveMenu: DayWithCook[]
-  responsibleLines: Record<CookSlot, string[]>
+  effectiveMenu: MenuDayForTelegram[]
+  responsibleLines: Record<CookSlot, ResponsibleItem[]>
 } {
-  const effectiveMenu: DayWithCook[] = []
-  const responsibleLines: Record<CookSlot, string[]> = { me: [], partner: [] }
+  const effectiveMenu: MenuDayForTelegram[] = []
+  const responsibleLines: Record<CookSlot, ResponsibleItem[]> = {
+    me: [],
+    partner: [],
+  }
+  const useRotation = rotationMode === 'by_day' || rotationMode === 'by_week'
 
   for (let i = 0; i < menu.length; i++) {
     const day = menu[i]
+    if (!day) continue
     const cook: { brunch?: CookSlot; dinner?: CookSlot; dessert?: CookSlot } =
       {}
-
-    const useRotation = rotationMode === 'by_day' || rotationMode === 'by_week'
-    const rotationByDay = rotationMode === 'by_day'
-    const firstMe = rotationFirst === 'me'
-
-    const slotForDay = (dayIndex: number): CookSlot => {
-      if (!useRotation) return 'me'
-      if (rotationByDay) {
-        const idx = firstMe ? dayIndex % 2 : (dayIndex + 1) % 2
-        return idx === 0 ? 'me' : 'partner'
-      }
-      const weekIdx = firstMe ? 0 : 1
-      return weekIdx === 0 ? 'me' : 'partner'
-    }
-
-    const dayCook = useRotation
-      ? slotForDay(i)
-      : (day.cook_day as CookSlot | undefined)
-    const mealCook = (m: 'brunch' | 'dinner' | 'dessert') => {
-      if (dayCook) return dayCook
-      return (
-        (day[`cook_${m}`] as CookSlot | undefined) ||
-        (useRotation ? slotForDay(i) : undefined)
-      )
-    }
 
     const meals = ['brunch', 'dinner', 'dessert'] as const
     for (const m of meals) {
       const name = day.meals[m]
       if (!name) continue
-      const who = mealCook(m)
-      if (who) {
-        cook[m] = who
-        responsibleLines[who].push(`${day.day} — ${m}: ${name}`)
-      }
+      const who = resolveMealCook(day, m, i, rotationMode, rotationFirst)
+      cook[m] = who
+      responsibleLines[who].push({ day: day.day, meal: m, dish: name })
     }
 
+    const dayCook = day.cook_day
     if (
       !useRotation &&
       dayCook &&
@@ -224,7 +206,11 @@ function computeCookAndResponsible(
       !day.meals.dinner &&
       !day.meals.dessert
     ) {
-      responsibleLines[dayCook].push(`${day.day} — whole day (no meals yet)`)
+      responsibleLines[dayCook].push({
+        day: day.day,
+        meal: 'whole day',
+        dish: 'No meals yet',
+      })
     }
 
     effectiveMenu.push({
@@ -234,129 +220,6 @@ function computeCookAndResponsible(
   }
 
   return { effectiveMenu, responsibleLines }
-}
-
-function formatMenuForTelegram(menu: DayWithCook[]) {
-  let text = '🍽️ *Weekly Menu Plan*\n\n'
-
-  menu.forEach((day) => {
-    text += `📅 *${day.day}*\n`
-    const c = day._cook
-    if (day.meals.brunch)
-      text += `🌅 Brunch: ${day.meals.brunch}${c?.brunch ? ` 👤 ${c.brunch}` : ''}\n`
-    if (day.meals.dinner)
-      text += `🌙 Dinner: ${day.meals.dinner}${c?.dinner ? ` 👤 ${c.dinner}` : ''}\n`
-    if (day.meals.dessert)
-      text += `🍰 Dessert: ${day.meals.dessert}${c?.dessert ? ` 👤 ${c.dessert}` : ''}\n`
-    if (!day.meals.brunch && !day.meals.dinner && !day.meals.dessert) {
-      text += `_No meals planned_\n`
-    }
-    text += '\n'
-  })
-
-  return text
-}
-
-function formatResponsibleMessage(_slot: CookSlot, lines: string[]): string {
-  let text = `👨‍🍳 *You're responsible for cooking:*\n\n`
-  lines.forEach((l) => {
-    text += `• ${l}\n`
-  })
-  return text
-}
-
-async function sendTelegramMessageSafe(
-  token: string,
-  chatId: string,
-  text: string,
-): Promise<boolean> {
-  try {
-    const res = await sendTelegramMessage(token, chatId, text)
-    return !!res?.ok
-  } catch {
-    return false
-  }
-}
-
-async function sendTelegramMessage(
-  token: string,
-  chatId: string,
-  text: string,
-) {
-  const url = `https://api.telegram.org/bot${token}/sendMessage`
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      chat_id: chatId,
-      text: text,
-      parse_mode: 'Markdown',
-    }),
-  })
-
-  const responseText = await response.text()
-
-  if (!response.ok) {
-    let errorMessage = `Telegram API error: ${responseText}`
-
-    try {
-      const errorJson = JSON.parse(responseText)
-      if (errorJson.description) {
-        errorMessage = `Telegram API error: ${errorJson.description}`
-      }
-      if (errorJson.error_code) {
-        errorMessage += ` (Error code: ${errorJson.error_code})`
-      }
-    } catch {
-      // Ignore parse errors
-    }
-
-    throw new Error(errorMessage)
-  }
-
-  return JSON.parse(responseText)
-}
-
-async function pinTelegramMessage(
-  token: string,
-  chatId: string,
-  messageId: number,
-) {
-  const url = `https://api.telegram.org/bot${token}/pinChatMessage`
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      chat_id: chatId,
-      message_id: messageId,
-      disable_notification: false,
-    }),
-  })
-
-  const responseText = await response.text()
-
-  if (!response.ok) {
-    let errorMessage = `Telegram API error: ${responseText}`
-
-    try {
-      const errorJson = JSON.parse(responseText)
-      if (errorJson.description) {
-        errorMessage = `Telegram API error: ${errorJson.description}`
-      }
-    } catch {
-      // Ignore parse errors
-    }
-
-    throw new Error(errorMessage)
-  }
-
-  return JSON.parse(responseText)
 }
 
 // PDF: sendTelegramDocument, isChromeError, generateMenuPDF — disabled (see git history to restore)

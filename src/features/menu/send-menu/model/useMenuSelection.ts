@@ -12,6 +12,7 @@ export function useMenuSelection(
   selectedMenu: { value: MenuSelection[] },
   weekDays: { value: WeekDay[] },
 ) {
+  const { t } = useI18n()
   const { isAuthenticated } = useAuth()
   const { apiFetch } = useApiFetch()
   const posthog = usePostHog()
@@ -53,7 +54,7 @@ export function useMenuSelection(
 
   const sendMenu = async (saveSchedule: () => Promise<void>) => {
     if (!isAuthenticated.value) {
-      message.value = 'Please log in to send menu'
+      message.value = t('menu.loginToSend')
       messageType.value = 'error'
       return
     }
@@ -94,7 +95,7 @@ export function useMenuSelection(
         body: { menu: menuPayload },
       })
 
-      message.value = 'Menu sent successfully!'
+      message.value = t('menu.sentSuccess')
       messageType.value = 'success'
 
       posthog?.capture('menu_sent', { pinned: response.pinned })
@@ -105,10 +106,7 @@ export function useMenuSelection(
       }, 4000)
     } catch (error: unknown) {
       console.error('Error sending menu:', error)
-      message.value = getApiErrorMessage(
-        error,
-        'Error sending menu. Please try again.',
-      )
+      message.value = getApiErrorMessage(error, t('menu.sendError'))
       messageType.value = 'error'
     } finally {
       isSending.value = false

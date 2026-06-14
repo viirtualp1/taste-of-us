@@ -9,6 +9,7 @@ interface RequireAuthOptions {
 }
 
 export function useRequireAuth(options: RequireAuthOptions = {}) {
+  const { t } = useI18n()
   const router = useRouter()
   const { isAuthenticated, isLoading: authLoading, authenticate } = useTelegram()
   const isReady = ref(false)
@@ -31,7 +32,7 @@ export function useRequireAuth(options: RequireAuthOptions = {}) {
     try {
       const result = await authenticate()
       if (!result.success) {
-        const message = result.error || 'Failed to authenticate with Telegram'
+        const message = result.error || t('auth.authFailed')
         if (options.onFailure) {
           options.onFailure(message)
         } else if (options.redirectTo) {
@@ -44,7 +45,7 @@ export function useRequireAuth(options: RequireAuthOptions = {}) {
     } catch (error) {
       console.error('Authentication error:', error)
       if (options.onFailure) {
-        options.onFailure('Failed to authenticate. Please open this app in Telegram.')
+        options.onFailure(t('auth.openInTelegram'))
       } else if (options.redirectTo) {
         await router.push(options.redirectTo)
       }

@@ -9,13 +9,33 @@ export default defineNuxtConfig({
     '@': fileURLToPath(new URL('./src', import.meta.url)),
   },
 
+  typescript: {
+    tsConfig: {
+      include: ['../src/**/*'],
+    },
+  },
+
   modules: [
     '@nuxt/eslint',
     '@nuxt/fonts',
     '@nuxt/icon',
     '@nuxt/image',
     '@posthog/nuxt',
+    '@nuxtjs/i18n',
   ],
+
+  i18n: {
+    locales: [
+      { code: 'en', iso: 'en-US', name: 'English', file: 'en.json' },
+      { code: 'ru', iso: 'ru-RU', name: 'Русский', file: 'ru.json' },
+    ],
+    defaultLocale: 'en',
+    strategy: 'prefix',
+    lazy: true,
+    restructureDir: 'i18n',
+    langDir: 'locales',
+    detectBrowserLanguage: false,
+  },
 
   posthogConfig: {
     publicKey: process.env.NUXT_PUBLIC_POSTHOG_KEY || '',

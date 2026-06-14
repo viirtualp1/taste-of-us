@@ -8,10 +8,10 @@
           <p
             class="text-xs sm:text-sm uppercase tracking-[0.25em] text-gray-500 whitespace-nowrap"
           >
-            Shopping List
+            {{ t('shopping.previewTitle') }}
           </p>
           <h3 class="text-xl sm:text-2xl font-bold text-gray-900 truncate">
-            This Week
+            {{ t('shopping.thisWeek') }}
           </h3>
         </div>
         <div class="flex items-center gap-2 shrink-0">
@@ -26,7 +26,7 @@
             @click="navigateToShopping"
           >
             <Icon name="heroicons:arrow-right" class="w-4 h-4 shrink-0" />
-            <span class="hidden sm:inline">View All</span>
+            <span class="hidden sm:inline">{{ t('shopping.viewAll') }}</span>
           </button>
         </div>
       </div>
@@ -44,7 +44,7 @@
             name="heroicons:shopping-cart"
             class="w-8 h-8 text-gray-400 mx-auto mb-2"
           />
-          <p class="text-sm text-gray-500">Your shopping list is empty</p>
+          <p class="text-sm text-gray-500">{{ t('shopping.empty') }}</p>
         </div>
       </div>
 
@@ -60,7 +60,7 @@
         />
         <div v-if="items.length > 5" class="text-center pt-2">
           <p class="text-xs text-gray-500">
-            +{{ items.length - 5 }} more items
+            {{ t('shopping.moreItems', { count: items.length - 5 }) }}
           </p>
         </div>
       </div>
@@ -69,7 +69,7 @@
 
   <BottomSheet
     :is-open="isAddModalOpen"
-    title="Add Item"
+    :title="t('shopping.addItemTitle')"
     content-class="p-4 sm:p-6 space-y-4"
     @close="closeAddModal"
   >
@@ -78,13 +78,13 @@
         for="item-name"
         class="block text-sm font-medium text-gray-700 mb-2"
       >
-        Item Name
+        {{ t('shopping.itemNameLabel') }}
       </label>
       <input
         id="item-name"
         v-model="newItemName"
         type="text"
-        placeholder="Enter item name"
+        :placeholder="t('shopping.itemNamePlaceholder')"
         class="w-full px-4 py-2.5 rounded-[12px] border border-gray-200/50 glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
         @keydown.enter="handleAddItem"
       />
@@ -95,13 +95,13 @@
         for="item-quantity"
         class="block text-sm font-medium text-gray-700 mb-2"
       >
-        Quantity (Optional)
+        {{ t('shopping.quantityOptional') }}
       </label>
       <input
         id="item-quantity"
         v-model="newItemQuantity"
         type="text"
-        placeholder="e.g. 500g, 1kg"
+        :placeholder="t('shopping.quantityExample')"
         class="w-full px-4 py-2.5 rounded-[12px] border border-gray-200/50 glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
         @keydown.enter="handleAddItem"
       />
@@ -113,14 +113,14 @@
           class="flex-1 px-4 py-2.5 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all"
           @click="closeAddModal"
         >
-          Cancel
+          {{ t('common.cancel') }}
         </button>
         <button
           class="flex-1 px-4 py-2.5 rounded-[12px] bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="isAddingItem || !newItemName.trim()"
           @click="handleAddItem"
         >
-          {{ isAddingItem ? 'Adding...' : 'Add' }}
+          {{ isAddingItem ? t('common.adding') : t('common.add') }}
         </button>
       </div>
     </template>
@@ -141,6 +141,8 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const { t } = useI18n()
+const localePath = useLocalePath()
 const router = useRouter()
 const { apiFetch } = useApiFetch()
 const { isAuthenticated, hapticFeedback } = useTelegram()
@@ -167,7 +169,7 @@ const newItemName = ref('')
 const newItemQuantity = ref('')
 
 const navigateToShopping = () => {
-  router.push('/shopping')
+  router.push(localePath('/shopping'))
 }
 
 const handleAddItem = async () => {

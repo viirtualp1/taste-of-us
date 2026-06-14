@@ -74,8 +74,12 @@ export default defineEventHandler(async (event) => {
 
   const recipient = (body.telegram_chat_id ?? '').trim() || null
   const secondMember = (body.second_member_telegram_chat_id ?? '').trim() || null
-  const rotationMode = body.cook_rotation_mode ?? 'none'
+  const requestedRotationMode = body.cook_rotation_mode ?? 'none'
   const rotationFirst = body.cook_rotation_first ?? 'me'
+  const rotationMode =
+    requestedRotationMode !== 'none' && !secondMember
+      ? 'none'
+      : requestedRotationMode
 
   const supabase = createSupabaseClient()
   const { data, error } = await supabase

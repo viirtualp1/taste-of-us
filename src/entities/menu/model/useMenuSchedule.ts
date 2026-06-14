@@ -5,6 +5,11 @@ import {
   createEmptyMenuSelection,
   createEmptyWeekMenu,
 } from '../lib/menuHelpers'
+import {
+  applyRotationPreFill,
+  type CookRotationFirst,
+  type CookRotationMode,
+} from '../lib/cookRotation'
 import type { MenuSelection } from './types'
 import type { WeekDay } from '@/shared/lib/utils/date'
 
@@ -26,6 +31,43 @@ type ApiFetch = <T = unknown>(
     query?: Record<string, string | number | boolean | undefined>
   },
 ) => Promise<T>
+
+interface CookSettings {
+  cook_rotation_mode: CookRotationMode
+  cook_rotation_first: CookRotationFirst
+  second_member_telegram_chat_id: string
+}
+
+async function loadCookSettings(apiFetch: ApiFetch): Promise<CookSettings> {
+  try {
+    const response = await apiFetch<CookSettings>('/api/user/settings')
+    return {
+      cook_rotation_mode: response?.cook_rotation_mode ?? 'none',
+      cook_rotation_first: response?.cook_rotation_first ?? 'me',
+      second_member_telegram_chat_id:
+        response?.second_member_telegram_chat_id?.trim() ?? '',
+    }
+  } catch {
+    return {
+      cook_rotation_mode: 'none',
+      cook_rotation_first: 'me',
+      second_member_telegram_chat_id: '',
+    }
+  }
+}
+
+function withRotationPreFill(
+  menu: MenuSelection[],
+  settings: CookSettings,
+): MenuSelection[] {
+  const hasSecondMember = settings.second_member_telegram_chat_id.length > 0
+  return applyRotationPreFill(
+    menu,
+    settings.cook_rotation_mode,
+    settings.cook_rotation_first,
+    hasSecondMember,
+  )
+}
 
 function normalizeSavedDay(day: unknown): MenuSelection {
   const dayData = day as Partial<
@@ -67,13 +109,21 @@ export function useMenuSchedule(
 ) {
   const isLoading = ref(false)
   const selectedMenu = ref<MenuSelection[]>([])
+  let cookSettings: CookSettings = {
+    cook_rotation_mode: 'none',
+    cook_rotation_first: 'me',
+    second_member_telegram_chat_id: '',
+  }
 
   const getWeekStartDate = () =>
     formatWeekStartDate(getStartOfWeek(new Date(weekStart.value)).toISOString())
 
   const resetToEmptyWeek = () => {
     if (!weekDays.value?.length) return
-    selectedMenu.value = createEmptyWeekMenu(weekDays.value.length)
+    selectedMenu.value = withRotationPreFill(
+      createEmptyWeekMenu(weekDays.value.length),
+      cookSettings,
+    )
   }
 
   const loadSchedule = async () => {
@@ -81,6 +131,8 @@ export function useMenuSchedule(
 
     isLoading.value = true
     try {
+      cookSettings = await loadCookSettings(apiFetch)
+
       const schedule = await apiFetch<Schedule[]>('/api/schedules', {
         query: { week_start: getWeekStartDate() },
       })
@@ -91,7 +143,10 @@ export function useMenuSchedule(
         weekDays.value?.length &&
         savedMenu.length === weekDays.value.length
       ) {
-        selectedMenu.value = savedMenu.map(normalizeSavedDay)
+        selectedMenu.value = withRotationPreFill(
+          savedMenu.map(normalizeSavedDay),
+          cookSettings,
+        )
         return
       }
 
@@ -146,7 +201,10 @@ export function useMenuSchedule(
     weekDays,
     (days) => {
       if (days?.length && selectedMenu.value.length !== days.length) {
-        selectedMenu.value = createEmptyWeekMenu(days.length)
+        selectedMenu.value = withRotationPreFill(
+          createEmptyWeekMenu(days.length),
+          cookSettings,
+        )
       }
     },
     { immediate: true },

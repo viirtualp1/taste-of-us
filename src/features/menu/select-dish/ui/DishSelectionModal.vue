@@ -12,11 +12,11 @@
         class="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0 bg-white"
       >
         <h2 class="text-lg sm:text-xl font-bold text-gray-900">
-          Select {{ categoryLabel }}
+          {{ t('dishes.selectTitle', { category: categoryLabel }) }}
         </h2>
         <button
           class="w-10 h-10 shrink-0 flex items-center justify-center rounded-[12px] text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-          aria-label="Close"
+          :aria-label="t('common.close')"
           @click.stop="closeModal"
         >
           <Icon name="heroicons:x-mark" class="w-5 h-5" />
@@ -36,9 +36,9 @@
               <input
                 v-model="searchQuery"
                 type="search"
-                placeholder="Search dishes..."
+                :placeholder="t('dishes.searchDishes')"
                 class="w-full pl-9 pr-4 py-2.5 sm:py-2 rounded-[12px] border border-gray-200 bg-gray-50 sm:bg-white focus:bg-white focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-200/50 text-gray-900 placeholder-gray-400 text-sm"
-                aria-label="Search dishes"
+                :aria-label="t('dishes.searchDishes')"
               />
             </div>
 
@@ -46,7 +46,7 @@
               class="flex sm:flex-col gap-2 overflow-x-auto sm:overflow-visible flex-nowrap sm:flex-wrap pb-0.5 sm:pb-0"
             >
               <button
-                v-for="menuCategory in CATEGORIES"
+                v-for="menuCategory in categories"
                 :key="menuCategory.key"
                 class="px-4 py-2 sm:py-3 rounded-[12px] text-sm font-medium transition-all whitespace-nowrap sm:whitespace-normal flex-shrink-0 sm:flex-shrink sm:w-full border text-left"
                 :class="
@@ -69,12 +69,12 @@
             v-if="filteredDishes.length === 0"
             class="text-center py-12 text-gray-500"
           >
-            <p class="text-lg font-medium">No dishes found</p>
+            <p class="text-lg font-medium">{{ t('dishes.noDishesFound') }}</p>
             <p class="text-sm mt-2">
               {{
                 searchQuery
-                  ? 'Try a different search or category'
-                  : 'Try selecting a different category'
+                  ? t('dishes.tryDifferentSearch')
+                  : t('dishes.tryDifferentCategory')
               }}
             </p>
           </div>
@@ -118,9 +118,9 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { MenuCategory, Dish, Ingredient } from '@/entities/menu'
-import { CATEGORIES } from '@/entities/menu'
 import { BottomSheet } from '@/shared/ui'
 import { useApiFetch } from '@/entities/user'
+import { useMenuTranslations } from '@/shared/i18n'
 
 interface Props {
   isOpen: boolean
@@ -136,15 +136,15 @@ const emit = defineEmits<{
   select: [dishName: string]
 }>()
 
+const { t } = useI18n()
+const { categories, getCategoryLabel } = useMenuTranslations()
 const { apiFetch } = useApiFetch()
 const selectedCategory = ref<MenuCategory>(props.category)
 const selectedDish = ref<string | undefined>(props.selectedDishName)
 const searchQuery = ref('')
 const dishIngredients = ref<Record<string, Ingredient[]>>({})
 
-const categoryLabel = computed(
-  () => CATEGORIES.find((item) => item.key === props.category)?.label ?? 'Dish',
-)
+const categoryLabel = computed(() => getCategoryLabel(props.category))
 
 const filteredDishes = computed(() => {
   if (!props.dishes || !Array.isArray(props.dishes)) return []

@@ -1,7 +1,7 @@
 <template>
   <BottomSheet
     :is-open="isOpen"
-    title="Profile Settings"
+    :title="t('profile.title')"
     content-class="p-4 sm:p-6 space-y-3"
     @close="closeModal"
   >
@@ -20,22 +20,20 @@
         />
         <div class="flex-1">
           <h3 class="text-sm font-semibold text-blue-900 mb-2">
-            How to get your Your Telegram Chat ID?
+            {{ t('profile.howToGetChatId') }}
           </h3>
           <ol
             class="text-xs text-blue-800 space-y-2 list-decimal list-inside"
           >
             <li>
-              Open Telegram and search for
-              <span class="font-mono font-semibold">@userinfobot</span>
+              {{ t('profile.chatIdStep1', { bot: '@userinfobot' }) }}
             </li>
-            <li>Start a conversation with the bot</li>
-            <li>Send any message to the bot</li>
+            <li>{{ t('profile.chatIdStep2') }}</li>
+            <li>{{ t('profile.chatIdStep3') }}</li>
             <li>
-              The bot will reply with your Chat ID (a number like
-              <span class="font-mono">123456789</span>)
+              {{ t('profile.chatIdStep4', { example: '123456789' }) }}
             </li>
-            <li>Copy that number and paste it here</li>
+            <li>{{ t('profile.chatIdStep5') }}</li>
           </ol>
         </div>
       </div>
@@ -46,18 +44,18 @@
         for="telegram-id"
         class="block text-sm font-medium text-gray-700 mb-2"
       >
-        Your Telegram Chat ID
+        {{ t('profile.yourChatId') }}
       </label>
       <input
         id="telegram-id"
         v-model="telegramId"
         type="text"
-        placeholder="Enter your Telegram Chat ID"
+        :placeholder="t('profile.yourChatIdPlaceholder')"
         class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
         :disabled="isLoading"
       />
       <p class="mt-1 text-xs text-gray-500">
-        Where you will receive the weekly menu and “you’re responsible” DMs.
+        {{ t('profile.yourChatIdHint') }}
       </p>
     </div>
     <div class="bg-yellow-50/80 border border-yellow-200 rounded-[12px] p-4">
@@ -68,47 +66,57 @@
         />
         <div class="flex-1">
           <h3 class="text-sm font-semibold text-yellow-900 mb-2">
-            Important: Start a conversation with the bot
+            {{ t('profile.startBotTitle') }}
           </h3>
           <p class="text-xs text-yellow-800">
-            Before receiving menu plans, the recipient must start a
-            conversation with the bot by sending
-            <span class="font-mono font-semibold">/start</span> to the
-            bot. Otherwise, the bot cannot send messages to them.
+            {{ t('profile.startBotDescription', { command: '/start' }) }}
           </p>
         </div>
       </div>
     </div>
 
-    <div>
+    <div
+      ref="partnerFieldRef"
+      :class="highlightPartnerField ? 'rounded-[12px] ring-2 ring-yellow-400 ring-offset-2' : ''"
+    >
       <label
         for="second-member-id"
         class="block text-sm font-medium text-gray-700 mb-2"
       >
-        Partner Telegram Chat ID
-        <span class="text-gray-400 font-normal">(optional)</span>
+        {{ t('profile.partnerChatId') }}
+        <span class="text-gray-400 font-normal">({{ t('common.optional') }})</span>
       </label>
       <input
         id="second-member-id"
         v-model="secondMemberId"
         type="text"
-        placeholder="Partner’s Chat ID for rotation & responsibility"
+        :placeholder="t('profile.partnerChatIdPlaceholder')"
         class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
+        :class="
+          highlightPartnerField
+            ? 'border-yellow-400 focus:border-yellow-500 focus:ring-yellow-200/60'
+            : ''
+        "
         :disabled="isLoading"
       />
+      <p
+        v-if="highlightPartnerField"
+        class="mt-2 text-xs text-yellow-800 bg-yellow-50 border border-yellow-200 rounded-[10px] px-3 py-2"
+      >
+        {{ t('profile.partnerHighlight') }}
+      </p>
     </div>
 
     <div>
     <label class="block text-sm font-medium text-gray-700 mb-2">
-      Cook assignment
+      {{ t('profile.cookAssignment') }}
     </label>
     <p class="text-xs text-gray-500 mb-3">
-      Automatically pre-fill who cooks in the planner. You can still adjust it per
-      day and meal.
+      {{ t('profile.cookAssignmentHint') }}
     </p>
         <div class="space-y-3">
         <div class="space-y-2">
-          <span class="text-xs text-gray-500 block">Mode</span>
+          <span class="text-xs text-gray-500 block">{{ t('profile.mode') }}</span>
           <div class="grid grid-cols-1 gap-2">
           <button
             v-for="option in cookModeOptions"
@@ -131,19 +139,19 @@
           </button>
         </div>
         <p
-          v-if="!hasSecondMember"
+          v-if="!hasSecondMember && !highlightPartnerField"
           class="text-[11px] text-yellow-700 mt-1 flex items-start gap-1.5"
         >
           <Icon
             name="heroicons:exclamation-triangle"
             class="w-3.5 h-3.5 mt-0.5 flex-shrink-0"
           />
-          Add a Second member Chat ID to enable automatic rotation between two people.
+          {{ t('profile.addPartnerForRotation') }}
         </p>
       </div>
 
       <div v-if="cookRotationMode !== 'none' && hasSecondMember" class="space-y-2">
-          <span class="text-xs text-gray-500 block">First in rotation</span>
+          <span class="text-xs text-gray-500 block">{{ t('profile.firstInRotation') }}</span>
           <div
             class="inline-flex items-center gap-1 p-1 rounded-full bg-gray-100 border border-gray-200"
           >
@@ -157,7 +165,7 @@
               "
               @click="cookRotationFirst = 'me'"
             >
-              Me
+              {{ t('common.me') }}
             </button>
             <button
               type="button"
@@ -169,7 +177,7 @@
               "
               @click="cookRotationFirst = 'partner'"
             >
-              Partner
+              {{ t('common.partner') }}
             </button>
           </div>
           <p class="text-[11px] text-gray-500">
@@ -185,14 +193,14 @@
           class="flex-1 px-4 py-2.5 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all"
           @click="closeModal"
         >
-          Cancel
+          {{ t('common.cancel') }}
         </button>
         <button
           class="flex-1 px-4 py-2.5 rounded-[12px] bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           :disabled="isLoading"
           @click="saveSettings"
         >
-          {{ isLoading ? 'Saving...' : 'Save' }}
+          {{ isLoading ? t('common.saving') : t('common.save') }}
         </button>
       </div>
     </template>
@@ -200,21 +208,25 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, ref, watch } from 'vue'
 import { useAuth, useApiFetch } from '@/entities/user'
 import { BottomSheet } from '@/shared/ui'
 
 interface Props {
   isOpen: boolean
+  highlightPartnerOnOpen?: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  highlightPartnerOnOpen: false,
+})
 
 const emit = defineEmits<{
   close: []
   save: [telegramId: string]
 }>()
 
+const { t } = useI18n()
 const { isAuthenticated } = useAuth()
 const { apiFetch } = useApiFetch()
 const telegramId = ref('')
@@ -223,6 +235,9 @@ const cookRotationMode = ref<'none' | 'by_day' | 'by_week'>('none')
 const cookRotationFirst = ref<'me' | 'partner'>('me')
 const isLoading = ref(false)
 const error = ref('')
+const highlightPartnerField = ref(false)
+const pendingCookMode = ref<'by_day' | 'by_week' | null>(null)
+const partnerFieldRef = ref<HTMLElement | null>(null)
 
 interface SettingsResponse {
   telegram_chat_id: string
@@ -235,46 +250,65 @@ const hasSecondMember = computed(
   () => !!secondMemberId.value && secondMemberId.value.trim().length > 0,
 )
 
-const cookModeOptions = [
+const cookModeOptions = computed(() => [
   {
     value: 'none' as const,
-    label: 'Off',
-    description: 'You choose who cooks for each day and meal.',
+    label: t('profile.cookModeOff'),
+    description: t('profile.cookModeOffDesc'),
   },
   {
     value: 'by_day' as const,
-    label: 'By day',
-    description: 'Alternate Me and Partner every day.',
+    label: t('profile.cookModeByDay'),
+    description: t('profile.cookModeByDayDesc'),
   },
   {
     value: 'by_week' as const,
-    label: 'By week',
-    description: 'One person cooks this week, the other next week.',
+    label: t('profile.cookModeByWeek'),
+    description: t('profile.cookModeByWeekDesc'),
   },
-] satisfies {
-  value: 'none' | 'by_day' | 'by_week'
-  label: string
-  description: string
-}[]
+])
 
 const rotationSummary = computed(() => {
   if (cookRotationMode.value === 'none' || !hasSecondMember.value) {
-    return 'Rotation is off. You can still assign cooks in each day card.'
+    return t('profile.rotationOff')
   }
 
   const first =
-    cookRotationFirst.value === 'me' ? 'You' : 'Partner'
+    cookRotationFirst.value === 'me' ? t('common.you') : t('common.partner')
 
   if (cookRotationMode.value === 'by_day') {
-    return `${first} cook on day 1, then you alternate each day (Me, Partner, Me, Partner, …).`
+    return t('profile.rotationByDay', { first })
   }
 
-  return `${first} cook this week, the other person cooks next week, and it keeps alternating.`
+  return t('profile.rotationByWeek', { first })
 })
 
+function focusPartnerField() {
+  highlightPartnerField.value = true
+  nextTick(() => {
+    partnerFieldRef.value?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    document.getElementById('second-member-id')?.focus()
+  })
+}
+
 function selectCookMode(mode: 'none' | 'by_day' | 'by_week') {
+  if (mode !== 'none' && !hasSecondMember.value) {
+    pendingCookMode.value = mode
+    focusPartnerField()
+    return
+  }
+
+  pendingCookMode.value = null
+  highlightPartnerField.value = false
   cookRotationMode.value = mode
 }
+
+watch(hasSecondMember, (hasPartner) => {
+  if (!hasPartner || !pendingCookMode.value) return
+  cookRotationMode.value = pendingCookMode.value
+  pendingCookMode.value = null
+  highlightPartnerField.value = false
+})
 
 const loadSettings = async () => {
   if (!isAuthenticated.value) return
@@ -290,7 +324,7 @@ const loadSettings = async () => {
     cookRotationFirst.value = response?.cook_rotation_first ?? 'me'
   } catch (err: any) {
     error.value =
-      err?.data?.message || err?.message || 'Failed to load settings'
+      err?.data?.message || err?.message || t('profile.loadFailed')
     console.error('Error loading settings:', err)
   } finally {
     isLoading.value = false
@@ -299,7 +333,7 @@ const loadSettings = async () => {
 
 const saveSettings = async () => {
   if (!isAuthenticated.value) {
-    error.value = 'Please log in to save settings'
+    error.value = t('profile.loginToSave')
     return
   }
 
@@ -307,7 +341,9 @@ const saveSettings = async () => {
   error.value = ''
 
   try {
-    await apiFetch('/api/user/settings', {
+    const response = await apiFetch<{
+      settings: SettingsResponse
+    }>('/api/user/settings', {
       method: 'POST',
       body: {
         telegram_chat_id: telegramId.value || null,
@@ -316,11 +352,13 @@ const saveSettings = async () => {
         cook_rotation_first: cookRotationFirst.value,
       },
     })
+    cookRotationMode.value = response?.settings?.cook_rotation_mode ?? 'none'
+    cookRotationFirst.value = response?.settings?.cook_rotation_first ?? 'me'
     emit('save', telegramId.value)
     closeModal()
   } catch (err: any) {
     error.value =
-      err?.data?.message || err?.message || 'Failed to save settings'
+      err?.data?.message || err?.message || t('profile.saveFailed')
     console.error('Error saving settings:', err)
   } finally {
     isLoading.value = false
@@ -332,6 +370,8 @@ const closeModal = () => {
   secondMemberId.value = ''
   cookRotationMode.value = 'none'
   cookRotationFirst.value = 'me'
+  highlightPartnerField.value = false
+  pendingCookMode.value = null
   error.value = ''
   emit('close')
 }
@@ -340,7 +380,11 @@ watch(
   () => props.isOpen,
   (newValue) => {
     if (newValue && isAuthenticated.value) {
-      loadSettings()
+      loadSettings().then(() => {
+        if (props.highlightPartnerOnOpen) {
+          focusPartnerField()
+        }
+      })
     }
   },
 )

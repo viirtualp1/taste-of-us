@@ -6,15 +6,15 @@
       >
         <div class="text-center mb-6">
           <h2 class="text-2xl font-bold text-gray-900 mb-2">
-            Welcome to Taste of Us
+            {{ t('home.welcomeTitle') }}
           </h2>
           <p class="text-gray-600 text-sm">
-            Please open this app in Telegram to start planning your weekly menu.
+            {{ t('home.welcomeDescription') }}
           </p>
         </div>
 
         <div v-if="isLoading" class="text-center py-8">
-          <p class="text-gray-600">Initializing Telegram Web App...</p>
+          <p class="text-gray-600">{{ t('home.initializing') }}</p>
         </div>
 
         <div
@@ -26,9 +26,10 @@
       </div>
     </div>
 
-    <menu-planner v-else @open-profile="handleOpenProfile" />
+    <menu-planner v-else ref="menuPlannerRef" @open-profile="handleOpenProfile" />
     <profile-settings-modal
       :is-open="isProfileModalOpen"
+      :highlight-partner-on-open="highlightPartnerOnOpen"
       @close="closeProfileModal"
       @save="handleSaveProfileSettings"
     />
@@ -45,9 +46,12 @@ definePageMeta({
   layout: 'default',
 })
 
+const { t } = useI18n()
 const { isAuthenticated, isLoading, hapticFeedback } = useTelegram()
 const authError = ref('')
 const isProfileModalOpen = ref(false)
+const highlightPartnerOnOpen = ref(false)
+const menuPlannerRef = ref<{ reloadSchedule?: () => Promise<void> } | null>(null)
 
 useRequireAuth({
   onFailure: (message) => {
@@ -60,17 +64,20 @@ useRequireAuth({
   },
 })
 
-function handleOpenProfile() {
+function handleOpenProfile(options?: { highlightPartner?: boolean }) {
+  highlightPartnerOnOpen.value = options?.highlightPartner ?? false
   isProfileModalOpen.value = true
   hapticFeedback.light()
 }
 
 function closeProfileModal() {
   isProfileModalOpen.value = false
+  highlightPartnerOnOpen.value = false
 }
 
-function handleSaveProfileSettings() {
+async function handleSaveProfileSettings() {
   closeProfileModal()
   hapticFeedback.success()
+  await menuPlannerRef.value?.reloadSchedule?.()
 }
 </script>

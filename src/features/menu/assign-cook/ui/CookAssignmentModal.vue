@@ -15,12 +15,12 @@
           <div class="flex items-center gap-2">
             <span class="text-xl" aria-hidden="true">👨‍🍳</span>
             <h2 class="text-lg sm:text-xl font-bold text-gray-900">
-              Responsible for cooking
+              {{ t('cook.title') }}
             </h2>
           </div>
           <button
             class="w-10 h-10 shrink-0 flex items-center justify-center rounded-[12px] text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
-            aria-label="Close"
+            :aria-label="t('common.close')"
             @click.stop="close"
           >
             <Icon name="heroicons:x-mark" class="w-5 h-5" />
@@ -31,8 +31,7 @@
           <div
             class="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-[12px] px-3 py-2"
           >
-            Choose who is responsible for cooking this day. You can assign for
-            the whole day or separately for each meal.
+            {{ t('cook.description') }}
           </div>
 
           <div
@@ -61,11 +60,11 @@
                 />
               </span>
               <span class="text-sm font-semibold text-gray-800">
-                Enable cook assignment
+                {{ t('cook.enableAssignment') }}
               </span>
             </div>
             <span class="text-xs text-gray-500">
-              {{ cookSectionEnabled ? 'On' : 'Off' }}
+              {{ cookSectionEnabled ? t('common.on') : t('common.off') }}
             </span>
           </div>
 
@@ -83,7 +82,7 @@
             >
               <div
                 role="tablist"
-                aria-label="Assign by whole day or per meal"
+                :aria-label="t('cook.assignByDayOrMeal')"
                 class="grid grid-cols-2 gap-2 p-1.5 rounded-[14px] bg-gray-100/80 border border-gray-200/60"
               >
                 <button
@@ -98,7 +97,7 @@
                   "
                   @click="setWholeDay(true)"
                 >
-                  Whole day
+                  {{ t('cook.wholeDay') }}
                 </button>
                 <button
                   type="button"
@@ -112,44 +111,44 @@
                   "
                   @click="setWholeDay(false)"
                 >
-                  Per meal
+                  {{ t('cook.perMeal') }}
                 </button>
               </div>
 
               <div v-if="isWholeDay" class="space-y-2">
-                <p class="text-xs text-gray-500 mb-2">Who cooks this day?</p>
+                <p class="text-xs text-gray-500 mb-2">{{ t('cook.whoCooksDay') }}</p>
                 <div
                   class="grid grid-cols-3 gap-2"
                   role="group"
-                  aria-label="Cook for whole day"
+                  :aria-label="t('cook.cookForWholeDay')"
                 >
                   <CookChip
                     :selected="!(localCookDay ?? '')"
-                    label="—"
+                    :label="t('common.dash')"
                     @select="onCookChange('cook_day', '')"
                   />
                   <CookChip
                     :selected="(localCookDay ?? '') === 'me'"
-                    label="Me"
+                    :label="t('common.me')"
                     @select="onCookChange('cook_day', 'me')"
                   />
                   <CookChip
                     :selected="(localCookDay ?? '') === 'partner'"
-                    label="Partner"
+                    :label="t('common.partner')"
                     @select="onCookChange('cook_day', 'partner')"
                   />
                 </div>
               </div>
 
               <template v-else>
-                <p class="text-xs text-gray-500 mb-3">Assign per meal</p>
+                <p class="text-xs text-gray-500 mb-3">{{ t('cook.assignPerMeal') }}</p>
                 <div class="space-y-4">
                   <div
                     v-for="m in mealCookFields"
                     :key="m.key"
                     class="space-y-2"
                     role="group"
-                    :aria-label="`Cook for ${m.label}`"
+                    :aria-label="t('cook.cookForMeal', { meal: m.label })"
                   >
                     <span
                       class="flex items-center gap-1.5 text-sm font-medium text-gray-700"
@@ -159,17 +158,17 @@
                     <div class="grid grid-cols-3 gap-2">
                       <CookChip
                         :selected="!(localMealValue(m.key) ?? '')"
-                        label="—"
+                        :label="t('common.dash')"
                         @select="onCookChange(m.key, '')"
                       />
                       <CookChip
                         :selected="(localMealValue(m.key) ?? '') === 'me'"
-                        label="Me"
+                        :label="t('common.me')"
                         @select="onCookChange(m.key, 'me')"
                       />
                       <CookChip
                         :selected="(localMealValue(m.key) ?? '') === 'partner'"
-                        label="Partner"
+                        :label="t('common.partner')"
                         @select="onCookChange(m.key, 'partner')"
                       />
                     </div>
@@ -188,14 +187,14 @@
             class="px-4 py-2 text-sm font-medium rounded-[12px] border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
             @click="close"
           >
-            Cancel
+            {{ t('common.cancel') }}
           </button>
           <button
             type="button"
             class="px-4 py-2 text-sm font-semibold rounded-[12px] bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
             @click="handleSubmit"
           >
-            Save
+            {{ t('common.save') }}
           </button>
         </div>
       </div>
@@ -217,11 +216,13 @@ const props = defineProps<Props>()
 
 type CookField = 'cook_day' | 'cook_brunch' | 'cook_dinner' | 'cook_dessert'
 
-const mealCookFields: { key: CookField; label: string }[] = [
-  { key: 'cook_brunch', label: 'Brunch' },
-  { key: 'cook_dinner', label: 'Dinner' },
-  { key: 'cook_dessert', label: 'Dessert' },
-]
+const { t } = useI18n()
+
+const mealCookFields = computed(() => [
+  { key: 'cook_brunch' as CookField, label: t('menu.categories.brunch') },
+  { key: 'cook_dinner' as CookField, label: t('menu.categories.dinner') },
+  { key: 'cook_dessert' as CookField, label: t('menu.categories.dessert') },
+])
 
 const emit = defineEmits<{
   close: []

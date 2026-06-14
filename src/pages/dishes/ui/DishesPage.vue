@@ -2,16 +2,18 @@
   <div class="space-y-6 pb-14 sm:pb-0">
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">My Dishes</h1>
+        <h1 class="text-2xl sm:text-3xl font-bold text-gray-900">
+          {{ t('dishes.title') }}
+        </h1>
         <p class="text-sm text-gray-600 mt-1">
-          Create and manage your custom dishes menu
+          {{ t('dishes.subtitle') }}
         </p>
       </div>
     </div>
 
     <div class="flex flex-col lg:flex-row gap-4 lg:gap-6">
       <div
-        v-for="category in CATEGORIES"
+        v-for="category in categories"
         :key="category.key"
         class="glass border border-gray-300/60 rounded-[20px] px-6 py-4 flex-1 min-w-0"
       >
@@ -50,7 +52,7 @@
               @click="openAddDishModal(category.key)"
             >
               <Icon name="heroicons:plus" class="w-4 h-4" />
-              <span class="hidden sm:inline">Add Dish</span>
+              <span class="hidden sm:inline">{{ t('dishes.addDish') }}</span>
             </button>
           </div>
         </div>
@@ -59,7 +61,7 @@
           <input
             v-model="searchQueries[category.key]"
             type="text"
-            placeholder="Search dishes in this category..."
+            :placeholder="t('dishes.searchPlaceholder')"
             class="w-full pr-9 pl-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
           />
           <button
@@ -83,7 +85,7 @@
           v-else-if="userDishes[category.key]?.length === 0"
           class="text-center py-8"
         >
-          <p class="text-gray-500">No dishes yet. Add your first dish!</p>
+          <p class="text-gray-500">{{ t('dishes.empty') }}</p>
         </div>
 
         <div v-else class="space-y-2">
@@ -121,7 +123,11 @@
             class="w-full p-3 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all text-sm"
             @click="expandedCategories[category.key] = true"
           >
-            Show All ({{ userDishes[category.key]?.length - 5 }} more)
+            {{
+              t('dishes.showAll', {
+                count: userDishes[category.key]?.length - 5,
+              })
+            }}
           </button>
           <button
             v-if="
@@ -132,7 +138,7 @@
             class="w-full p-3 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all text-sm"
             @click="expandedCategories[category.key] = false"
           >
-            Show Less
+            {{ t('dishes.showLess') }}
           </button>
         </div>
       </div>
@@ -144,7 +150,7 @@
         @click="openImportModal"
       >
         <Icon name="heroicons:arrow-down-tray" class="w-5 h-5 shrink-0" />
-        <span class="hidden sm:inline">Import</span>
+        <span class="hidden sm:inline">{{ t('common.import') }}</span>
       </button>
       <div class="h-4 w-px bg-gray-300/50 shrink-0" />
       <button
@@ -156,7 +162,9 @@
           :name="isNavigating ? 'heroicons:arrow-path' : 'heroicons:arrow-left'"
           :class="['w-5 h-5', isNavigating && 'animate-spin']"
         />
-        <span class="hidden sm:inline">{{ isNavigating ? 'Loading...' : 'Back' }}</span>
+        <span class="hidden sm:inline">{{
+          isNavigating ? t('common.loading') : t('common.back')
+        }}</span>
       </button>
     </floating-actions-bar>
 
@@ -183,21 +191,24 @@ import {
   useUserDishes,
   type MenuCategory,
   type Dish,
-  CATEGORIES,
 } from '@/entities/menu'
 import { DishFormModal } from '@/features/dish/manage-dish'
 import { ImportDishesModal } from '@/features/dish/import-dishes'
 import { TouSkeleton } from '@/shared/ui'
 import { FloatingActionsBar } from '@/widgets/floating-actions-bar'
 import { getApiErrorMessage } from '@/shared/lib/utils/apiError'
+import { useMenuTranslations } from '@/shared/i18n'
 
 definePageMeta({
   layout: 'default',
 })
 
+const { t } = useI18n()
+const localePath = useLocalePath()
 const router = useRouter()
 const { isAuthenticated } = useAuth()
 const { apiFetch } = useApiFetch()
+const { categories } = useMenuTranslations()
 const {
   dishesByCategory: userDishes,
   isLoading,
@@ -205,7 +216,7 @@ const {
 } = useUserDishes(apiFetch, isAuthenticated)
 
 useRequireAuth({
-  redirectTo: '/',
+  redirectTo: localePath('/'),
   onReady: () => loadUserDishes(),
 })
 
@@ -281,11 +292,11 @@ async function handleImportComplete() {
 function handleBack() {
   if (isNavigating.value) return
   isNavigating.value = true
-  router.push('/')
+  router.push(localePath('/'))
 }
 
 async function confirmDeleteDish(dish: Dish) {
-  if (!confirm(`Are you sure you want to delete "${dish.name}"?`)) return
+  if (!confirm(t('dishes.deleteConfirm', { name: dish.name }))) return
 
   try {
     await apiFetch(`/api/user/dishes/${dish.id}`, {
@@ -294,7 +305,7 @@ async function confirmDeleteDish(dish: Dish) {
     await loadUserDishes()
   } catch (error) {
     console.error('Error deleting dish:', error)
-    alert(getApiErrorMessage(error, 'Failed to delete dish. Please try again.'))
+    alert(getApiErrorMessage(error, t('dishes.deleteFailed')))
   }
 }
 </script>

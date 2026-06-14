@@ -6,12 +6,18 @@ import {
   formatWeekStartDate,
   type WeekDay,
 } from '@/shared/lib/utils/date'
+import { LOCALE_DATE_MAP, type AppLocale } from '@/shared/i18n/constants'
 
 const weekStart = ref('')
 const isClient = ref(false)
 const activeDayIndex = ref(0)
 
 export function useWeekNavigation() {
+  const { locale, t } = useI18n()
+  const dateLocale = computed(
+    () => LOCALE_DATE_MAP[locale.value as AppLocale] ?? 'en-US',
+  )
+
   const weekStartDate = computed(() => {
     if (!weekStart.value) return new Date()
     return new Date(weekStart.value)
@@ -22,7 +28,7 @@ export function useWeekNavigation() {
       return []
     }
     try {
-      return buildWeekDays(weekStartDate.value)
+      return buildWeekDays(weekStartDate.value, dateLocale.value)
     } catch {
       return []
     }
@@ -30,9 +36,9 @@ export function useWeekNavigation() {
 
   const weekLabel = computed(() => {
     if (!isClient.value || !weekStart.value) {
-      return 'Loading...'
+      return t('common.loading')
     }
-    return formatWeekLabel(weekStartDate.value)
+    return formatWeekLabel(weekStartDate.value, dateLocale.value)
   })
 
   const weekStartInput = computed(() => {

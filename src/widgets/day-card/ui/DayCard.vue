@@ -18,7 +18,7 @@
             <p
               class="text-xs sm:text-sm uppercase tracking-[0.25em] text-gray-500"
             >
-              Dish selector
+              {{ t('menu.dishSelector') }}
             </p>
             <tou-card-title>{{ day.display }}</tou-card-title>
           </div>
@@ -47,7 +47,7 @@
         >
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
             <div
-              v-for="category in CATEGORIES"
+              v-for="category in categories"
               :key="category.key"
               class="space-y-2 sm:space-y-3 relative overflow-visible"
             >
@@ -62,14 +62,16 @@
                 <span class="font-semibold text-gray-900">
                   {{
                     selectedMenu?.[category.key] ||
-                    `Select ${category.label.toLowerCase()}`
+                    t('menu.selectCategory', {
+                      category: category.label.toLowerCase(),
+                    })
                   }}
                 </span>
                 <span
                   v-if="selectedMenu?.[category.key]"
                   class="text-xs text-gray-500 block sm:inline sm:ml-1 mt-0.5 sm:mt-1"
                 >
-                  Click to change
+                  {{ t('menu.clickToChange') }}
                 </span>
               </button>
             </div>
@@ -83,7 +85,7 @@
               <span class="flex items-center gap-3">
                 <span class="text-lg select-none" aria-hidden="true">👨‍🍳</span>
                 <span class="text-sm font-semibold">
-                  Responsible for cooking
+                  {{ t('menu.responsibleForCooking') }}
                 </span>
               </span>
               <span
@@ -92,9 +94,9 @@
                 <span
                   class="w-1.5 h-1.5 rounded-full"
                   :class="
-                    cookSummary === 'Not set'
+                    cookSummaryKey === 'not_set'
                       ? 'bg-gray-300'
-                      : cookSummary === 'Me'
+                      : cookSummaryKey === 'me'
                         ? 'bg-green-500'
                         : 'bg-blue-500'
                   "
@@ -132,7 +134,7 @@ import type {
   Dish,
 } from '@/entities/menu'
 import type { WeekDay } from '@/shared/lib/utils/date'
-import { getDayLabel, getDayBadgeClass, CATEGORIES } from '@/entities/menu'
+import { useMenuTranslations } from '@/shared/i18n'
 import {
   TouCard,
   TouCardHeader,
@@ -161,27 +163,33 @@ defineEmits<{
   ): void
 }>()
 
+const { t } = useI18n()
+const { categories, getDayLabel, getDayBadgeClass, getCookLabel } =
+  useMenuTranslations()
+
 const isModalOpen = ref(false)
 const selectedCategory = ref<MenuCategory>('brunch')
 const isCookModalOpen = ref(false)
 
-const cookSummary = computed(() => {
+const cookSummaryKey = computed(() => {
   const menu = props.selectedMenu
-  if (!menu) return 'Not set'
+  if (!menu) return 'not_set' as const
 
   const day = (menu.cook_day ?? '').trim()
-  if (day === 'me') return 'Me'
-  if (day === 'partner') return 'Partner'
+  if (day === 'me') return 'me' as const
+  if (day === 'partner') return 'partner' as const
 
   const hasPerMeal =
     !!(menu.cook_brunch ?? '').trim() ||
     !!(menu.cook_dinner ?? '').trim() ||
     !!(menu.cook_dessert ?? '').trim()
 
-  if (hasPerMeal) return 'Per meal'
+  if (hasPerMeal) return 'per_meal' as const
 
-  return 'Not set'
+  return 'not_set' as const
 })
+
+const cookSummary = computed(() => getCookLabel(cookSummaryKey.value))
 
 const openModal = (category: MenuCategory) => {
   selectedCategory.value = category
@@ -202,10 +210,10 @@ const closeCookModal = () => {
 
 const dayLabel = computed(() => {
   if (!props.selectedMenu) {
-    return 'Not set'
+    return t('common.notSet')
   }
 
-  return getDayLabel(props.dayIndex, [props.selectedMenu], CATEGORIES)
+  return getDayLabel(props.dayIndex, [props.selectedMenu])
 })
 
 const badgeClass = computed(() => {
@@ -213,6 +221,6 @@ const badgeClass = computed(() => {
     return 'bg-white/70 text-gray-600 border border-gray-200/50'
   }
 
-  return getDayBadgeClass(props.dayIndex, [props.selectedMenu], CATEGORIES)
+  return getDayBadgeClass(props.dayIndex, [props.selectedMenu], categories.value)
 })
 </script>

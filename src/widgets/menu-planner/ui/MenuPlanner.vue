@@ -68,9 +68,9 @@ import {
   useUserDishes,
   type MenuCategory,
   type MenuSelection,
-  CATEGORIES,
   findNextIncompleteDay,
 } from '@/entities/menu'
+import { useMenuTranslations } from '@/shared/i18n'
 import { useTelegram, useApiFetch } from '@/entities/user'
 import { useMenuSelection } from '@/features/menu/send-menu'
 import { ShoppingListPreview } from '@/widgets/shopping-item'
@@ -80,8 +80,11 @@ import { TouToast } from '@/shared/ui'
 import { ActionButtons } from '@/widgets/action-buttons'
 import { ConfirmMenuModal } from '@/features/menu/confirm-menu'
 
-defineEmits<{ 'open-profile': [] }>()
+defineEmits<{ 'open-profile': [options?: { highlightPartner?: boolean }] }>()
 
+const { t } = useI18n()
+const localePath = useLocalePath()
+const { categories } = useMenuTranslations()
 const { apiFetch } = useApiFetch()
 const { isAuthenticated, hapticFeedback } = useTelegram()
 const { allDishes, isLoading: isDishesLoading, load: loadUserDishes } =
@@ -138,7 +141,7 @@ const handleShowConfirm = () => {
   })
 
   if (!hasAnyDish) {
-    showToast('Add at least one dish to the menu before sending.')
+    showToast(t('menu.addDishBeforeSend'))
     hapticFeedback.light()
     return
   }
@@ -150,7 +153,7 @@ const handleShowConfirm = () => {
   const currentJson = JSON.stringify(selectedMenu.value)
 
   if (initialJson && initialJson === currentJson) {
-    showToast('Menu for this week has not changed.')
+    showToast(t('menu.menuNotChanged'))
     hapticFeedback.light()
     return
   }
@@ -170,12 +173,12 @@ const handleConfirmSend = async () => {
 }
 
 const handleOpenDishes = () => {
-  navigateTo('/dishes')
+  navigateTo(localePath('/dishes'))
   hapticFeedback.light()
 }
 
 const handleOpenShopping = () => {
-  navigateTo('/shopping')
+  navigateTo(localePath('/shopping'))
   hapticFeedback.light()
 }
 
@@ -198,7 +201,7 @@ const handleMenuUpdate = (
     dayIndex,
     selectedMenu.value,
     weekDays.value.length,
-    CATEGORIES,
+    categories.value,
   )
 
   if (nextIncompleteDay !== null) {
@@ -212,5 +215,9 @@ onMounted(async () => {
   initialSelectedMenu.value = JSON.parse(
     JSON.stringify(selectedMenu.value),
   ) as MenuSelection[]
+})
+
+defineExpose({
+  reloadSchedule: loadSchedule,
 })
 </script>

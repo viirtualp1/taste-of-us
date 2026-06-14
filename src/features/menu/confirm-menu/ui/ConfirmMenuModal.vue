@@ -1,7 +1,7 @@
 <template>
   <BottomSheet
     :is-open="isOpen"
-    title="Confirm Menu"
+    :title="t('menu.confirmTitle')"
     content-class="p-4 sm:p-6 pb-0"
     @close="handleEdit"
   >
@@ -30,7 +30,7 @@
               <p
                 class="text-xs text-gray-500 uppercase tracking-wide mb-0.5"
               >
-                Brunch
+                {{ t('menu.categories.brunch') }}
               </p>
               <p class="text-sm font-semibold text-gray-900">
                 {{ selectedMenu[index].brunch }}
@@ -42,7 +42,7 @@
             class="p-2 rounded-[12px] bg-gray-50/50 border border-gray-200/50"
           >
             <p class="text-xs text-gray-400 italic text-center">
-              No brunch
+              {{ t('menu.noBrunch') }}
             </p>
           </div>
 
@@ -55,7 +55,7 @@
               <p
                 class="text-xs text-gray-500 uppercase tracking-wide mb-0.5"
               >
-                Dinner
+                {{ t('menu.categories.dinner') }}
               </p>
               <p class="text-sm font-semibold text-gray-900">
                 {{ selectedMenu[index].dinner }}
@@ -67,7 +67,7 @@
             class="p-2 rounded-[12px] bg-gray-50/50 border border-gray-200/50"
           >
             <p class="text-xs text-gray-400 italic text-center">
-              No dinner
+              {{ t('menu.noDinner') }}
             </p>
           </div>
 
@@ -80,7 +80,7 @@
               <p
                 class="text-xs text-gray-500 uppercase tracking-wide mb-0.5"
               >
-                Dessert
+                {{ t('menu.categories.dessert') }}
               </p>
               <p class="text-sm font-semibold text-gray-900">
                 {{ selectedMenu[index].dessert }}
@@ -92,7 +92,7 @@
             class="p-2 rounded-[12px] bg-gray-50/50 border border-gray-200/50"
           >
             <p class="text-xs text-gray-400 italic text-center">
-              No dessert
+              {{ t('menu.noDessert') }}
             </p>
           </div>
         </div>
@@ -105,7 +105,7 @@
           class="flex-1 px-4 py-2.5 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all"
           @click="handleEdit"
         >
-          Edit
+          {{ t('common.edit') }}
         </button>
         <button
           class="flex-1 px-4 py-2.5 rounded-[12px] bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
@@ -120,9 +120,9 @@
               name="heroicons:arrow-path"
               class="w-4 h-4 animate-spin"
             />
-            Sending...
+            {{ t('common.sending') }}
           </span>
-          <span v-else>Confirm & Send</span>
+          <span v-else>{{ t('menu.confirmAndSend') }}</span>
         </button>
       </div>
     </template>
@@ -149,6 +149,8 @@ const emit = defineEmits<{
   edit: []
   confirm: []
 }>()
+
+const { t } = useI18n()
 
 const handleEdit = () => {
   emit('edit')

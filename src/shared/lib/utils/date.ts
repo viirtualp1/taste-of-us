@@ -29,20 +29,20 @@ export function getStartOfWeek(date: Date) {
   return copy
 }
 
-export function buildWeekDays(startDate: Date): WeekDay[] {
+export function buildWeekDays(startDate: Date, locale = 'en-US'): WeekDay[] {
   const days: WeekDay[] = []
 
   for (let i = 0; i < 7; i++) {
     const date = new Date(startDate)
     date.setDate(startDate.getDate() + i)
     days.push({
-      name: date.toLocaleDateString('en-US', { weekday: 'long' }),
-      display: date.toLocaleDateString('en-US', {
+      name: date.toLocaleDateString(locale, { weekday: 'long' }),
+      display: date.toLocaleDateString(locale, {
         weekday: 'long',
         day: 'numeric',
         month: 'short',
       }),
-      short: date.toLocaleDateString('en-US', {
+      short: date.toLocaleDateString(locale, {
         month: 'short',
         day: 'numeric',
       }),
@@ -59,16 +59,16 @@ export function formatWeekStartDate(isoWeekStart: string): string {
   return isoWeekStart.split('T')[0] ?? ''
 }
 
-export function formatWeekLabel(startDate: Date) {
+export function formatWeekLabel(startDate: Date, locale = 'en-US') {
   const start = startDate
   const end = new Date(start)
   end.setDate(start.getDate() + 6)
 
-  const startLabel = start.toLocaleDateString('en-US', {
+  const startLabel = start.toLocaleDateString(locale, {
     month: 'short',
     day: 'numeric',
   })
-  const endLabel = end.toLocaleDateString('en-US', {
+  const endLabel = end.toLocaleDateString(locale, {
     month: 'short',
     day: 'numeric',
   })

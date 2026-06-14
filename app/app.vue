@@ -5,13 +5,20 @@
 </template>
 
 <script setup lang="ts">
+const { t, locale } = useI18n()
+
 useHead({
-  title: 'Taste of Us - Weekly Menu Planner',
+  htmlAttrs: {
+    lang: locale,
+  },
+})
+
+useHead({
+  title: () => t('app.title'),
   meta: [
     {
       name: 'description',
-      content:
-        'Plan your weekly meals together with Taste of Us. Create and share your meal plan with your partner.',
+      content: () => t('app.description'),
     },
     {
       name: 'keywords',
@@ -22,11 +29,10 @@ useHead({
     { name: 'viewport', content: 'width=device-width, initial-scale=1' },
     { name: 'theme-color', content: '#22c55e' },
 
-    { property: 'og:title', content: 'Taste of Us - Weekly Menu Planner' },
+    { property: 'og:title', content: () => t('app.title') },
     {
       property: 'og:description',
-      content:
-        'Plan your weekly meals together with Taste of Us. Create and share your meal plan with your partner.',
+      content: () => t('app.description'),
     },
     { property: 'og:type', content: 'website' },
     { property: 'og:image', content: '/favicon.png' },
@@ -34,11 +40,10 @@ useHead({
     { property: 'og:site_name', content: 'Taste of Us' },
 
     { name: 'twitter:card', content: 'summary' },
-    { name: 'twitter:title', content: 'Taste of Us - Weekly Menu Planner' },
+    { name: 'twitter:title', content: () => t('app.title') },
     {
       name: 'twitter:description',
-      content:
-        'Plan your weekly meals together with Taste of Us. Create and share your meal plan with your partner.',
+      content: () => t('app.description'),
     },
     { name: 'twitter:image', content: '/favicon.png' },
   ],
@@ -55,18 +60,15 @@ useHead({
 })
 
 useSeoMeta({
-  title: 'Taste of Us - Weekly Menu Planner',
-  description:
-    'Plan your weekly meals together with Taste of Us. Create and share your meal plan with your partner.',
-  ogTitle: 'Taste of Us - Weekly Menu Planner',
-  ogDescription:
-    'Plan your weekly meals together with Taste of Us. Create and share your meal plan with your partner.',
+  title: () => t('app.title'),
+  description: () => t('app.description'),
+  ogTitle: () => t('app.title'),
+  ogDescription: () => t('app.description'),
   ogImage: '/favicon.png',
   ogUrl: 'https://taste-of-us.com',
   twitterCard: 'summary',
-  twitterTitle: 'Taste of Us - Weekly Menu Planner',
-  twitterDescription:
-    'Plan your weekly meals together with Taste of Us. Create and share your meal plan with your partner.',
+  twitterTitle: () => t('app.title'),
+  twitterDescription: () => t('app.description'),
   twitterImage: '/favicon.png',
 })
 </script>
