@@ -4,6 +4,7 @@ export default {
   content: [
     './app/**/*.{js,vue,ts}',
     './src/**/*.{js,vue,ts}',
+    './.storybook/**/*.{js,ts}',
   ],
   theme: {
     extend: {

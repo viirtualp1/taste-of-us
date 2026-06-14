@@ -46,14 +46,13 @@
                 class="flex items-center justify-between px-4 py-3 border-b border-border shrink-0"
               >
                 <h2 class="text-xl font-bold text-foreground">{{ title }}</h2>
-                <button
+                <TouIconButton
                   v-if="showCloseButton"
-                  class="w-10 h-10 shrink-0 flex items-center justify-center rounded-[12px] text-muted-foreground hover:bg-[var(--surface-hover)] hover:text-foreground transition-colors"
+                  variant="close"
+                  icon="heroicons:x-mark"
                   aria-label="Close"
                   @click="handleClose"
-                >
-                  <Icon name="heroicons:x-mark" class="w-5 h-5" />
-                </button>
+                />
               </div>
               <div
                 class="flex-1 overflow-y-auto overscroll-contain min-h-0"
@@ -77,6 +76,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted, onUnmounted } from 'vue'
+import TouIconButton from './TouIconButton.vue'
 
 interface Props {
   isOpen: boolean

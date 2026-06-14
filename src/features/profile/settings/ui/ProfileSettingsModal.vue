@@ -5,98 +5,64 @@
     content-class="p-4 sm:p-6 space-y-3"
     @close="closeModal"
   >
-    <div
-      v-if="error"
-      class="bg-red-50 border border-red-200 rounded-[12px] p-3"
-    >
-      <p class="text-sm text-red-800">{{ error }}</p>
-    </div>
+    <TouAlert v-if="error">{{ error }}</TouAlert>
 
-    <div class="bg-blue-50/80 border border-blue-200 rounded-[12px] p-4">
-      <div class="flex items-start gap-3">
-        <Icon
-          name="heroicons:information-circle"
-          class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"
-        />
-        <div class="flex-1">
-          <h3 class="text-sm font-semibold text-blue-900 mb-2">
-            {{ t('profile.howToGetChatId') }}
-          </h3>
-          <ol
-            class="text-xs text-blue-800 space-y-2 list-decimal list-inside"
-          >
-            <li>
-              {{ t('profile.chatIdStep1', { bot: '@userinfobot' }) }}
-            </li>
-            <li>{{ t('profile.chatIdStep2') }}</li>
-            <li>{{ t('profile.chatIdStep3') }}</li>
-            <li>
-              {{ t('profile.chatIdStep4', { example: '123456789' }) }}
-            </li>
-            <li>{{ t('profile.chatIdStep5') }}</li>
-          </ol>
-        </div>
-      </div>
-    </div>
+    <TouAlert
+      variant="info"
+      icon="heroicons:information-circle"
+      :title="t('profile.howToGetChatId')"
+    >
+      <ol class="space-y-2 list-decimal list-inside">
+        <li>{{ t('profile.chatIdStep1', { bot: '@userinfobot' }) }}</li>
+        <li>{{ t('profile.chatIdStep2') }}</li>
+        <li>{{ t('profile.chatIdStep3') }}</li>
+        <li>{{ t('profile.chatIdStep4', { example: '123456789' }) }}</li>
+        <li>{{ t('profile.chatIdStep5') }}</li>
+      </ol>
+    </TouAlert>
 
     <div>
-      <label
-        for="telegram-id"
-        class="block text-sm font-medium text-gray-700 mb-2"
-      >
+      <TouFieldLabel for="telegram-id">
         {{ t('profile.yourChatId') }}
-      </label>
-      <input
+      </TouFieldLabel>
+      <TouInput
         id="telegram-id"
         v-model="telegramId"
         type="text"
+        class="w-full"
         :placeholder="t('profile.yourChatIdPlaceholder')"
-        class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
         :disabled="isLoading"
       />
       <p class="mt-1 text-xs text-gray-500">
         {{ t('profile.yourChatIdHint') }}
       </p>
     </div>
-    <div class="bg-yellow-50/80 border border-yellow-200 rounded-[12px] p-4">
-      <div class="flex items-start gap-3">
-        <Icon
-          name="heroicons:exclamation-triangle"
-          class="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5"
-        />
-        <div class="flex-1">
-          <h3 class="text-sm font-semibold text-yellow-900 mb-2">
-            {{ t('profile.startBotTitle') }}
-          </h3>
-          <p class="text-xs text-yellow-800">
-            {{ t('profile.startBotDescription', { command: '/start' }) }}
-          </p>
-        </div>
-      </div>
-    </div>
+    <TouAlert
+      variant="warning"
+      icon="heroicons:exclamation-triangle"
+      :title="t('profile.startBotTitle')"
+    >
+      {{ t('profile.startBotDescription', { command: '/start' }) }}
+    </TouAlert>
 
     <div
       ref="partnerFieldRef"
       :class="highlightPartnerField ? 'rounded-[12px] ring-2 ring-yellow-400 ring-offset-2' : ''"
     >
-      <label
-        for="second-member-id"
-        class="block text-sm font-medium text-gray-700 mb-2"
-      >
+      <TouFieldLabel for="second-member-id">
         {{ t('profile.partnerChatId') }}
         <span class="text-gray-400 font-normal">({{ t('common.optional') }})</span>
-      </label>
-      <input
+      </TouFieldLabel>
+      <TouInput
         id="second-member-id"
         v-model="secondMemberId"
         type="text"
-        :placeholder="t('profile.partnerChatIdPlaceholder')"
-        class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
         :class="
           highlightPartnerField
-            ? 'border-yellow-400 focus:border-yellow-500 focus:ring-yellow-200/60'
-            : ''
+            ? 'w-full border-yellow-400 focus:border-yellow-500 focus:ring-yellow-200/60'
+            : 'w-full'
         "
+        :placeholder="t('profile.partnerChatIdPlaceholder')"
         :disabled="isLoading"
       />
       <p
@@ -108,9 +74,7 @@
     </div>
 
     <div>
-    <label class="block text-sm font-medium text-gray-700 mb-2">
-      {{ t('profile.cookAssignment') }}
-    </label>
+    <TouFieldLabel>{{ t('profile.cookAssignment') }}</TouFieldLabel>
     <p class="text-xs text-gray-500 mb-3">
       {{ t('profile.cookAssignmentHint') }}
     </p>
@@ -188,21 +152,14 @@
     </div>
 
     <template #footer>
-      <div class="flex gap-3 p-4 sm:p-6">
-        <button
-          class="flex-1 px-4 py-2.5 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all"
-          @click="closeModal"
-        >
-          {{ t('common.cancel') }}
-        </button>
-        <button
-          class="flex-1 px-4 py-2.5 rounded-[12px] bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="isLoading"
-          @click="saveSettings"
-        >
-          {{ isLoading ? t('common.saving') : t('common.save') }}
-        </button>
-      </div>
+      <TouModalFooter
+        :cancel-label="t('common.cancel')"
+        :confirm-label="t('common.save')"
+        :loading-label="t('common.saving')"
+        :loading="isLoading"
+        @cancel="closeModal"
+        @confirm="saveSettings"
+      />
     </template>
   </BottomSheet>
 </template>
@@ -210,7 +167,13 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import { useAuth, useApiFetch } from '@/entities/user'
-import { BottomSheet } from '@/shared/ui'
+import {
+  BottomSheet,
+  TouAlert,
+  TouFieldLabel,
+  TouInput,
+  TouModalFooter,
+} from '@/shared/ui'
 
 interface Props {
   isOpen: boolean

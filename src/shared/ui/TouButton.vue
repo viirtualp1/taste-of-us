@@ -10,6 +10,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { cn } from '@/shared/lib/utils'
 
 interface Props {
   variant?:
@@ -56,8 +57,4 @@ const sizeClassesMap = {
 
 const variantClasses = computed(() => variantClassesMap[props.variant])
 const sizeClasses = computed(() => sizeClassesMap[props.size])
-
-function cn(...classes: (string | undefined | null | false)[]) {
-  return classes.filter(Boolean).join(' ')
-}
 </script>

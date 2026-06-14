@@ -6,12 +6,7 @@
     desktop-max-width="max-w-2xl"
     @close="closeModal"
   >
-    <div
-      v-if="error"
-      class="bg-red-50 border border-red-200 rounded-[12px] p-3"
-    >
-      <p class="text-sm text-red-800">{{ error }}</p>
-    </div>
+    <TouAlert v-if="error">{{ error }}</TouAlert>
 
     <div
       ref="dropZoneRef"
@@ -87,21 +82,15 @@
     </div>
 
     <template #footer>
-      <div class="flex items-center gap-3 p-4 sm:p-6">
-        <button
-          class="flex-1 px-4 py-2.5 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all"
-          @click="closeModal"
-        >
-          {{ t('common.cancel') }}
-        </button>
-        <button
-          class="flex-1 px-4 py-2.5 rounded-[12px] bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="isLoading || !selectedFile"
-          @click="handleImport"
-        >
-          {{ isLoading ? t('common.importing') : t('common.import') }}
-        </button>
-      </div>
+      <TouModalFooter
+        :cancel-label="t('common.cancel')"
+        :confirm-label="t('common.import')"
+        :loading-label="t('common.importing')"
+        :loading="isLoading"
+        :confirm-disabled="!selectedFile"
+        @cancel="closeModal"
+        @confirm="handleImport"
+      />
     </template>
   </BottomSheet>
 </template>
@@ -109,7 +98,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useApiFetch } from '@/entities/user'
-import { BottomSheet } from '@/shared/ui'
+import { BottomSheet, TouAlert, TouModalFooter } from '@/shared/ui'
 import { getApiErrorMessage } from '@/shared/lib/utils/apiError'
 
 interface Props {

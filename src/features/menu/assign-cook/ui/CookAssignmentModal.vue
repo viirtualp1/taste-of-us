@@ -18,13 +18,12 @@
               {{ t('cook.title') }}
             </h2>
           </div>
-          <button
-            class="w-10 h-10 shrink-0 flex items-center justify-center rounded-[12px] text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+          <TouIconButton
+            variant="close"
+            icon="heroicons:x-mark"
             :aria-label="t('common.close')"
             @click.stop="close"
-          >
-            <Icon name="heroicons:x-mark" class="w-5 h-5" />
-          </button>
+          />
         </div>
 
         <div class="flex-1 overflow-y-auto p-4 space-y-5">
@@ -204,7 +203,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { BottomSheet, CookChip } from '@/shared/ui'
+import { BottomSheet, CookChip, TouIconButton } from '@/shared/ui'
 import type { MenuSelection } from '@/entities/menu'
 
 interface Props {

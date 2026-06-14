@@ -5,43 +5,26 @@
     content-class="p-4 sm:p-6 space-y-4"
     @close="closeModal"
   >
-    <div
-      v-if="error"
-      class="bg-red-50 border border-red-200 rounded-[12px] p-3"
-    >
-      <p class="text-sm text-red-800">{{ error }}</p>
-    </div>
+    <TouAlert v-if="error">{{ error }}</TouAlert>
 
     <div>
-      <label
-        for="email"
-        class="block text-sm font-medium text-gray-700 mb-2"
-      >
-        Email
-      </label>
-      <input
+      <TouFieldLabel for="email">Email</TouFieldLabel>
+      <TouInput
         id="email"
         v-model="email"
         type="email"
         placeholder="your@email.com"
-        class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
         @keyup.enter="handleSubmit"
       />
     </div>
 
     <div>
-      <label
-        for="password"
-        class="block text-sm font-medium text-gray-700 mb-2"
-      >
-        Password
-      </label>
-      <input
+      <TouFieldLabel for="password">Password</TouFieldLabel>
+      <TouInput
         id="password"
         v-model="password"
         type="password"
         placeholder="••••••••"
-        class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
         @keyup.enter="handleSubmit"
       />
     </div>
@@ -60,21 +43,14 @@
     </div>
 
     <template #footer>
-      <div class="flex gap-3 p-4 sm:p-6">
-        <button
-          class="flex-1 px-4 py-2.5 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all"
-          @click="closeModal"
-        >
-          Cancel
-        </button>
-        <button
-          class="flex-1 px-4 py-2.5 rounded-[12px] bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="isLoading"
-          @click="handleSubmit"
-        >
-          {{ isLoading ? 'Loading...' : isLogin ? 'Login' : 'Sign Up' }}
-        </button>
-      </div>
+      <TouModalFooter
+        cancel-label="Cancel"
+        :confirm-label="isLogin ? 'Login' : 'Sign Up'"
+        loading-label="Loading..."
+        :loading="isLoading"
+        @cancel="closeModal"
+        @confirm="handleSubmit"
+      />
     </template>
   </BottomSheet>
 </template>
@@ -82,7 +58,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAuth } from '@/entities/user'
-import { BottomSheet } from '@/shared/ui'
+import {
+  BottomSheet,
+  TouAlert,
+  TouFieldLabel,
+  TouInput,
+  TouModalFooter,
+} from '@/shared/ui'
 
 interface Props {
   isOpen: boolean

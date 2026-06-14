@@ -33,13 +33,12 @@
               <h2 class="text-xl font-bold text-foreground">
                 <slot name="title">Select a dish</slot>
               </h2>
-              <button
-                class="w-10 h-10 shrink-0 flex items-center justify-center rounded-[12px] text-muted-foreground hover:bg-[var(--surface-hover)] transition-colors"
+              <TouIconButton
+                variant="close"
+                icon="heroicons:x-mark"
                 aria-label="Close"
                 @click="$emit('update:modelValue', false)"
-              >
-                <Icon name="heroicons:x-mark" class="w-5 h-5" />
-              </button>
+              />
             </div>
             <div class="flex-1 overflow-y-auto p-6">
               <slot />
@@ -52,6 +51,8 @@
 </template>
 
 <script setup lang="ts">
+import TouIconButton from './TouIconButton.vue'
+
 interface Props {
   modelValue: boolean
 }

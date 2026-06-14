@@ -12,6 +12,8 @@
 </template>
 
 <script setup lang="ts">
+import { cn } from '@/shared/lib/utils'
+
 interface Props {
   class?: string
 }
@@ -19,8 +21,4 @@ interface Props {
 const props = withDefaults(defineProps<Props>(), {
   class: undefined,
 })
-
-function cn(...classes: (string | undefined | null | false)[]) {
-  return classes.filter(Boolean).join(' ')
-}
 </script>

@@ -81,16 +81,12 @@
           />
         </div>
 
-        <div v-else-if="items.length === 0" class="text-center py-12">
-          <Icon
-            name="heroicons:shopping-cart"
-            class="w-12 h-12 text-gray-400 mx-auto mb-3"
-          />
-          <p class="text-gray-500">{{ t('shopping.empty') }}</p>
-          <p class="text-sm text-gray-400 mt-1">
-            {{ t('shopping.emptyHint') }}
-          </p>
-        </div>
+        <TouEmptyState
+          v-else-if="items.length === 0"
+          icon="heroicons:shopping-cart"
+          :title="t('shopping.empty')"
+          :description="t('shopping.emptyHint')"
+        />
 
         <div v-else class="space-y-4">
           <div v-if="dishItems.length > 0">
@@ -263,7 +259,7 @@ import {
   type CommonItem,
 } from '@/entities/shopping-list'
 import { ShoppingItem } from '@/widgets/shopping-item'
-import { TouSkeleton } from '@/shared/ui'
+import { TouSkeleton, TouEmptyState } from '@/shared/ui'
 import { FloatingActionsBar } from '@/widgets/floating-actions-bar'
 
 definePageMeta({

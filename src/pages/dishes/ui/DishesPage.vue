@@ -22,11 +22,7 @@
             <h2 class="text-xl font-bold text-gray-900">
               {{ category.label }}
             </h2>
-            <span
-              class="px-2.5 py-0.5 rounded-full text-xs font-semibold glass-nested"
-            >
-              {{ userDishes[category.key]?.length || 0 }}
-            </span>
+            <TouBadge>{{ userDishes[category.key]?.length || 0 }}</TouBadge>
           </div>
           <div class="flex items-center gap-2">
             <button
@@ -81,12 +77,11 @@
           />
         </div>
 
-        <div
+        <TouEmptyState
           v-else-if="userDishes[category.key]?.length === 0"
-          class="text-center py-8"
-        >
-          <p class="text-gray-500">{{ t('dishes.empty') }}</p>
-        </div>
+          :title="t('dishes.empty')"
+          class="py-8"
+        />
 
         <div v-else class="space-y-2">
           <div
@@ -194,7 +189,7 @@ import {
 } from '@/entities/menu'
 import { DishFormModal } from '@/features/dish/manage-dish'
 import { ImportDishesModal } from '@/features/dish/import-dishes'
-import { TouSkeleton } from '@/shared/ui'
+import { TouSkeleton, TouBadge, TouEmptyState } from '@/shared/ui'
 import { FloatingActionsBar } from '@/widgets/floating-actions-bar'
 import { getApiErrorMessage } from '@/shared/lib/utils/apiError'
 import { useMenuTranslations } from '@/shared/i18n'

@@ -14,13 +14,12 @@
         <h2 class="text-lg sm:text-xl font-bold text-gray-900">
           {{ t('dishes.selectTitle', { category: categoryLabel }) }}
         </h2>
-        <button
-          class="w-10 h-10 shrink-0 flex items-center justify-center rounded-[12px] text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+        <TouIconButton
+          variant="close"
+          icon="heroicons:x-mark"
           :aria-label="t('common.close')"
           @click.stop="closeModal"
-        >
-          <Icon name="heroicons:x-mark" class="w-5 h-5" />
-        </button>
+        />
       </div>
 
       <div class="flex flex-col sm:flex-row flex-1 overflow-hidden min-h-0">
@@ -65,19 +64,15 @@
         <div
           class="flex-1 overflow-y-auto p-4 sm:p-6 overscroll-contain min-h-0 bg-white"
         >
-          <div
+          <TouEmptyState
             v-if="filteredDishes.length === 0"
-            class="text-center py-12 text-gray-500"
-          >
-            <p class="text-lg font-medium">{{ t('dishes.noDishesFound') }}</p>
-            <p class="text-sm mt-2">
-              {{
-                searchQuery
-                  ? t('dishes.tryDifferentSearch')
-                  : t('dishes.tryDifferentCategory')
-              }}
-            </p>
-          </div>
+            :title="t('dishes.noDishesFound')"
+            :description="
+              searchQuery
+                ? t('dishes.tryDifferentSearch')
+                : t('dishes.tryDifferentCategory')
+            "
+          />
 
           <div
             v-else
@@ -118,7 +113,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue'
 import type { MenuCategory, Dish, Ingredient } from '@/entities/menu'
-import { BottomSheet } from '@/shared/ui'
+import { BottomSheet, TouIconButton, TouEmptyState } from '@/shared/ui'
 import { useApiFetch } from '@/entities/user'
 import { useMenuTranslations } from '@/shared/i18n'
 

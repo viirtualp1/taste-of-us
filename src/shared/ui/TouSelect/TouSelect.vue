@@ -19,6 +19,8 @@
 </template>
 
 <script setup lang="ts">
+import { cn } from '@/shared/lib/utils'
+
 interface Props {
   modelValue?: string
   class?: string
@@ -32,8 +34,4 @@ const props = withDefaults(defineProps<Props>(), {
 defineEmits<{
   'update:modelValue': [value: string]
 }>()
-
-function cn(...classes: (string | undefined | null | false)[]) {
-  return classes.filter(Boolean).join(' ')
-}
 </script>

@@ -5,26 +5,16 @@
     content-class="p-4 sm:p-6 space-y-4"
     @close="closeModal"
   >
-    <div
-      v-if="error"
-      class="bg-red-50 border border-red-200 rounded-[12px] p-3"
-    >
-      <p class="text-sm text-red-800">{{ error }}</p>
-    </div>
+    <TouAlert v-if="error">{{ error }}</TouAlert>
 
     <div>
-      <label
-        for="dish-name"
-        class="block text-sm font-medium text-gray-700 mb-2"
-      >
-        {{ t('dishes.dishName') }}
-      </label>
-      <input
+      <TouFieldLabel for="dish-name">{{ t('dishes.dishName') }}</TouFieldLabel>
+      <TouInput
         id="dish-name"
         v-model="dishName"
         type="text"
+        class="w-full"
         :placeholder="t('dishes.dishNamePlaceholder')"
-        class="w-full px-4 py-2.5 rounded-[12px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
       />
     </div>
 
@@ -78,18 +68,20 @@
       </div>
 
       <div class="flex gap-2 mt-3">
-        <input
+        <TouInput
           v-model="newIngredientName"
           type="text"
+          size="sm"
+          class="flex-1 min-w-0"
           :placeholder="t('dishes.ingredientName')"
-          class="flex-1 min-w-0 px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
           @keydown.enter="addIngredient"
         />
-        <input
+        <TouInput
           v-model="newIngredientQuantity"
           type="text"
+          size="sm"
+          class="w-24 sm:w-32"
           :placeholder="t('dishes.qtyPlaceholder')"
-          class="w-24 sm:w-32 px-3 py-2 text-sm rounded-[10px] border glass-nested focus:border-green-400/60 focus:outline-none focus:ring-2 focus:ring-green-200/50 transition-all"
           @keydown.enter="addIngredient"
         />
         <button
@@ -112,21 +104,15 @@
     </p>
 
     <template #footer>
-      <div class="flex gap-3 p-4 sm:p-6">
-        <button
-          class="flex-1 px-4 py-2.5 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all"
-          @click="closeModal"
-        >
-          {{ t('common.cancel') }}
-        </button>
-        <button
-          class="flex-1 px-4 py-2.5 rounded-[12px] bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="isLoading || !dishName.trim()"
-          @click="handleSave"
-        >
-          {{ isLoading ? t('common.saving') : t('common.save') }}
-        </button>
-      </div>
+      <TouModalFooter
+        :cancel-label="t('common.cancel')"
+        :confirm-label="t('common.save')"
+        :loading-label="t('common.saving')"
+        :loading="isLoading"
+        :confirm-disabled="!dishName.trim()"
+        @cancel="closeModal"
+        @confirm="handleSave"
+      />
     </template>
   </BottomSheet>
 </template>
@@ -134,7 +120,14 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import { useApiFetch } from '@/entities/user'
-import { BottomSheet, TouSkeleton } from '@/shared/ui'
+import {
+  BottomSheet,
+  TouSkeleton,
+  TouAlert,
+  TouFieldLabel,
+  TouInput,
+  TouModalFooter,
+} from '@/shared/ui'
 import type { MenuCategory, Dish, Ingredient } from '@/entities/menu'
 
 interface Props {

@@ -100,37 +100,20 @@
     </div>
 
     <template #footer>
-      <div class="flex items-center gap-3 p-4 sm:p-6 pt-4">
-        <button
-          class="flex-1 px-4 py-2.5 rounded-[12px] glass-nested border border-gray-200/50 text-gray-700 font-medium hover:border-green-300/60 hover:bg-green-50/40 transition-all"
-          @click="handleEdit"
-        >
-          {{ t('common.edit') }}
-        </button>
-        <button
-          class="flex-1 px-4 py-2.5 rounded-[12px] bg-gradient-to-r from-green-600 to-emerald-600 text-white font-medium hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-          :disabled="isSending"
-          @click="handleConfirm"
-        >
-          <span
-            v-if="isSending"
-            class="flex items-center justify-center gap-2"
-          >
-            <Icon
-              name="heroicons:arrow-path"
-              class="w-4 h-4 animate-spin"
-            />
-            {{ t('common.sending') }}
-          </span>
-          <span v-else>{{ t('menu.confirmAndSend') }}</span>
-        </button>
-      </div>
+      <TouModalFooter
+        :cancel-label="t('common.edit')"
+        :confirm-label="t('menu.confirmAndSend')"
+        :loading-label="t('common.sending')"
+        :loading="isSending"
+        @cancel="handleEdit"
+        @confirm="handleConfirm"
+      />
     </template>
   </BottomSheet>
 </template>
 
 <script setup lang="ts">
-import { BottomSheet } from '@/shared/ui'
+import { BottomSheet, TouModalFooter } from '@/shared/ui'
 import type { MenuSelection } from '@/entities/menu'
 import type { WeekDay } from '@/shared/lib/utils/date'
 

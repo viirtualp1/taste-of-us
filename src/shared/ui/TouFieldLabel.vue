@@ -1,12 +1,5 @@
 <template>
-  <label
-    :class="
-      cn(
-        'text-sm font-semibold leading-none text-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
-        props.class,
-      )
-    "
-  >
+  <label :class="cn('block text-sm font-medium text-gray-700 mb-2', props.class)">
     <slot />
   </label>
 </template>

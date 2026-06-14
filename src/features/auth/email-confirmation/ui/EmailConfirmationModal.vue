@@ -29,22 +29,10 @@
       </p>
     </div>
 
-    <div
-      class="bg-blue-50/80 border border-blue-200 rounded-[16px] p-4"
-    >
-      <div class="flex items-start gap-3">
-        <Icon
-          name="heroicons:information-circle"
-          class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"
-        />
-        <div class="flex-1">
-          <p class="text-xs text-blue-800">
-            After confirming your email, you'll be automatically
-            logged in and can start planning your weekly menu!
-          </p>
-        </div>
-      </div>
-    </div>
+    <TouAlert variant="info" icon="heroicons:information-circle">
+      After confirming your email, you'll be automatically logged in and can
+      start planning your weekly menu!
+    </TouAlert>
 
     <template #footer>
       <div class="p-4 sm:p-6">
@@ -60,7 +48,7 @@
 </template>
 
 <script setup lang="ts">
-import { BottomSheet } from '@/shared/ui'
+import { BottomSheet, TouAlert } from '@/shared/ui'
 
 interface Props {
   isOpen: boolean
