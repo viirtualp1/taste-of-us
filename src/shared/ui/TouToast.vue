@@ -16,8 +16,8 @@
           'sm:left-auto sm:right-4 sm:bottom-6 sm:max-w-[500px] sm:w-max',
           'glass rounded-[16px] px-4 py-3 font-medium shadow-lg',
           type === 'success'
-            ? 'text-green-700 bg-green-50/80 border border-green-200/50'
-            : 'text-red-700 bg-red-50/80 border border-red-200/50',
+            ? 'text-green-700 dark:text-green-300 bg-green-50/80 dark:bg-green-950/60 border border-green-200/50 dark:border-green-800/50'
+            : 'text-red-700 dark:text-red-300 bg-red-50/80 dark:bg-red-950/60 border border-red-200/50 dark:border-red-800/50',
         ]"
       >
         <div class="flex justify-center sm:justify-start gap-2 break-words">

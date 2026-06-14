@@ -6,7 +6,7 @@
     :aria-label="t('locale.chooseTitle')"
   >
     <div
-      class="glass border border-gray-300/60 rounded-full p-1 flex items-center gap-0.5 shadow-sm"
+      class="glass border border-border rounded-full p-1 flex items-center gap-0.5 shadow-sm"
     >
       <button
         v-for="option in localeOptions"
@@ -16,7 +16,7 @@
         :class="
           locale === option.code
             ? 'bg-green-600 text-white shadow-sm'
-            : 'text-gray-600 hover:text-gray-900 hover:bg-white/60'
+            : 'text-muted-foreground hover:text-foreground hover:bg-[var(--surface-hover)]'
         "
         :aria-pressed="locale === option.code"
         @click="switchLocale(option.code)"

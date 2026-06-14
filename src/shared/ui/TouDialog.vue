@@ -24,17 +24,17 @@
         >
           <div
             v-if="modelValue"
-            class="relative z-50 glass border border-gray-300/60 rounded-[20px] shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+            class="relative z-50 glass border border-border rounded-[20px] shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
             style="border-radius: 20px"
           >
             <div
-              class="flex items-center justify-between px-4 py-3 border-b border-white/20"
+              class="flex items-center justify-between px-4 py-3 border-b border-border"
             >
-              <h2 class="text-xl font-bold text-gray-900">
+              <h2 class="text-xl font-bold text-foreground">
                 <slot name="title">Select a dish</slot>
               </h2>
               <button
-                class="w-10 h-10 shrink-0 flex items-center justify-center rounded-[12px] text-gray-600 hover:bg-white/20 transition-colors"
+                class="w-10 h-10 shrink-0 flex items-center justify-center rounded-[12px] text-muted-foreground hover:bg-[var(--surface-hover)] transition-colors"
                 aria-label="Close"
                 @click="$emit('update:modelValue', false)"
               >

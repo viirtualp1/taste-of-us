@@ -27,7 +27,7 @@
         >
           <div
             v-if="isOpen"
-            class="relative z-10 w-full sm:rounded-[20px] rounded-t-[20px] flex flex-col bg-white shadow-2xl border border-gray-200/80 overflow-hidden"
+            class="relative z-10 w-full sm:rounded-[20px] rounded-t-[20px] flex flex-col bg-card text-card-foreground shadow-2xl border border-border overflow-hidden"
             :class="[
               desktopMaxWidth && desktopMaxWidth !== 'max-w-md' ? desktopMaxWidth : (customLayout ? '' : 'sm:max-w-md'),
               customLayout && desktopHeight ? '' : 'max-h-[65vh] sm:max-h-[90vh]',
@@ -43,12 +43,12 @@
             <template v-else>
               <div
                 v-if="title"
-                class="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0"
+                class="flex items-center justify-between px-4 py-3 border-b border-border shrink-0"
               >
-                <h2 class="text-xl font-bold text-gray-900">{{ title }}</h2>
+                <h2 class="text-xl font-bold text-foreground">{{ title }}</h2>
                 <button
                   v-if="showCloseButton"
-                  class="w-10 h-10 shrink-0 flex items-center justify-center rounded-[12px] text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition-colors"
+                  class="w-10 h-10 shrink-0 flex items-center justify-center rounded-[12px] text-muted-foreground hover:bg-[var(--surface-hover)] hover:text-foreground transition-colors"
                   aria-label="Close"
                   @click="handleClose"
                 >
@@ -63,7 +63,7 @@
               </div>
               <div
                 v-if="$slots.footer"
-                class="shrink-0 border-t border-gray-200"
+                class="shrink-0 border-t border-border"
               >
                 <slot name="footer" />
               </div>

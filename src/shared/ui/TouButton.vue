@@ -40,10 +40,11 @@ const variantClassesMap = {
   destructive:
     'bg-gradient-to-r from-red-500 to-rose-600 text-white shadow-lg hover:shadow-xl',
   outline:
-    'glass border border-gray-200/50 text-gray-800 hover:border-green-300/60 hover:bg-green-50/40',
-  secondary: 'glass border border-gray-200/50 text-gray-800 hover:border-green-300/60 hover:bg-green-50/40',
-  ghost: 'text-gray-800 hover:bg-green-50/40',
-  link: 'text-green-600 underline-offset-4 hover:underline',
+    'glass border border-border text-foreground hover:border-green-400/60 hover:bg-[var(--surface-hover)]',
+  secondary:
+    'glass border border-border text-foreground hover:border-green-400/60 hover:bg-[var(--surface-hover)]',
+  ghost: 'text-foreground hover:bg-[var(--surface-hover)]',
+  link: 'text-green-600 dark:text-green-400 underline-offset-4 hover:underline',
 }
 
 const sizeClassesMap = {

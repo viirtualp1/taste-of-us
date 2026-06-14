@@ -22,16 +22,23 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { LanguageSwitcher } from '@/features/i18n/language-switcher'
 import {
   LocalePickerModal,
   useLocalePreference,
 } from '@/features/i18n/locale-picker'
+import { useTelegramTheme } from '@/shared/lib/theme'
 
 const { isPickerOpen, openPickerIfNeeded } = useLocalePreference()
+const { init: initTheme, cleanup: cleanupTheme } = useTelegramTheme()
 
 onMounted(() => {
+  initTheme()
   openPickerIfNeeded()
+})
+
+onUnmounted(() => {
+  cleanupTheme()
 })
 </script>
