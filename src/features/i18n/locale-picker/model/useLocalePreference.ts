@@ -1,13 +1,11 @@
 import { ref } from 'vue'
-import {
-  LOCALE_PREFERENCE_KEY,
-  type AppLocale,
-} from '@/shared/i18n/constants'
+import { LOCALE_PREFERENCE_KEY, type AppLocale } from '@/shared/i18n/constants'
+
+const isPickerOpen = ref(false)
 
 export function useLocalePreference() {
   const { locale, setLocale } = useI18n()
   const switchLocalePath = useSwitchLocalePath()
-  const isPickerOpen = ref(false)
 
   const markLocaleChosen = (code: AppLocale) => {
     if (import.meta.client) {
