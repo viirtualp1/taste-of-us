@@ -97,10 +97,21 @@ export default defineEventHandler(async (event) => {
     partner: partnerChatId,
   }
 
+  const includeCookInfo = shouldIncludeCookInfo(
+    secondMember,
+    rotationMode,
+    body.menu,
+  )
+  const effectiveRotationMode =
+    secondMember && (rotationMode === 'by_day' || rotationMode === 'by_week')
+      ? rotationMode
+      : 'none'
+
   const { effectiveMenu, responsibleLines } = computeCookAndResponsible(
     body.menu,
-    rotationMode,
+    effectiveRotationMode,
     rotationFirst,
+    includeCookInfo,
   )
 
   try {
@@ -115,11 +126,7 @@ export default defineEventHandler(async (event) => {
       const sentMessageId = menuResult.result?.message_id
       if (sentMessageId) {
         try {
-          await pinChatMessage(
-            telegramBotToken,
-            telegramChatId,
-            sentMessageId,
-          )
+          await pinChatMessage(telegramBotToken, telegramChatId, sentMessageId)
           messageId = sentMessageId
         } catch {
           // Ignore pin errors
@@ -168,14 +175,47 @@ export default defineEventHandler(async (event) => {
   }
 })
 
+function menuHasCookAssignment(menu: MenuDay[]): boolean {
+  return menu.some(
+    (day) =>
+      !!day.cook_day ||
+      !!day.cook_brunch ||
+      !!day.cook_dinner ||
+      !!day.cook_dessert,
+  )
+}
+
+function shouldIncludeCookInfo(
+  secondMember: string | null,
+  rotationMode: CookRotationMode,
+  menu: MenuDay[],
+): boolean {
+  const hasRotation =
+    !!secondMember && (rotationMode === 'by_day' || rotationMode === 'by_week')
+
+  return hasRotation || menuHasCookAssignment(menu)
+}
+
 function computeCookAndResponsible(
   menu: MenuDay[],
   rotationMode: CookRotationMode,
   rotationFirst: CookRotationFirst,
+  includeCookInfo: boolean,
 ): {
   effectiveMenu: MenuDayForTelegram[]
   responsibleLines: Record<CookSlot, ResponsibleItem[]>
 } {
+  if (!includeCookInfo) {
+    return {
+      effectiveMenu: menu.map((day) => ({
+        day: day.day,
+        date: day.date,
+        meals: day.meals,
+      })),
+      responsibleLines: { me: [], partner: [] },
+    }
+  }
+
   const effectiveMenu: MenuDayForTelegram[] = []
   const responsibleLines: Record<CookSlot, ResponsibleItem[]> = {
     me: [],
