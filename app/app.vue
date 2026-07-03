@@ -6,6 +6,7 @@
 
 <script setup lang="ts">
 const { t, locale } = useI18n()
+const config = useRuntimeConfig()
 
 useHead({
   htmlAttrs: {
@@ -51,12 +52,14 @@ useHead({
     { rel: 'icon', type: 'image/jpg', href: '/favicon.png' },
     { rel: 'canonical', href: 'https://taste-of-us.com' },
   ],
-  script: [
-    {
-      src: 'https://telegram.org/js/telegram-web-app.js',
-      defer: true,
-    },
-  ],
+  script: config.public.mswEnabled
+    ? []
+    : [
+      {
+        src: 'https://telegram.org/js/telegram-web-app.js',
+        defer: true,
+      },
+    ],
 })
 
 useSeoMeta({

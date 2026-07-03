@@ -20,12 +20,12 @@ export function useRequireAuth(options: RequireAuthOptions = {}) {
   }
 
   onMounted(async () => {
-    if (isAuthenticated.value) {
-      await markReady(false)
-      return
+    while (authLoading.value) {
+      await new Promise((resolve) => setTimeout(resolve, 50))
     }
 
-    if (authLoading.value) {
+    if (isAuthenticated.value) {
+      await markReady(false)
       return
     }
 
