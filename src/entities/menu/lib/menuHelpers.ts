@@ -19,8 +19,10 @@ export function createEmptyWeekMenu(dayCount: number): MenuSelection[] {
 export function getDayCount(
   dayIndex: number,
   selectedMenu: MenuSelection[],
-  categories: { key: MenuCategory; label: string }[],
+  categories: { key: MenuCategory; label: string }[] = [],
 ): number {
+  if (!categories.length) return 0
+
   return categories.reduce(
     (acc, category) => (selectedMenu[dayIndex]?.[category.key] ? acc + 1 : acc),
     0,
@@ -84,8 +86,12 @@ export function getDayLabelColor(
 export function calculateStats(
   selectedMenu: MenuSelection[],
   weekDaysLength: number,
-  categories: { key: MenuCategory; label: string }[],
+  categories: { key: MenuCategory; label: string }[] = [],
 ) {
+  if (!categories.length) {
+    return { totalSlots: 0, filledSlots: 0, completion: 0 }
+  }
+
   const totalSlots = weekDaysLength * categories.length
   const filledSlots = selectedMenu.reduce(
     (acc, day) =>
@@ -106,8 +112,10 @@ export function calculateStats(
 export function isDayComplete(
   dayIndex: number,
   selectedMenu: MenuSelection[],
-  categories: { key: MenuCategory; label: string }[],
+  categories: { key: MenuCategory; label: string }[] = [],
 ): boolean {
+  if (!categories.length) return false
+
   const day = selectedMenu[dayIndex]
   if (!day) return false
 

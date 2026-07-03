@@ -1,5 +1,5 @@
 import { ref, computed, markRaw } from 'vue'
-import WebApp from '@twa-dev/sdk'
+import { getTelegramWebApp } from '@/shared/lib/telegram/getTelegramWebApp'
 
 function safeHaptic(fn: () => void): () => void {
   return () => {
@@ -169,10 +169,14 @@ export function useTelegram() {
         )
       }
 
-      WebApp.ready()
-      WebApp.expand()
+      const tg = getTelegramWebApp<TelegramWebApp>()
+      if (!tg) {
+        isLoading.value = false
+        return
+      }
 
-      const tg = WebApp as unknown as TelegramWebApp
+      tg.ready()
+      tg.expand()
       webApp.value = tg
 
       if (tg.initDataUnsafe?.user) {
@@ -197,8 +201,21 @@ export function useTelegram() {
   }
 
   const authenticate = async () => {
-    if (!webApp.value) {
+    const config = useRuntimeConfig()
+
+    if (!webApp.value?.initData) {
+      init()
+    }
+
+    if (!webApp.value?.initData) {
       await new Promise((resolve) => setTimeout(resolve, 100))
+      init()
+    }
+
+    if (!webApp.value?.initData && config.public.mswEnabled) {
+      const { setupTelegramWebAppMock } = await import('@/mocks/telegram-webapp')
+      setupTelegramWebAppMock()
+      init()
     }
 
     if (!webApp.value?.initData) {
