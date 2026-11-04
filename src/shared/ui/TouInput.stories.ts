@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3'
+import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import TouInput from './TouInput.vue'
 
 const meta: Meta<typeof TouInput> = {
@@ -8,11 +8,11 @@ const meta: Meta<typeof TouInput> = {
   argTypes: {
     size: { control: 'select', options: ['md', 'sm'] },
   },
-  args: { size: 'md', placeholder: 'Type something…' },
+  args: { size: 'md' },
   render: (args) => ({
     components: { TouInput },
     setup: () => ({ args }),
-    template: `<div class="max-w-sm"><TouInput v-bind="args" class="w-full" /></div>`,
+    template: `<div class="max-w-sm"><TouInput v-bind="args" class="w-full" placeholder="Type something…" /></div>`,
   }),
 }
 

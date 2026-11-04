@@ -1,60 +1,23 @@
 <template>
-  <FloatingActionsBar>
-      <button
-        class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-        :disabled="isSending"
-        @click="$emit('send')"
-      >
-        <span v-if="isSending" class="flex items-center gap-2 whitespace-nowrap">
-          <TouSpinner class="h-4 w-4 shrink-0" />
-          <span class="hidden sm:inline">{{ t('common.sending') }}</span>
-        </span>
-        <span v-else class="flex items-center gap-2 whitespace-nowrap">
-          <svg
-            class="w-4 h-4 shrink-0"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-            />
-          </svg>
-          <span class="hidden sm:inline">{{ t('nav.sendMenu') }}</span>
-        </span>
-      </button>
-      <div class="h-4 w-px bg-gray-300/50 shrink-0" />
-      <button
-        class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95 whitespace-nowrap"
-        @click="$emit('open-dishes')"
-      >
-        <Icon name="heroicons:pencil-square" class="w-5 h-5 shrink-0" />
-        <span class="hidden sm:inline">{{ t('nav.dishes') }}</span>
-      </button>
-      <div class="h-4 w-px bg-gray-300/50 shrink-0" />
-      <button
-        class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95 whitespace-nowrap"
-        @click="$emit('open-shopping')"
-      >
-        <Icon name="heroicons:shopping-cart" class="w-5 h-5 shrink-0" />
-        <span class="hidden sm:inline">{{ t('nav.shopping') }}</span>
-      </button>
-      <div class="h-4 w-px bg-gray-300/50 shrink-0" />
-      <button
-        class="flex items-center gap-2 text-gray-900 transition-opacity hover:opacity-70 active:scale-95 whitespace-nowrap"
-        @click="$emit('open-profile')"
-      >
-        <Icon name="heroicons:user-circle" class="w-5 h-5 shrink-0" />
-        <span class="hidden sm:inline">{{ t('nav.settings') }}</span>
-      </button>
-  </FloatingActionsBar>
+  <!-- Docks next to the tab bar: AppTabBar renders #tabbar-accessory. -->
+  <Teleport defer to="#tabbar-accessory">
+    <button
+      v-glass="{ bezel: 16, refraction: 14, magnify: 0.08 }"
+      type="button"
+      class="send-btn glass glass-press"
+      :disabled="isSending"
+      :aria-label="isSending ? t('common.sending') : t('nav.sendMenu')"
+      :title="t('nav.sendMenu')"
+      @click="$emit('send')"
+    >
+      <TouSpinner v-if="isSending" class="h-5 w-5" />
+      <Icon v-else name="heroicons:paper-airplane-solid" class="w-6 h-6 -rotate-45 translate-x-0.5 -translate-y-px" />
+    </button>
+  </Teleport>
 </template>
 
 <script setup lang="ts">
-import { FloatingActionsBar } from '@/widgets/floating-actions-bar'
+import { vGlass } from '@/shared/lib/liquid-glass'
 import { TouSpinner } from '@/shared/ui'
 
 interface Props {
@@ -65,10 +28,30 @@ defineProps<Props>()
 
 defineEmits<{
   send: []
-  'open-dishes': []
-  'open-shopping': []
-  'open-profile': []
 }>()
 
 const { t } = useI18n()
 </script>
+
+<style scoped>
+/* Separate circular action beside the tab bar, as in iOS 26: tinted Liquid Glass. */
+.send-btn {
+  display: grid;
+  place-items: center;
+  width: var(--tabbar);
+  height: var(--tabbar);
+  border-radius: 50%;
+  background: rgb(var(--accent) / 0.94);
+  color: rgb(var(--on-accent));
+  box-shadow:
+    inset 0 0 10px rgb(255 255 255 / 0.35),
+    0 0 0 0.5px rgb(0 0 0 / 0.06),
+    0 10px 26px rgb(var(--accent) / 0.4);
+}
+.send-btn[data-liquid] {
+  background: rgb(var(--accent) / 0.88);
+}
+.send-btn:disabled {
+  opacity: 0.7;
+}
+</style>

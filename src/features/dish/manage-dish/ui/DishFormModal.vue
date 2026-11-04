@@ -2,7 +2,7 @@
   <BottomSheet
     :is-open="isOpen"
     :title="dish ? t('dishes.editDish') : t('dishes.addDishModal')"
-    content-class="p-4 sm:p-6 space-y-4"
+    content-class="px-4 pt-2 pb-2 sm:px-5 space-y-4"
     @close="closeModal"
   >
     <TouAlert v-if="error">{{ error }}</TouAlert>
@@ -85,7 +85,7 @@
           @keydown.enter="addIngredient"
         />
         <button
-          class="w-9 h-9 flex items-center justify-center rounded-[10px] glass-nested border border-gray-200/50 text-gray-700 hover:border-green-300/60 hover:bg-green-50/40 transition-all disabled:opacity-50 shrink-0"
+          class="w-9 h-9 flex items-center justify-center rounded-[10px] glass-nested text-gray-700 hover:bg-gray-500/10 transition-all disabled:opacity-50 shrink-0"
           :disabled="!newIngredientName.trim() || isAddingIngredient"
           @click="addIngredient"
         >

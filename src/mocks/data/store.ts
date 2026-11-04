@@ -1,5 +1,5 @@
-import type { MenuCategory } from '@/entities/menu'
-import type { CommonItem, ShoppingListItem } from '@/entities/shopping-list'
+import type { MenuCategory } from '@/entities/menu/model/types'
+import type { CommonItem, ShoppingListItem } from '@/entities/shopping-list/model/types'
 import { MOCK_TELEGRAM_USER } from './constants'
 import { createSeedData } from './seed'
 
@@ -353,8 +353,8 @@ export const mockStore = {
 
     for (const ing of state.ingredients) {
       if (!validIds.has(ing.dish_id)) continue
-      if (!grouped[ing.dish_id]) grouped[ing.dish_id] = []
-      grouped[ing.dish_id].push({
+      const list = (grouped[ing.dish_id] ??= [])
+      list.push({
         id: ing.id,
         name: ing.name,
         quantity: ing.quantity,
@@ -529,7 +529,7 @@ export const mockStore = {
         entry.quantities.length === 0
           ? null
           : entry.quantities.length === 1
-            ? entry.quantities[0]
+            ? (entry.quantities[0] ?? null)
             : entry.quantities.join(' + ')
 
       state.shoppingList.push({

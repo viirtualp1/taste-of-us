@@ -1,3 +1,4 @@
+import { normalizeWeekStartKey } from '@/shared/lib/utils/date'
 import { getUserIdFromTelegram } from '../../utils/auth'
 import { createSupabaseClient } from '../../utils/supabase'
 
@@ -13,7 +14,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const body = await readBody(event)
-    const { week_start } = body
+    const week_start = normalizeWeekStartKey(body.week_start as string | undefined)
 
     if (!week_start) {
       throw createError({
@@ -113,7 +114,7 @@ export default defineEventHandler(async (event) => {
       const dishId = Array.from(entry.dishIds)[0]
       let quantity: string | null = null
       if (entry.quantities.length === 1) {
-        quantity = entry.quantities[0]
+        quantity = entry.quantities[0] ?? null
       } else if (entry.quantities.length > 1) {
         quantity = entry.quantities.join(' + ')
       }

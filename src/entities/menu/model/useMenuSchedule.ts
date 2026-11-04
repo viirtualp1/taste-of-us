@@ -1,5 +1,5 @@
-import { ref, watch } from 'vue'
-import { getStartOfWeek, formatWeekStartDate } from '@/shared/lib/utils/date'
+import { ref, watch, type Ref } from 'vue'
+import { formatWeekStartDate } from '@/shared/lib/utils/date'
 import { debounce } from '@/shared/lib/utils/debounce'
 import {
   createEmptyMenuSelection,
@@ -73,7 +73,10 @@ function normalizeSavedDay(day: unknown): MenuSelection {
   const dayData = day as Partial<
     MenuSelection & { breakfast?: string; lunch?: string }
   >
-  const base = {
+  const base: Pick<
+    MenuSelection,
+    'cook_day' | 'cook_brunch' | 'cook_dinner' | 'cook_dessert'
+  > = {
     cook_day: (dayData.cook_day as MenuSelection['cook_day']) || '',
     cook_brunch: (dayData.cook_brunch as MenuSelection['cook_brunch']) || '',
     cook_dinner: (dayData.cook_dinner as MenuSelection['cook_dinner']) || '',
@@ -103,9 +106,9 @@ function normalizeSavedDay(day: unknown): MenuSelection {
 
 export function useMenuSchedule(
   apiFetch: ApiFetch,
-  weekStart: { value: string },
-  isClient: { value: boolean },
-  weekDays: { value: WeekDay[] },
+  weekStart: Readonly<Ref<string>>,
+  isClient: Readonly<Ref<boolean>>,
+  weekDays: Readonly<Ref<WeekDay[]>>,
 ) {
   const isLoading = ref(false)
   const selectedMenu = ref<MenuSelection[]>([])
@@ -116,7 +119,7 @@ export function useMenuSchedule(
   }
 
   const getWeekStartDate = () =>
-    formatWeekStartDate(getStartOfWeek(new Date(weekStart.value)).toISOString())
+    formatWeekStartDate(weekStart.value)
 
   const resetToEmptyWeek = () => {
     if (!weekDays.value?.length) return

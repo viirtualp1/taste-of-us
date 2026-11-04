@@ -11,7 +11,7 @@ export async function startMockServiceWorker() {
   worker = setupWorker(...handlers)
 
   await worker.start({
-    onUnhandledRequest: 'bypass',
+    onUnhandledFrame: 'bypass',
     serviceWorker: {
       url: '/mockServiceWorker.js',
     },

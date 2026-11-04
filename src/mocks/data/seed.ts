@@ -1,6 +1,6 @@
-import type { MenuCategory } from '@/entities/menu'
-import type { CommonItem, ShoppingListItem } from '@/entities/shopping-list'
-import { getStartOfWeek } from '@/shared/lib/utils/date'
+import type { MenuCategory } from '@/entities/menu/model/types'
+import type { CommonItem, ShoppingListItem } from '@/entities/shopping-list/model/types'
+import { getStartOfWeek, toDateKey } from '@/shared/lib/utils/date'
 import { MOCK_TELEGRAM_USER } from './constants'
 
 interface DishRecord {
@@ -45,13 +45,13 @@ function id(label: string) {
 }
 
 function currentWeekStart() {
-  return getStartOfWeek(new Date()).toISOString().split('T')[0]!
+  return toDateKey(getStartOfWeek(new Date()))
 }
 
 function previousWeekStart() {
   const date = getStartOfWeek(new Date())
   date.setDate(date.getDate() - 7)
-  return date.toISOString().split('T')[0]!
+  return toDateKey(date)
 }
 
 const DISH = {

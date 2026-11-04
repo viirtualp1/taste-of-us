@@ -1,197 +1,753 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+/* Nuxt's build cache lives under node_modules, so point Tailwind at the sources explicitly. */
+@source '../..';
+@source '../../../app';
+
+/* Dark mode follows the `.dark` class that useTelegramTheme puts on <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Apple HIG (iOS 26 · Liquid Glass) design tokens.
+ * Colours live in :root / .dark as RGB channels; `@theme inline` maps them onto
+ * Tailwind's palette, so every utility (`text-gray-500`, `bg-green-500/15`)
+ * flips with the theme and opacity modifiers keep working.
+ */
+@theme inline {
+  --color-gray-50: rgb(var(--gray-50));
+  --color-gray-100: rgb(var(--gray-100));
+  --color-gray-200: rgb(var(--gray-200));
+  --color-gray-300: rgb(var(--gray-300));
+  --color-gray-400: rgb(var(--gray-400));
+  --color-gray-500: rgb(var(--gray-500));
+  --color-gray-600: rgb(var(--gray-600));
+  --color-gray-700: rgb(var(--gray-700));
+  --color-gray-800: rgb(var(--gray-800));
+  --color-gray-900: rgb(var(--gray-900));
+
+  --color-green-50: rgb(var(--green-50));
+  --color-green-100: rgb(var(--green-100));
+  --color-green-200: rgb(var(--green-200));
+  --color-green-300: rgb(var(--green-300));
+  --color-green-400: rgb(var(--green-400));
+  --color-green-500: rgb(var(--green-500));
+  --color-green-600: rgb(var(--green-600));
+  --color-green-700: rgb(var(--green-700));
+  --color-green-800: rgb(var(--green-800));
+  --color-green-900: rgb(var(--green-900));
+
+  --color-emerald-50: rgb(var(--green-50));
+  --color-emerald-100: rgb(var(--green-100));
+  --color-emerald-200: rgb(var(--green-200));
+  --color-emerald-300: rgb(var(--green-300));
+  --color-emerald-400: rgb(var(--green-400));
+  --color-emerald-500: rgb(var(--green-500));
+  --color-emerald-600: rgb(var(--green-600));
+  --color-emerald-700: rgb(var(--green-700));
+  --color-emerald-800: rgb(var(--green-800));
+  --color-emerald-900: rgb(var(--green-900));
+
+  --color-red-50: rgb(var(--red-50));
+  --color-red-100: rgb(var(--red-100));
+  --color-red-200: rgb(var(--red-200));
+  --color-red-300: rgb(var(--red-300));
+  --color-red-400: rgb(var(--red-400));
+  --color-red-500: rgb(var(--red-500));
+  --color-red-600: rgb(var(--red-600));
+  --color-red-700: rgb(var(--red-700));
+  --color-red-800: rgb(var(--red-800));
+  --color-red-900: rgb(var(--red-900));
+
+  --color-rose-50: rgb(var(--red-50));
+  --color-rose-100: rgb(var(--red-100));
+  --color-rose-200: rgb(var(--red-200));
+  --color-rose-300: rgb(var(--red-300));
+  --color-rose-400: rgb(var(--red-400));
+  --color-rose-500: rgb(var(--red-500));
+  --color-rose-600: rgb(var(--red-600));
+  --color-rose-700: rgb(var(--red-700));
+  --color-rose-800: rgb(var(--red-800));
+  --color-rose-900: rgb(var(--red-900));
+
+  --color-blue-50: rgb(var(--blue-50));
+  --color-blue-100: rgb(var(--blue-100));
+  --color-blue-200: rgb(var(--blue-200));
+  --color-blue-300: rgb(var(--blue-300));
+  --color-blue-400: rgb(var(--blue-400));
+  --color-blue-500: rgb(var(--blue-500));
+  --color-blue-600: rgb(var(--blue-600));
+  --color-blue-700: rgb(var(--blue-700));
+  --color-blue-800: rgb(var(--blue-800));
+  --color-blue-900: rgb(var(--blue-900));
+
+  --color-yellow-50: rgb(var(--orange-50));
+  --color-yellow-100: rgb(var(--orange-100));
+  --color-yellow-200: rgb(var(--orange-200));
+  --color-yellow-300: rgb(var(--orange-300));
+  --color-yellow-400: rgb(var(--orange-400));
+  --color-yellow-500: rgb(var(--orange-500));
+  --color-yellow-600: rgb(var(--orange-600));
+  --color-yellow-700: rgb(var(--orange-700));
+  --color-yellow-800: rgb(var(--orange-800));
+  --color-yellow-900: rgb(var(--orange-900));
+
+  --color-amber-50: rgb(var(--orange-50));
+  --color-amber-100: rgb(var(--orange-100));
+  --color-amber-200: rgb(var(--orange-200));
+  --color-amber-300: rgb(var(--orange-300));
+  --color-amber-400: rgb(var(--orange-400));
+  --color-amber-500: rgb(var(--orange-500));
+  --color-amber-600: rgb(var(--orange-600));
+  --color-amber-700: rgb(var(--orange-700));
+  --color-amber-800: rgb(var(--orange-800));
+  --color-amber-900: rgb(var(--orange-900));
+
+  --color-orange-50: rgb(var(--orange-50));
+  --color-orange-100: rgb(var(--orange-100));
+  --color-orange-200: rgb(var(--orange-200));
+  --color-orange-300: rgb(var(--orange-300));
+  --color-orange-400: rgb(var(--orange-400));
+  --color-orange-500: rgb(var(--orange-500));
+  --color-orange-600: rgb(var(--orange-600));
+  --color-orange-700: rgb(var(--orange-700));
+  --color-orange-800: rgb(var(--orange-800));
+  --color-orange-900: rgb(var(--orange-900));
+
+  --color-border: rgb(var(--separator) / 0.2);
+  --color-input: rgb(var(--separator) / 0.2);
+  --color-ring: rgb(var(--accent));
+  --color-background: rgb(var(--bg));
+  --color-foreground: rgb(var(--ink));
+  --color-primary: rgb(var(--accent));
+  --color-primary-foreground: rgb(var(--on-accent));
+  --color-secondary: rgb(var(--fill));
+  --color-secondary-foreground: rgb(var(--ink));
+  --color-destructive: rgb(var(--red-500));
+  --color-destructive-foreground: rgb(var(--on-accent));
+  --color-muted: rgb(var(--fill));
+  --color-muted-foreground: rgb(var(--muted));
+  --color-accent: rgb(var(--accent-soft));
+  --color-accent-foreground: rgb(var(--accent));
+  --color-popover: rgb(var(--panel));
+  --color-popover-foreground: rgb(var(--ink));
+  --color-card: rgb(var(--panel));
+  --color-card-foreground: rgb(var(--ink));
+
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r);
+  --radius-lg: var(--r-lg);
+  --radius-sheet: var(--r-sheet);
+
+  --font-sans:
+    -apple-system, BlinkMacSystemFont, 'SF Pro Text', Inter, 'Segoe UI', Roboto,
+    sans-serif;
+}
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 142 20% 15%;
-    --card: 0 0% 100%;
-    --card-foreground: 142 20% 15%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 142 20% 15%;
-    --primary: 142 76% 36%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 142 30% 96%;
-    --secondary-foreground: 142 20% 15%;
-    --muted: 142 20% 96%;
-    --muted-foreground: 142 10% 45%;
-    --accent: 142 50% 92%;
-    --accent-foreground: 142 76% 36%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 142 20% 90%;
-    --input: 142 20% 90%;
-    --ring: 142 76% 36%;
-    --radius: 0.5rem;
-    --glass-bg: rgba(255, 255, 255, 0.95);
-    --glass-border: rgba(0, 0, 0, 0.1);
-    --glass-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.1);
-    --glass-nested-bg: rgba(255, 255, 255, 0.6);
-    --glass-nested-border: rgba(0, 0, 0, 0.06);
-    --gradient-accent-from: #f0f9f4;
-    --gradient-accent-via: #e8f5ed;
-    --gradient-accent-to: #f0f9f4;
-    --surface-hover: rgba(240, 253, 244, 0.4);
-    --surface-selected: rgba(240, 253, 244, 0.6);
+    /* Labels & surfaces */
+    --ink: 29 29 31;
+    --muted: 110 110 115;
+    --faint: 174 174 178;
+    --bg: 242 242 247;
+    --panel: 255 255 255;
+    --fill: 118 118 128;
+    --separator: 60 60 67;
+    --accent: 52 199 89;
+    --accent-ink: 36 138 61;
+    --accent-soft: 52 199 89;
+    --on-accent: 255 255 255;
+
+    /* System grays (light) */
+    --gray-50: 242 242 247;
+    --gray-100: 229 229 234;
+    --gray-200: 209 209 214;
+    --gray-300: 199 199 204;
+    --gray-400: 174 174 178;
+    --gray-500: 110 110 115;
+    --gray-600: 86 86 91;
+    --gray-700: 60 60 67;
+    --gray-800: 44 44 46;
+    --gray-900: 29 29 31;
+
+    /* System green — 500/600 are the fill, 700+ the accessible text tone */
+    --green-50: 235 249 239;
+    --green-100: 214 244 222;
+    --green-200: 175 232 190;
+    --green-300: 133 220 155;
+    --green-400: 90 210 120;
+    --green-500: 52 199 89;
+    --green-600: 48 180 80;
+    --green-700: 36 138 61;
+    --green-800: 28 110 48;
+    --green-900: 20 80 35;
+
+    --red-50: 255 238 237;
+    --red-100: 255 221 219;
+    --red-200: 255 196 192;
+    --red-300: 255 157 151;
+    --red-400: 255 105 97;
+    --red-500: 255 59 48;
+    --red-600: 230 45 35;
+    --red-700: 200 30 20;
+    --red-800: 160 25 18;
+    --red-900: 120 20 14;
+
+    --blue-50: 235 244 255;
+    --blue-100: 214 233 255;
+    --blue-200: 173 211 255;
+    --blue-300: 122 184 255;
+    --blue-400: 61 154 255;
+    --blue-500: 0 122 255;
+    --blue-600: 0 110 230;
+    --blue-700: 0 88 190;
+    --blue-800: 0 70 150;
+    --blue-900: 0 50 110;
+
+    --orange-50: 255 246 233;
+    --orange-100: 255 236 209;
+    --orange-200: 255 219 168;
+    --orange-300: 255 195 112;
+    --orange-400: 255 170 56;
+    --orange-500: 255 149 0;
+    --orange-600: 230 130 0;
+    --orange-700: 178 96 0;
+    --orange-800: 140 75 0;
+    --orange-900: 100 54 0;
+
+    /* Materials — Liquid Glass.
+       --glass is the frosted fallback (no SVG refraction: WebKit, Firefox);
+       --glass-clear is the tint once real refraction is on ([data-liquid]). */
+    --glass: rgb(255 255 255 / 0.42);
+    --glass-clear: rgb(255 255 255 / 0.16);
+    --glass-strong: rgb(250 250 252 / 0.62);
+    --glass-blur: blur(14px) saturate(190%) brightness(1.04);
+    --glass-rim: rgb(255 255 255 / 0.95);
+    --glass-rim-soft: rgb(255 255 255 / 0.35);
+    --glass-glow: rgb(255 255 255 / 0.28);
+    --glass-line: rgb(0 0 0 / 0.08);
+    --glass-shadow: 0 10px 30px rgb(0 0 0 / 0.12), 0 2px 6px rgb(0 0 0 / 0.06);
+    --card-shadow: 0 1px 2px rgb(0 0 0 / 0.04), 0 4px 16px rgb(0 0 0 / 0.04);
+
+    /* Shape */
+    --r-sm: 8px;
+    --r: 12px;
+    --r-lg: 16px;
+    --r-xl: 22px;
+    --r-sheet: 28px;
+    --r-pill: 999px;
+    --tap: 44px;
+    --safe-b: env(safe-area-inset-bottom, 0px);
+    --safe-t: env(safe-area-inset-top, 0px);
+    --tabbar: 56px;
+
+    color-scheme: light;
   }
 
   .dark {
-    --background: 142 15% 8%;
-    --foreground: 142 10% 92%;
-    --card: 142 12% 12%;
-    --card-foreground: 142 10% 92%;
-    --popover: 142 12% 12%;
-    --popover-foreground: 142 10% 92%;
-    --primary: 142 70% 45%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 142 15% 18%;
-    --secondary-foreground: 142 10% 90%;
-    --muted: 142 12% 18%;
-    --muted-foreground: 142 8% 60%;
-    --accent: 142 25% 20%;
-    --accent-foreground: 142 70% 55%;
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 142 12% 22%;
-    --input: 142 12% 22%;
-    --ring: 142 70% 45%;
-    --glass-bg: rgba(20, 32, 25, 0.88);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.35);
-    --glass-nested-bg: rgba(255, 255, 255, 0.05);
-    --glass-nested-border: rgba(255, 255, 255, 0.08);
-    --gradient-accent-from: #0f1a14;
-    --gradient-accent-via: #142019;
-    --gradient-accent-to: #0f1a14;
-    --surface-hover: rgba(20, 83, 45, 0.25);
-    --surface-selected: rgba(20, 83, 45, 0.4);
+    --ink: 245 245 247;
+    --muted: 152 152 157;
+    --faint: 99 99 102;
+    --bg: 0 0 0;
+    --panel: 28 28 30;
+    --fill: 118 118 128;
+    --separator: 84 84 88;
+    --accent: 48 209 88;
+    --accent-ink: 48 209 88;
+    --accent-soft: 48 209 88;
+
+    --gray-50: 28 28 30;
+    --gray-100: 44 44 46;
+    --gray-200: 58 58 60;
+    --gray-300: 72 72 74;
+    --gray-400: 99 99 102;
+    --gray-500: 152 152 157;
+    --gray-600: 174 174 178;
+    --gray-700: 199 199 204;
+    --gray-800: 229 229 234;
+    --gray-900: 245 245 247;
+
+    --green-50: 18 42 25;
+    --green-100: 22 56 32;
+    --green-200: 28 80 44;
+    --green-300: 36 110 58;
+    --green-400: 42 160 72;
+    --green-500: 48 209 88;
+    --green-600: 48 209 88;
+    --green-700: 74 222 112;
+    --green-800: 120 232 150;
+    --green-900: 170 242 190;
+
+    --red-50: 50 18 16;
+    --red-100: 70 22 20;
+    --red-200: 100 30 26;
+    --red-300: 150 40 34;
+    --red-400: 220 55 46;
+    --red-500: 255 69 58;
+    --red-600: 255 69 58;
+    --red-700: 255 105 97;
+    --red-800: 255 150 144;
+    --red-900: 255 196 192;
+
+    --blue-50: 10 30 56;
+    --blue-100: 12 40 76;
+    --blue-200: 14 56 110;
+    --blue-300: 16 80 160;
+    --blue-400: 10 110 220;
+    --blue-500: 10 132 255;
+    --blue-600: 10 132 255;
+    --blue-700: 100 170 255;
+    --blue-800: 150 200 255;
+    --blue-900: 200 225 255;
+
+    --orange-50: 52 32 6;
+    --orange-100: 70 42 8;
+    --orange-200: 100 60 10;
+    --orange-300: 150 90 12;
+    --orange-400: 220 135 10;
+    --orange-500: 255 159 10;
+    --orange-600: 255 159 10;
+    --orange-700: 255 179 64;
+    --orange-800: 255 204 128;
+    --orange-900: 255 226 180;
+
+    --glass: rgb(40 40 46 / 0.45);
+    --glass-clear: rgb(30 30 34 / 0.22);
+    --glass-strong: rgb(30 30 32 / 0.66);
+    --glass-blur: blur(14px) saturate(170%) brightness(0.95);
+    --glass-rim: rgb(255 255 255 / 0.42);
+    --glass-rim-soft: rgb(255 255 255 / 0.12);
+    --glass-glow: rgb(255 255 255 / 0.08);
+    --glass-line: rgb(255 255 255 / 0.1);
+    --glass-shadow: 0 10px 30px rgb(0 0 0 / 0.5);
+    --card-shadow: none;
+
     color-scheme: dark;
   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
+  *,
+  *::before,
+  *::after {
+    -webkit-tap-highlight-color: transparent;
+  }
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: rgb(var(--separator) / 0.18);
+  }
+  /* v4 resets button cursor to default; keep the pointer for tappable controls. */
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
   }
   html,
   body {
-    @apply text-foreground;
-    background: transparent;
+    color: rgb(var(--ink));
+    background: rgb(var(--bg));
     font-family:
-      'Manrope',
-      ui-sans-serif,
-      system-ui,
       -apple-system,
       BlinkMacSystemFont,
+      'SF Pro Text',
+      Inter,
       'Segoe UI',
+      Roboto,
       sans-serif;
+    font-size: 15px;
+    line-height: 1.47;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Soft colour behind the glass — without it translucent surfaces read as flat grey. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(60% 45% at 0% 0%, rgb(var(--accent) / 0.14), transparent),
+      radial-gradient(50% 40% at 100% 35%, rgb(90 200 250 / 0.12), transparent),
+      radial-gradient(60% 45% at 40% 100%, rgb(255 149 0 / 0.08), transparent);
+  }
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.022em;
+  }
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    letter-spacing: inherit;
+  }
+  :focus-visible {
+    outline: 3px solid rgb(var(--accent) / 0.55);
+    outline-offset: 2px;
+  }
+  input[type='date']::-webkit-calendar-picker-indicator {
+    opacity: 0.55;
+  }
+  .dark input[type='date']::-webkit-calendar-picker-indicator {
+    filter: invert(1);
   }
 }
 
-@layer utilities {
+/* Component classes stay in the components layer so utilities can override them. */
+@layer components {
+  /* ---------- Materials ---------- */
+
+  /* Floating chrome: bars, buttons, sheets (iOS 26 Liquid Glass).
+     v-glass adds real refraction on Chromium and sets [data-liquid]. */
   .glass {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    box-shadow: var(--glass-shadow);
+    position: relative;
+    isolation: isolate;
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    border: 0;
+    box-shadow:
+      inset 0 0 10px var(--glass-glow),
+      0 0 0 0.5px var(--glass-line),
+      var(--glass-shadow);
   }
-
-  .glass-nested {
-    background: var(--glass-nested-bg);
-    border: 1px solid var(--glass-nested-border);
+  .glass[data-liquid] {
+    background: var(--glass-clear);
   }
-
-  .gradient-bg,
-  .gradient-bg-accent {
+  /* Specular rim: light hits the top-left edge hardest, bounces off the bottom-right. */
+  .glass::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border-radius: inherit;
+    padding: 1.25px;
+    pointer-events: none;
     background: linear-gradient(
       135deg,
-      var(--gradient-accent-from) 0%,
-      var(--gradient-accent-via) 50%,
-      var(--gradient-accent-to) 100%
+      var(--glass-rim) 0%,
+      var(--glass-rim-soft) 28%,
+      transparent 50%,
+      var(--glass-rim-soft) 78%,
+      var(--glass-rim) 100%
     );
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+  }
+  /* Glass reacts to touch: it swells and brightens like a drop under a finger. */
+  .glass-press {
+    transition:
+      transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+      filter 0.2s;
+  }
+  .glass.glass-press:active:not(:disabled) {
+    transform: scale(1.08);
+    filter: brightness(1.06);
+  }
+  /* Content cards: opaque grouped cell — dozens of blurred cards would stutter on phones. */
+  .surface {
+    background: rgb(var(--panel));
+    border: 0;
+    box-shadow:
+      0 0 0 0.5px var(--glass-line),
+      var(--card-shadow);
+  }
+  /* Inner wells: fields, chips, inset rows inside a card. */
+  .glass-nested {
+    background: rgb(var(--fill) / 0.12);
+    border-color: transparent;
   }
 
-  .text-balance {
-    text-wrap: balance;
+  /* ---------- Typography ---------- */
+  .large-title {
+    font-size: 34px;
+    line-height: 1.12;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+  .section-header {
+    padding: 0 16px 6px;
+    font-size: 13px;
+    font-weight: 400;
+    color: rgb(var(--muted));
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+  .section-footer {
+    padding: 6px 16px 0;
+    font-size: 13px;
+    color: rgb(var(--muted));
   }
 
-  .scrollbar-hide {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+  /* ---------- Inset grouped list ---------- */
+  .list {
+    background: rgb(var(--panel));
+    border-radius: var(--r-lg);
+    overflow: hidden;
+    box-shadow:
+      0 0 0 0.5px var(--glass-line),
+      var(--card-shadow);
+  }
+  .list-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: var(--tap);
+    padding: 11px 16px;
+    text-align: left;
+    background: transparent;
+    transition: background-color 0.15s;
+  }
+  button.list-row:active,
+  a.list-row:active {
+    background: rgb(var(--fill) / 0.16);
+  }
+  /* Hairline separator inset past the leading icon, as in Settings. */
+  .list-row + .list-row::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: var(--row-inset, 16px);
+    height: 0.5px;
+    background: rgb(var(--separator) / 0.29);
+  }
+  .list--icons {
+    --row-inset: 60px;
+  }
+  .row-icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 17px;
+  }
+  .chevron {
+    flex: none;
+    width: 14px;
+    height: 14px;
+    color: rgb(var(--faint));
   }
 
-  .scrollbar-hide::-webkit-scrollbar {
+  /* ---------- Controls ---------- */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: var(--tap);
+    padding: 0 20px;
+    border-radius: var(--r-pill);
+    font-weight: 600;
+    font-size: 15px;
+    background: rgb(var(--fill) / 0.12);
+    color: rgb(var(--ink));
+    white-space: nowrap;
+    transition:
+      transform 0.15s,
+      opacity 0.15s,
+      background-color 0.15s;
+  }
+  .btn:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .btn--primary {
+    background: rgb(var(--accent));
+    color: rgb(var(--on-accent));
+  }
+  .btn--tinted {
+    background: rgb(var(--accent) / 0.15);
+    color: rgb(var(--accent-ink));
+  }
+  .btn--danger {
+    background: rgb(var(--red-500) / 0.12);
+    color: rgb(var(--red-500));
+  }
+  .btn--sm {
+    height: 34px;
+    padding: 0 14px;
+    font-size: 14px;
+  }
+  /* Circular toolbar button (iOS 26 glass). */
+  .icon-btn {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: var(--tap);
+    height: var(--tap);
+    border-radius: 50%;
+    color: rgb(var(--ink));
+    transition: transform 0.15s;
+  }
+  .icon-btn:active:not(:disabled) {
+    transform: scale(0.92);
+  }
+  .icon-btn--sm {
+    width: 34px;
+    height: 34px;
+  }
+
+  .field {
+    width: 100%;
+    height: var(--tap);
+    padding: 0 14px;
+    border: 0;
+    border-radius: var(--r);
+    background: rgb(var(--fill) / 0.12);
+    color: rgb(var(--ink));
+    outline: none;
+    transition: box-shadow 0.15s;
+  }
+  .field::placeholder {
+    color: rgb(var(--muted) / 0.8);
+  }
+  .field:focus {
+    box-shadow: 0 0 0 2px rgb(var(--accent) / 0.55);
+  }
+
+  /* iOS segmented control */
+  .segmented {
+    display: grid;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
+    padding: 2px;
+    border-radius: var(--r-pill);
+    background: rgb(var(--fill) / 0.12);
+  }
+  .segmented > button {
+    height: 30px;
+    padding: 0 12px;
+    border-radius: var(--r-pill);
+    font-size: 13px;
+    font-weight: 500;
+    color: rgb(var(--ink));
+    transition:
+      background 0.2s,
+      box-shadow 0.2s;
+  }
+  .segmented > [aria-pressed='true'],
+  .segmented > [aria-selected='true'] {
+    background: rgb(var(--panel));
+    font-weight: 600;
+    box-shadow:
+      0 3px 8px rgb(0 0 0 / 0.12),
+      0 0 0 0.5px rgb(0 0 0 / 0.04);
+  }
+  .dark .segmented > [aria-pressed='true'],
+  .dark .segmented > [aria-selected='true'] {
+    background: #636366;
+  }
+
+  /* iOS switch on a native checkbox */
+  .ios-switch {
+    appearance: none;
+    position: relative;
+    flex: none;
+    width: 51px;
+    height: 31px;
+    border-radius: var(--r-pill);
+    background: rgb(var(--fill) / 0.16);
+    cursor: pointer;
+    transition: background-color 0.25s;
+  }
+  .ios-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow:
+      0 3px 8px rgb(0 0 0 / 0.15),
+      0 3px 1px rgb(0 0 0 / 0.06);
+    transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  .dark .ios-switch {
+    background: rgb(var(--fill) / 0.32);
+  }
+  .ios-switch:checked {
+    background: rgb(var(--accent));
+  }
+  .ios-switch:checked::after {
+    transform: translateX(20px);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 34px;
+    padding: 0 14px;
+    border-radius: var(--r-pill);
+    background: rgb(var(--fill) / 0.12);
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition:
+      background 0.15s,
+      transform 0.15s;
+  }
+  .chip:active {
+    transform: scale(0.96);
+  }
+  .chip[aria-pressed='true'] {
+    background: rgb(var(--ink));
+    color: rgb(var(--bg));
+  }
+}
+
+@utility scrollbar-hide {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
     display: none;
   }
+}
 
-  .dark .text-gray-900 {
-    color: hsl(var(--foreground));
+/* Legacy hook: a few feature templates still use bg-white for cells. */
+.dark .bg-white {
+  background-color: rgb(var(--panel));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition: none !important;
+    animation: none !important;
   }
+}
 
-  .dark .text-gray-800 {
-    color: hsl(var(--foreground) / 0.92);
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass {
+    background: rgb(var(--panel));
   }
-
-  .dark .text-gray-700 {
-    color: hsl(var(--foreground) / 0.82);
-  }
-
-  .dark .text-gray-600,
-  .dark .text-gray-500,
-  .dark .text-gray-400 {
-    color: hsl(var(--muted-foreground));
-  }
-
-  .dark .bg-white {
-    background-color: hsl(var(--card));
-  }
-
-  .dark .bg-gray-50 {
-    background-color: hsl(var(--muted) / 0.8);
-  }
-
-  .dark .border-gray-200,
-  .dark .border-gray-200\/50,
-  .dark .border-gray-200\/60,
-  .dark .border-gray-200\/80,
-  .dark .border-gray-300,
-  .dark .border-gray-300\/60 {
-    border-color: hsl(var(--border) / 0.6);
-  }
-
-  .dark .hover\:bg-gray-100:hover {
-    background-color: hsl(var(--muted));
-  }
-
-  .dark .hover\:bg-white\/60:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .dark .hover\:bg-green-50\/40:hover,
-  .dark .hover\:bg-green-50\/50:hover,
-  .dark .hover\:bg-green-50\/60:hover {
-    background-color: var(--surface-hover);
-  }
-
-  .dark .bg-green-50\/60,
-  .dark .bg-green-50\/80 {
-    background-color: var(--surface-selected);
-  }
-
-  .dark .border-white\/20,
-  .dark .border-white\/40 {
-    border-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .dark .hover\:bg-white\/30:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .dark .hover\:border-white\/50:hover {
-    border-color: rgba(255, 255, 255, 0.15);
-  }
-
-  .dark .placeholder-gray-400::placeholder {
-    color: hsl(var(--muted-foreground));
+}
+@media (prefers-reduced-transparency: reduce) {
+  .glass {
+    background: rgb(var(--panel));
   }
 }

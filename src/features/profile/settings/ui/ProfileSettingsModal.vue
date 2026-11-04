@@ -2,7 +2,7 @@
   <BottomSheet
     :is-open="isOpen"
     :title="t('profile.title')"
-    content-class="p-4 sm:p-6 space-y-3"
+    content-class="px-4 pt-2 pb-2 sm:px-5 space-y-5"
     @close="closeModal"
   >
     <TouAlert v-if="error">{{ error }}</TouAlert>
@@ -47,7 +47,7 @@
 
     <div
       ref="partnerFieldRef"
-      :class="highlightPartnerField ? 'rounded-[12px] ring-2 ring-yellow-400 ring-offset-2' : ''"
+      :class="highlightPartnerField ? 'rounded-[14px] ring-2 ring-orange-500 ring-offset-4 ring-offset-transparent' : ''"
     >
       <TouFieldLabel for="second-member-id">
         {{ t('profile.partnerChatId') }}
@@ -59,7 +59,7 @@
         type="text"
         :class="
           highlightPartnerField
-            ? 'w-full border-yellow-400 focus:border-yellow-500 focus:ring-yellow-200/60'
+            ? 'w-full shadow-[0_0_0_2px_rgb(var(--orange-500))]!'
             : 'w-full'
         "
         :placeholder="t('profile.partnerChatIdPlaceholder')"
@@ -67,7 +67,7 @@
       />
       <p
         v-if="highlightPartnerField"
-        class="mt-2 text-xs text-yellow-800 bg-yellow-50 border border-yellow-200 rounded-[10px] px-3 py-2"
+        class="mt-2 text-[13px] text-orange-700 bg-orange-500/10 rounded-[12px] px-3 py-2"
       >
         {{ t('profile.partnerHighlight') }}
       </p>
@@ -81,25 +81,26 @@
         <div class="space-y-3">
         <div class="space-y-2">
           <span class="text-xs text-gray-500 block">{{ t('profile.mode') }}</span>
-          <div class="grid grid-cols-1 gap-2">
+          <div class="list">
           <button
             v-for="option in cookModeOptions"
             :key="option.value"
             type="button"
-            class="text-left px-3 py-2.5 rounded-[12px] border text-xs cursor-pointer sm:text-sm transition-all"
-            :class="
-              cookRotationMode === option.value
-                ? 'border-green-500 bg-green-50 text-gray-900 shadow-sm'
-                : 'border-gray-200 bg-white text-gray-700 hover:border-green-300 hover:bg-green-50/40'
-            "
+            class="list-row"
+            :aria-pressed="cookRotationMode === option.value"
             @click="selectCookMode(option.value)"
           >
-            <div class="font-semibold mb-0.5">
-              {{ option.label }}
-            </div>
-            <div class="text-[11px] text-gray-500">
-              {{ option.description }}
-            </div>
+            <span class="flex-1 min-w-0">
+              <span class="block text-[17px] leading-snug">{{ option.label }}</span>
+              <span class="block text-[13px] text-muted-foreground">
+                {{ option.description }}
+              </span>
+            </span>
+            <Icon
+              v-if="cookRotationMode === option.value"
+              name="heroicons:check-20-solid"
+              class="w-5 h-5 shrink-0 text-green-700"
+            />
           </button>
         </div>
         <p
@@ -108,7 +109,7 @@
         >
           <Icon
             name="heroicons:exclamation-triangle"
-            class="w-3.5 h-3.5 mt-0.5 flex-shrink-0"
+            class="w-3.5 h-3.5 mt-0.5 shrink-0"
           />
           {{ t('profile.addPartnerForRotation') }}
         </p>
@@ -116,29 +117,17 @@
 
       <div v-if="cookRotationMode !== 'none' && hasSecondMember" class="space-y-2">
           <span class="text-xs text-gray-500 block">{{ t('profile.firstInRotation') }}</span>
-          <div
-            class="inline-flex items-center gap-1 p-1 rounded-full bg-gray-100 border border-gray-200"
-          >
+          <div class="segmented max-w-xs">
             <button
               type="button"
-              class="px-3 py-1.5 text-xs sm:text-sm rounded-full font-medium transition-all"
-              :class="
-                cookRotationFirst === 'me'
-                  ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
-                  : 'text-gray-600 hover:text-gray-800'
-              "
+              :aria-pressed="cookRotationFirst === 'me'"
               @click="cookRotationFirst = 'me'"
             >
               {{ t('common.me') }}
             </button>
             <button
               type="button"
-              class="px-3 py-1.5 text-xs sm:text-sm rounded-full font-medium transition-all"
-              :class="
-                cookRotationFirst === 'partner'
-                  ? 'bg-white text-gray-900 shadow-sm border border-gray-200'
-                  : 'text-gray-600 hover:text-gray-800'
-              "
+              :aria-pressed="cookRotationFirst === 'partner'"
               @click="cookRotationFirst = 'partner'"
             >
               {{ t('common.partner') }}

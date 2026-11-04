@@ -1,7 +1,7 @@
 <template>
-  <div :class="cn('rounded-[12px] border p-4', containerClass, props.class)">
+  <div :class="cn('rounded-[14px] p-3.5', containerClass, props.class)">
     <div v-if="icon" class="flex items-start gap-3">
-      <Icon :name="icon" :class="cn('w-5 h-5 flex-shrink-0 mt-0.5', iconClass)" />
+      <Icon :name="icon" :class="cn('w-5 h-5 shrink-0 mt-0.5', iconClass)" />
       <div class="flex-1 min-w-0">
         <h3 v-if="title" :class="cn('text-sm font-semibold mb-2', titleClass)">
           {{ title }}
@@ -47,27 +47,27 @@ const variantStyles: Record<
   { container: string; title: string; body: string; icon: string }
 > = {
   error: {
-    container: 'bg-red-50 border-red-200',
-    title: 'text-red-900',
-    body: 'text-red-800',
-    icon: 'text-red-600',
+    container: 'bg-red-500/10',
+    title: 'text-foreground',
+    body: 'text-red-700',
+    icon: 'text-red-500',
   },
   info: {
-    container: 'bg-blue-50/80 border-blue-200',
-    title: 'text-blue-900',
-    body: 'text-blue-800',
-    icon: 'text-blue-600',
+    container: 'bg-blue-500/10',
+    title: 'text-foreground',
+    body: 'text-muted-foreground',
+    icon: 'text-blue-500',
   },
   warning: {
-    container: 'bg-yellow-50/80 border-yellow-200',
-    title: 'text-yellow-900',
-    body: 'text-yellow-800',
-    icon: 'text-yellow-600',
+    container: 'bg-orange-500/10',
+    title: 'text-foreground',
+    body: 'text-muted-foreground',
+    icon: 'text-orange-500',
   },
   success: {
-    container: 'bg-green-50/80 border-green-200',
-    title: 'text-green-900',
-    body: 'text-green-800',
+    container: 'bg-green-500/10',
+    title: 'text-foreground',
+    body: 'text-muted-foreground',
     icon: 'text-green-600',
   },
 }

@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/vue3'
+import type { Meta, StoryObj } from '@storybook/vue3-vite'
 import TouCard from './TouCard.vue'
 import TouCardHeader from './TouCardHeader.vue'
 import TouCardTitle from './TouCardTitle.vue'

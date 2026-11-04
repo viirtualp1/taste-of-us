@@ -2,7 +2,7 @@
   <span
     :class="
       cn(
-        'inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold',
+        'inline-flex items-center rounded-full px-2 py-0.5 text-xs font-semibold tabular-nums',
         variantClasses,
         props.class,
       )
@@ -27,8 +27,8 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const variantClassesMap = {
-  default: 'glass-nested',
-  neutral: 'border border-gray-300 bg-gray-50 text-gray-700',
+  default: 'bg-gray-500/[0.14] text-gray-500',
+  neutral: 'bg-gray-500/[0.14] text-gray-700',
 }
 
 const variantClasses = computed(() => variantClassesMap[props.variant])

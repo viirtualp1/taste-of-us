@@ -1,9 +1,11 @@
+import { normalizeWeekStartKey } from '@/shared/lib/utils/date'
 import { createSupabaseClient } from '../utils/supabase'
 
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event)
-    const { week_start, menu_data } = body
+    const { menu_data } = body
+    const week_start = normalizeWeekStartKey(body.week_start as string | undefined)
 
     if (!week_start || !menu_data) {
       throw createError({

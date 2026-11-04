@@ -2,8 +2,10 @@ import boundaries from 'eslint-plugin-boundaries'
 
 const fsdLayers = ['app', 'pages', 'widgets', 'features', 'entities', 'shared']
 
+const layer = (type) => ({ element: { type } })
+
 function allowLayers(...layers) {
-  return layers.map((type) => ({ to: { type } }))
+  return layers.map((type) => ({ to: layer(type) }))
 }
 
 export default {
@@ -13,13 +15,22 @@ export default {
   settings: {
     'boundaries/include': ['src/**/*'],
     'boundaries/dependency-nodes': ['import'],
+    // Without a resolver every import target is "unknown" and no policy can match.
+    'import/resolver': {
+      typescript: {
+        alwaysTryTypes: true,
+        project: './src/tsconfig.json',
+        extensions: ['.ts', '.tsx', '.js', '.mjs', '.vue'],
+      },
+    },
+    // Folder matching is the default in eslint-plugin-boundaries v7.
     'boundaries/elements': [
-      { type: 'app', pattern: 'app', mode: 'folder' },
-      { type: 'pages', pattern: 'pages/*', mode: 'folder' },
-      { type: 'widgets', pattern: 'widgets/*', mode: 'folder' },
-      { type: 'features', pattern: 'features/*/*', mode: 'folder' },
-      { type: 'entities', pattern: 'entities/*', mode: 'folder' },
-      { type: 'shared', pattern: 'shared/*', mode: 'folder' },
+      { type: 'app', pattern: 'app' },
+      { type: 'pages', pattern: 'pages/*' },
+      { type: 'widgets', pattern: 'widgets/*' },
+      { type: 'features', pattern: 'features/*/*' },
+      { type: 'entities', pattern: 'entities/*' },
+      { type: 'shared', pattern: 'shared/*' },
     ],
   },
   rules: {
@@ -27,25 +38,25 @@ export default {
       'error',
       {
         default: 'disallow',
-        rules: [
-          { from: { type: 'app' }, allow: allowLayers(...fsdLayers) },
+        policies: [
+          { from: layer('app'), allow: allowLayers(...fsdLayers) },
           {
-            from: { type: 'pages' },
+            from: layer('pages'),
             allow: allowLayers('widgets', 'features', 'entities', 'shared'),
           },
           {
-            from: { type: 'widgets' },
+            from: layer('widgets'),
             allow: allowLayers('features', 'entities', 'shared'),
           },
           {
-            from: { type: 'features' },
+            from: layer('features'),
             allow: allowLayers('entities', 'shared'),
           },
           {
-            from: { type: 'entities' },
+            from: layer('entities'),
             allow: allowLayers('shared'),
           },
-          { from: { type: 'shared' }, allow: [] },
+          { from: layer('shared'), allow: allowLayers('shared') },
         ],
       },
     ],

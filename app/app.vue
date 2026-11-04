@@ -27,8 +27,11 @@ useHead({
         'menu planner, meal planning, weekly menu, food planning, meal schedule',
     },
     { name: 'author', content: 'Taste of Us' },
-    { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-    { name: 'theme-color', content: '#22c55e' },
+    {
+      name: 'viewport',
+      content: 'width=device-width, initial-scale=1, viewport-fit=cover',
+    },
+    { name: 'theme-color', content: '#f2f2f7' },
 
     { property: 'og:title', content: () => t('app.title') },
     {

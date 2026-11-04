@@ -2,7 +2,7 @@
   <label
     :class="
       cn(
-        'text-sm font-semibold leading-none text-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
+        'text-[13px] font-normal uppercase tracking-[0.02em] leading-none text-muted-foreground peer-disabled:cursor-not-allowed peer-disabled:opacity-70',
         props.class,
       )
     "

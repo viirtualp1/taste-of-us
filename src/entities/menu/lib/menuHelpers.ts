@@ -55,14 +55,14 @@ export function getDayBadgeClass(
   const count = getDayCount(dayIndex, selectedMenu, categories)
 
   if (count === 0) {
-    return 'bg-white/70 text-gray-600 border border-gray-200/50'
+    return 'bg-gray-500/[0.14] text-gray-500'
   }
 
   if (count === categories.length) {
-    return 'bg-green-100/80 text-green-700 border border-green-200/80'
+    return 'bg-green-500/15 text-green-700'
   }
 
-  return 'bg-emerald-100/80 text-emerald-700 border border-emerald-200/80'
+  return 'bg-orange-500/15 text-orange-700'
 }
 
 export function getDayLabelColor(
@@ -77,10 +77,10 @@ export function getDayLabelColor(
   }
 
   if (count === categories.length) {
-    return 'text-green-600 font-semibold'
+    return 'text-green-700 font-semibold'
   }
 
-  return 'text-emerald-600 font-medium'
+  return 'text-orange-700 font-medium'
 }
 
 export function calculateStats(

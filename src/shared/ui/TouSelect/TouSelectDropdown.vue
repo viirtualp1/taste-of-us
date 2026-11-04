@@ -4,8 +4,8 @@
       type="button"
       :class="
         cn(
-          'glass flex h-12 w-full items-center justify-between rounded-[12px] border border-border px-4 py-3 text-sm font-medium text-foreground transition-all duration-300 hover:bg-[var(--surface-hover)] hover:border-green-400/40 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
-          isOpen && 'ring-2 ring-green-400 border-green-300',
+          'field flex items-center justify-between text-[15px] font-medium disabled:cursor-not-allowed disabled:opacity-50',
+          isOpen && 'shadow-[0_0_0_2px_rgb(var(--accent)/0.55)]!',
           props.class,
         )
       "
@@ -43,7 +43,8 @@
         <div
           v-if="isOpen"
           ref="dropdownMenuRef"
-          class="glass fixed rounded-[16px] border border-border shadow-2xl max-h-64 overflow-hidden"
+          v-glass="{ bezel: 14, refraction: 10, blur: 14 }"
+          class="glass fixed rounded-[16px] max-h-64 overflow-hidden"
           :style="{
             zIndex: 99999,
             top: `${dropdownPosition.top}px`,
@@ -58,9 +59,9 @@
               type="button"
               :class="
                 cn(
-                  'w-full text-left px-4 py-3 text-sm font-medium transition-all duration-200 hover:bg-[var(--surface-hover)] border-b border-border last:border-b-0',
+                  'w-full text-left px-4 py-3 text-[15px] transition-colors hover:bg-gray-500/10 border-b border-border last:border-b-0',
                   modelValue === option.value &&
-                    'bg-[var(--surface-selected)] text-green-700 dark:text-green-300 font-semibold',
+                    'text-green-700 font-semibold',
                 )
               "
               @click="selectOption(option.value)"
@@ -75,6 +76,7 @@
 </template>
 
 <script setup lang="ts">
+import { vGlass } from '@/shared/lib/liquid-glass'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { cn } from '@/shared/lib/utils'
 

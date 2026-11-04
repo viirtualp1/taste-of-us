@@ -1,106 +1,66 @@
 <template>
-  <tou-card class="overflow-hidden flex-shrink-0 min-w-0 h-full">
-    <tou-card-content class="space-y-3 sm:space-y-5 md:space-y-6">
-      <div
-        class="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between"
-      >
-        <div class="space-y-1">
-          <p
-            class="text-xs sm:text-sm uppercase tracking-[0.25em] text-gray-500"
-          >
-            {{ t('week.selector') }}
-          </p>
-          <h3 class="text-xl sm:text-2xl font-bold text-gray-900">
-            {{ t('week.weekOf', { label: weekLabel }) }}
-          </h3>
-          <p class="text-xs sm:text-sm text-gray-600">
-            {{ t('week.pickDate') }}
-          </p>
-        </div>
-        <div class="flex items-center gap-2 sm:gap-3 shrink-0 w-full sm:w-auto">
-          <button
-            class="w-10 h-[42px] sm:w-auto sm:px-3 flex items-center justify-center gap-1.5 rounded-[18px] text-sm font-semibold text-gray-800 bg-white/50 border border-gray-200/50 hover:border-green-300/60 hover:bg-green-50/40 transition-all"
-            @click="$emit('prev-week')"
-          >
-            <Icon name="heroicons:chevron-left" class="w-4 h-4 shrink-0" />
-            <span class="hidden sm:inline">{{ t('common.prev') }}</span>
-          </button>
-          <div
-            class="flex-1 sm:flex-none glass-nested rounded-[12px] px-2 sm:px-4 py-2 border"
-          >
-            <input
-              class="bg-transparent text-xs sm:text-sm font-semibold text-gray-800 outline-none w-full sm:w-[120px]"
-              type="date"
-              :value="weekStartInput"
-              @change="onInputChange"
-            />
-          </div>
-          <button
-            class="w-10 h-[42px] sm:w-auto sm:px-3 flex items-center justify-center gap-1.5 rounded-[18px] text-sm font-semibold text-gray-800 bg-white/50 border border-gray-200/50 hover:border-green-300/60 hover:bg-green-50/40 transition-all"
-            @click="$emit('next-week')"
-          >
-            <span class="hidden sm:inline">{{ t('common.next') }}</span>
-            <Icon name="heroicons:chevron-right" class="w-4 h-4 shrink-0" />
-          </button>
-        </div>
-      </div>
-
-      <div
-        ref="daysContainerRef"
-        class="flex items-stretch gap-2 sm:gap-3 overflow-x-auto scrollbar-hide rounded-[20px] py-3 -mx-2 px-2"
-      >
-        <div
-          v-for="(day, dayIndex) in weekDays"
-          :key="day.date"
-          class="flex-1 min-w-[80px] sm:min-w-[100px] lg:min-w-[90px] xl:min-w-[120px] relative flex flex-col"
+  <section class="surface rounded-[22px] p-3 sm:p-4">
+    <div class="flex items-center justify-between gap-2 pl-2 pb-2">
+      <label class="relative flex items-center gap-1.5 min-w-0 cursor-pointer">
+        <span class="text-[17px] font-semibold truncate">
+          {{ t('week.weekOf', { label: weekLabel }) }}
+        </span>
+        <Icon
+          name="heroicons:chevron-down-20-solid"
+          class="w-4 h-4 text-green-700 shrink-0"
+        />
+        <!-- Native date picker sits invisibly over the title, as a tappable menu. -->
+        <input
+          class="absolute inset-0 opacity-0 cursor-pointer"
+          type="date"
+          :value="weekStartInput"
+          :aria-label="t('week.pickDate')"
+          @change="onInputChange"
+        />
+      </label>
+      <div class="flex items-center gap-1 shrink-0">
+        <button
+          type="button"
+          class="icon-btn icon-btn--sm text-green-700"
+          :aria-label="t('common.prev')"
+          @click="$emit('prev-week')"
         >
-          <span
-            v-if="day.isToday"
-            class="xl:hidden absolute left-1/2 -translate-x-1/2 -top-2 z-10 px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-600 text-white shadow-sm whitespace-nowrap"
-          >
-            {{ t('common.today') }}
-          </span>
-          <button
-            :ref="(el) => { if (el) dayButtonRefs[dayIndex] = el as HTMLElement }"
-            class="flex-1 min-h-0 rounded-[16px] px-2 sm:px-3 lg:px-2 xl:px-4 py-3 sm:py-4 text-left transition-all flex flex-col gap-1.5 relative"
-            :class="[
-              dayIndex === activeDayIndex
-                ? 'glass border border-green-400/60 ring-2 ring-green-200/50 bg-green-50/60'
-                : 'glass border border-gray-200/50 hover:border-green-300/60 hover:bg-green-50/40',
-            ]"
-            @click="$emit('select-day', dayIndex)"
-          >
-            <span class="text-xs text-gray-500 truncate">{{ day.name }}</span>
-            <span
-              class="text-base lg:text-sm xl:text-lg font-semibold text-gray-900 truncate"
-            >
-              {{ day.short }}
-            </span>
-            <span
-              v-if="day.isToday"
-              class="hidden xl:inline absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-600 text-white"
-            >
-              {{ t('common.today') }}
-            </span>
-            <span
-              class="text-xs mt-1 transition-colors min-h-[16px] flex items-center"
-              :class="getDayLabelColorClass(dayIndex)"
-            >
-              {{ getDayLabelForIndex(dayIndex) }}
-            </span>
-          </button>
-        </div>
+          <Icon name="heroicons:chevron-left-20-solid" class="w-5 h-5" />
+        </button>
+        <button
+          type="button"
+          class="icon-btn icon-btn--sm text-green-700"
+          :aria-label="t('common.next')"
+          @click="$emit('next-week')"
+        >
+          <Icon name="heroicons:chevron-right-20-solid" class="w-5 h-5" />
+        </button>
       </div>
-    </tou-card-content>
-  </tou-card>
+    </div>
+
+    <div class="grid grid-cols-7 gap-1" role="tablist">
+      <button
+        v-for="(day, dayIndex) in weekDays"
+        :key="day.date"
+        type="button"
+        role="tab"
+        class="day"
+        :aria-selected="dayIndex === activeDayIndex"
+        :aria-label="`${day.display} — ${getDayLabel(dayIndex, selectedMenu)}`"
+        :data-today="day.isToday || undefined"
+        @click="$emit('select-day', dayIndex)"
+      >
+        <span class="day__weekday">{{ day.weekdayShort }}</span>
+        <span class="day__num">{{ day.dayOfMonth }}</span>
+        <span class="day__dot" :data-status="status(dayIndex)" />
+      </button>
+    </div>
+  </section>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick, onMounted } from 'vue'
-import { TouCard, TouCardContent } from '@/shared/ui'
 import type { WeekDay } from '@/shared/lib/utils/date'
-import type { MenuSelection } from '@/entities/menu'
-import { useMenuTranslations } from '@/shared/i18n'
+import { getDayCount, type MenuSelection, useMenuTranslations } from '@/entities/menu'
 
 interface Props {
   weekLabel: string
@@ -113,7 +73,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const { t } = useI18n()
-const { getDayLabel, getDayLabelColor } = useMenuTranslations()
+const { categories, getDayLabel } = useMenuTranslations()
 
 const emit = defineEmits<{
   'prev-week': []
@@ -122,51 +82,75 @@ const emit = defineEmits<{
   'week-input-change': [event: Event]
 }>()
 
-const daysContainerRef = ref<HTMLElement | null>(null)
-const dayButtonRefs = ref<Record<number, HTMLElement>>({})
-
-const scrollToActiveDay = async () => {
-  await nextTick()
-  if (!daysContainerRef.value) return
-
-  const activeButton = dayButtonRefs.value[props.activeDayIndex]
-  if (!activeButton) return
-
-  const container = daysContainerRef.value
-  const buttonRect = activeButton.getBoundingClientRect()
-  const containerRect = container.getBoundingClientRect()
-
-  const scrollLeft = container.scrollLeft + (buttonRect.left - containerRect.left) - (containerRect.width / 2) + (buttonRect.width / 2)
-
-  container.scrollTo({
-    left: scrollLeft,
-    behavior: 'smooth',
-  })
+const status = (dayIndex: number) => {
+  const count = getDayCount(dayIndex, props.selectedMenu, categories.value)
+  if (count === 0) return 'empty'
+  return count === categories.value.length ? 'complete' : 'partial'
 }
 
-const tryScrollToActive = () => {
-  nextTick(() => {
-    if (!daysContainerRef.value) return
-    const container = daysContainerRef.value
-    if (container.scrollWidth > container.clientWidth) {
-      scrollToActiveDay()
-    }
-  })
-}
 const onInputChange = (event: Event) => {
   emit('week-input-change', event)
 }
-
-const getDayLabelForIndex = (dayIndex: number) => {
-  return getDayLabel(dayIndex, props.selectedMenu)
-}
-
-const getDayLabelColorClass = (dayIndex: number) => {
-  return getDayLabelColor(dayIndex, props.selectedMenu)
-}
-
-watch(() => props.activeDayIndex, tryScrollToActive)
-
-onMounted(tryScrollToActive)
-
 </script>
+
+<style scoped>
+/* Calendar-style day picker: weekday, date in a circle, a dot for how planned the day is. */
+.day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 0 4px;
+  border-radius: var(--r);
+  transition: background-color 0.15s;
+}
+.day:active {
+  background: rgb(var(--fill) / 0.12);
+}
+.day__weekday {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: rgb(var(--muted));
+}
+.day__num {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  font-size: 19px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+.day[data-today] .day__num,
+.day[data-today] .day__weekday {
+  color: rgb(var(--accent-ink));
+  font-weight: 600;
+}
+.day[aria-selected='true'] .day__num {
+  background: rgb(var(--ink));
+  color: rgb(var(--bg));
+  font-weight: 600;
+}
+.day[aria-selected='true'][data-today] .day__num {
+  background: rgb(var(--accent));
+  color: rgb(var(--on-accent));
+}
+.day__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: transparent;
+}
+.day__dot[data-status='partial'] {
+  background: rgb(var(--orange-500));
+}
+.day__dot[data-status='complete'] {
+  background: rgb(var(--accent));
+}
+</style>

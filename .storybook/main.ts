@@ -1,5 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import vue from '@vitejs/plugin-vue'
+import tailwindcss from '@tailwindcss/vite'
 import type { StorybookConfig } from '@storybook/vue3-vite'
 
 const config: StorybookConfig = {
@@ -12,7 +13,7 @@ const config: StorybookConfig = {
   viteFinal: async (viteConfig) => {
     const { mergeConfig } = await import('vite')
     return mergeConfig(viteConfig, {
-      plugins: [vue()],
+      plugins: [vue(), tailwindcss()],
       resolve: {
         alias: {
           '@': fileURLToPath(new URL('../src', import.meta.url)),

@@ -35,7 +35,7 @@ export default defineEventHandler(async (event) => {
       })
     }
 
-    const dishUserId = (ingredient.user_dishes as { user_id: string }).user_id
+    const dishUserId = (ingredient.user_dishes as unknown as { user_id: string }).user_id
     if (dishUserId !== userId) {
       throw createError({
         statusCode: 403,
