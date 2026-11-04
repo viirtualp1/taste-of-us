@@ -8,63 +8,43 @@
     @close="close"
   >
     <template #custom>
-      <div class="flex flex-col h-full bg-white">
-        <div
-          class="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0"
-        >
-          <div class="flex items-center gap-2">
-            <span class="text-xl" aria-hidden="true">👨‍🍳</span>
-            <h2 class="text-lg sm:text-xl font-bold text-gray-900">
-              {{ t('cook.title') }}
-            </h2>
-          </div>
-          <TouIconButton
-            variant="close"
-            icon="heroicons:x-mark"
-            :aria-label="t('common.close')"
-            @click.stop="close"
-          />
+      <div class="flex flex-col h-full min-h-0">
+        <div class="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-4 pt-5 pb-2 shrink-0">
+          <button
+            type="button"
+            class="btn btn--sm bg-transparent! px-1! font-normal text-[17px]"
+            @click="close"
+          >
+            {{ t('common.cancel') }}
+          </button>
+          <h2 class="text-[17px] font-semibold text-center truncate">
+            {{ t('cook.title') }}
+          </h2>
+          <button
+            type="button"
+            class="btn btn--sm bg-transparent! px-1! text-[17px] text-green-700"
+            @click="handleSubmit"
+          >
+            {{ t('common.save') }}
+          </button>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-4 space-y-5">
-          <div
-            class="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-[12px] px-3 py-2"
-          >
-            {{ t('cook.description') }}
-          </div>
-
-          <div
-            class="flex items-center justify-between gap-3 p-2 rounded-[14px] bg-gray-50 border border-gray-200/80 cursor-pointer"
-            @click="cookSectionEnabled = !cookSectionEnabled"
-          >
-            <div class="flex items-center gap-3">
-              <span
-                class="relative flex h-5 w-5 shrink-0 items-center justify-center rounded-[10px] border-2 transition-colors"
-                :class="
-                  cookSectionEnabled
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-gray-300 bg-white'
-                "
-              >
+        <div class="flex-1 overflow-y-auto px-4 pt-2 pb-6 space-y-5">
+          <div>
+            <div class="list">
+              <label class="list-row cursor-pointer">
+                <span class="flex-1 text-[17px]">
+                  {{ t('cook.enableAssignment') }}
+                </span>
                 <input
                   v-model="cookSectionEnabled"
                   type="checkbox"
-                  class="absolute inset-0 cursor-pointer opacity-0"
-                  @click.stop
+                  role="switch"
+                  class="ios-switch"
                 />
-                <Icon
-                  v-if="cookSectionEnabled"
-                  name="heroicons:check"
-                  class="h-3 w-3 text-green-600"
-                />
-              </span>
-              <span class="text-sm font-semibold text-gray-800">
-                {{ t('cook.enableAssignment') }}
-              </span>
+              </label>
             </div>
-            <span class="text-xs text-gray-500">
-              {{ cookSectionEnabled ? t('common.on') : t('common.off') }}
-            </span>
+            <p class="section-footer">{{ t('cook.description') }}</p>
           </div>
 
           <Transition
@@ -75,25 +55,16 @@
             leave-from-class="opacity-100 max-h-[80vh]"
             leave-to-class="opacity-0 max-h-0 overflow-hidden"
           >
-            <div
-              v-show="cookSectionEnabled"
-              class="space-y-4 sm:space-y-5 overflow-hidden"
-            >
+            <div v-show="cookSectionEnabled" class="space-y-5 overflow-hidden">
               <div
                 role="tablist"
                 :aria-label="t('cook.assignByDayOrMeal')"
-                class="grid grid-cols-2 gap-2 p-1.5 rounded-[14px] bg-gray-100/80 border border-gray-200/60"
+                class="segmented"
               >
                 <button
                   type="button"
                   role="tab"
                   :aria-selected="isWholeDay"
-                  class="min-h-[44px] rounded-[10px] text-sm font-medium transition-all touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/60 focus-visible:ring-offset-1"
-                  :class="
-                    isWholeDay
-                      ? 'bg-white text-gray-900 shadow-sm border border-gray-200/80'
-                      : 'text-gray-500 hover:text-gray-700 active:bg-gray-200/50'
-                  "
                   @click="setWholeDay(true)"
                 >
                   {{ t('cook.wholeDay') }}
@@ -102,20 +73,14 @@
                   type="button"
                   role="tab"
                   :aria-selected="!isWholeDay"
-                  class="min-h-[44px] rounded-[10px] text-sm font-medium transition-all touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/60 focus-visible:ring-offset-1"
-                  :class="
-                    !isWholeDay
-                      ? 'bg-white text-gray-900 shadow-sm border border-gray-200/80'
-                      : 'text-gray-500 hover:text-gray-700 active:bg-gray-200/50'
-                  "
                   @click="setWholeDay(false)"
                 >
                   {{ t('cook.perMeal') }}
                 </button>
               </div>
 
-              <div v-if="isWholeDay" class="space-y-2">
-                <p class="text-xs text-gray-500 mb-2">{{ t('cook.whoCooksDay') }}</p>
+              <div v-if="isWholeDay">
+                <p class="section-header">{{ t('cook.whoCooksDay') }}</p>
                 <div
                   class="grid grid-cols-3 gap-2"
                   role="group"
@@ -140,20 +105,15 @@
               </div>
 
               <template v-else>
-                <p class="text-xs text-gray-500 mb-3">{{ t('cook.assignPerMeal') }}</p>
+                <p class="section-footer pt-0! -mt-2">{{ t('cook.assignPerMeal') }}</p>
                 <div class="space-y-4">
                   <div
                     v-for="m in mealCookFields"
                     :key="m.key"
-                    class="space-y-2"
                     role="group"
                     :aria-label="t('cook.cookForMeal', { meal: m.label })"
                   >
-                    <span
-                      class="flex items-center gap-1.5 text-sm font-medium text-gray-700"
-                    >
-                      {{ m.label }}
-                    </span>
+                    <p class="section-header">{{ m.label }}</p>
                     <div class="grid grid-cols-3 gap-2">
                       <CookChip
                         :selected="!(localMealValue(m.key) ?? '')"
@@ -177,25 +137,6 @@
             </div>
           </Transition>
         </div>
-
-        <div
-          class="shrink-0 border-t border-gray-200 px-4 py-3 flex justify-end gap-2 bg-white"
-        >
-          <button
-            type="button"
-            class="px-4 py-2 text-sm font-medium rounded-[12px] border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors"
-            @click="close"
-          >
-            {{ t('common.cancel') }}
-          </button>
-          <button
-            type="button"
-            class="px-4 py-2 text-sm font-semibold rounded-[12px] bg-green-600 text-white hover:bg-green-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-            @click="handleSubmit"
-          >
-            {{ t('common.save') }}
-          </button>
-        </div>
       </div>
     </template>
   </BottomSheet>
@@ -203,7 +144,7 @@
 
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
-import { BottomSheet, CookChip, TouIconButton } from '@/shared/ui'
+import { BottomSheet, CookChip } from '@/shared/ui'
 import type { MenuSelection } from '@/entities/menu'
 
 interface Props {

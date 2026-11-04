@@ -2,35 +2,30 @@
   <BottomSheet
     :is-open="isOpen"
     :title="t('locale.chooseTitle')"
-    content-class="p-4 sm:p-6 space-y-4"
+    content-class="px-4 pt-1 pb-6 sm:px-5 space-y-4"
     desktop-max-width="max-w-md"
     @close="selectLocale('en')"
   >
-    <p class="text-sm text-gray-600 text-center">
+    <p class="text-[15px] text-muted-foreground text-center text-balance">
       {{ t('locale.chooseDescription') }}
     </p>
 
-    <div class="grid grid-cols-1 gap-3">
+    <div class="list">
       <button
         v-for="option in localeOptions"
         :key="option.code"
         type="button"
-        class="flex items-center justify-between px-4 py-4 rounded-[16px] border text-left transition-all hover:border-green-400 hover:bg-green-50/50 active:scale-[0.99]"
-        :class="
-          locale === option.code
-            ? 'border-green-500 bg-green-50 shadow-sm'
-            : 'border-gray-200 bg-white'
-        "
+        class="list-row justify-between"
         @click="selectLocale(option.code)"
       >
         <span class="flex items-center gap-3">
           <span class="text-2xl" aria-hidden="true">{{ option.flag }}</span>
-          <span class="font-semibold text-gray-900">{{ option.label }}</span>
+          <span class="text-[17px]">{{ option.label }}</span>
         </span>
         <Icon
           v-if="locale === option.code"
-          name="heroicons:check-circle"
-          class="w-5 h-5 text-green-600"
+          name="heroicons:check-20-solid"
+          class="w-5 h-5 text-green-700"
         />
       </button>
     </div>

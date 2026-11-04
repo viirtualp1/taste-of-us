@@ -1,32 +1,48 @@
 <template>
-  <div class="space-y-10 pb-14 sm:pb-0">
-    <div v-if="!isAuthenticated" class="flex justify-center">
-      <div
-        class="glass border border-gray-300/60 rounded-[20px] p-6 sm:p-8 max-w-md w-full"
-      >
-        <div class="text-center mb-6">
-          <h2 class="text-2xl font-bold text-gray-900 mb-2">
-            {{ t('home.welcomeTitle') }}
-          </h2>
-          <p class="text-gray-600 text-sm">
-            {{ t('home.welcomeDescription') }}
-          </p>
-        </div>
+  <div>
+    <PageHeader :title="t('nav.menu')">
+      <template v-if="isAuthenticated" #actions>
+        <button
+          v-glass="{ bezel: 12, refraction: 10 }"
+          type="button"
+          class="icon-btn icon-btn--sm glass glass-press"
+          :aria-label="t('nav.settings')"
+          @click="handleOpenProfile()"
+        >
+          <Icon name="heroicons:cog-6-tooth" class="w-5 h-5" />
+        </button>
+      </template>
+    </PageHeader>
 
-        <div v-if="isLoading" class="text-center py-8">
-          <p class="text-gray-600">{{ t('home.initializing') }}</p>
-        </div>
+    <div v-if="!isAuthenticated" class="flex justify-center pt-6">
+      <div class="surface rounded-[22px] p-6 sm:p-8 max-w-md w-full text-center">
+        <span
+          class="mx-auto mb-4 grid place-items-center w-16 h-16 rounded-[18px] bg-green-500 text-white"
+        >
+          <Icon name="heroicons:heart-solid" class="w-8 h-8" />
+        </span>
+        <h2 class="text-[22px] font-bold mb-1.5">
+          {{ t('home.welcomeTitle') }}
+        </h2>
+        <p class="text-muted-foreground text-[15px] text-balance">
+          {{ t('home.welcomeDescription') }}
+        </p>
 
         <div
-          v-else-if="authError"
-          class="bg-red-50 border border-red-200 rounded-[12px] p-3"
+          v-if="isLoading"
+          class="flex items-center justify-center gap-2 pt-6 text-muted-foreground"
         >
-          <p class="text-sm text-red-800">{{ authError }}</p>
+          <TouSpinner />
+          <span>{{ t('home.initializing') }}</span>
         </div>
+
+        <TouAlert v-else-if="authError" class="mt-5 text-left">
+          {{ authError }}
+        </TouAlert>
       </div>
     </div>
 
-    <menu-planner v-else ref="menuPlannerRef" @open-profile="handleOpenProfile" />
+    <menu-planner v-else ref="menuPlannerRef" />
     <profile-settings-modal
       :is-open="isProfileModalOpen"
       :highlight-partner-on-open="highlightPartnerOnOpen"
@@ -37,10 +53,13 @@
 </template>
 
 <script setup lang="ts">
+import { vGlass } from '@/shared/lib/liquid-glass'
 import { ref } from 'vue'
 import { useTelegram, useRequireAuth } from '@/entities/user'
-import { MenuPlanner } from '@/widgets/menu-planner'
+import MenuPlanner from './MenuPlanner.vue'
 import { ProfileSettingsModal } from '@/features/profile/settings'
+import { PageHeader } from '@/widgets/page-header'
+import { TouAlert, TouSpinner } from '@/shared/ui'
 
 definePageMeta({
   layout: 'default',

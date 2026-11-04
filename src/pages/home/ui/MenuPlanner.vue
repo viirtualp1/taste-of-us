@@ -1,14 +1,14 @@
 <template>
   <div
-    class="grid grid-cols-1 lg:grid-cols-[minmax(260px,0.75fr)_2.25fr] auto-rows-auto lg:grid-rows-[auto_1fr] gap-4 md:gap-6 min-w-0 w-full overflow-x-hidden"
+    class="grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(280px,1fr)] lg:grid-rows-[auto_1fr] gap-x-6 gap-y-6 min-w-0 w-full"
   >
     <div
-      class="min-h-0 min-w-0 order-4 lg:col-start-1 lg:row-start-1 lg:row-span-2 lg:self-stretch"
+      class="min-h-0 min-w-0 order-4 lg:order-0 lg:col-start-2 lg:row-start-1 lg:row-span-2"
     >
       <shopping-list-preview :week-start="weekStart" />
     </div>
 
-    <div class="min-h-0 min-w-0 order-2 lg:col-start-2 lg:row-start-1">
+    <div class="min-h-0 min-w-0 order-2 lg:order-0 lg:col-start-1 lg:row-start-1">
       <week-selector-skeleton v-if="isPageLoading" />
       <week-selector
         v-else
@@ -24,7 +24,7 @@
       />
     </div>
 
-    <div class="min-h-0 min-w-0 order-3 lg:col-start-2 lg:row-start-2">
+    <div class="min-h-0 min-w-0 order-3 lg:order-0 lg:col-start-1 lg:row-start-2">
       <day-card-skeleton v-if="isPageLoading || !weekDays[activeDayIndex]" />
       <day-card
         v-else-if="weekDays[activeDayIndex]"
@@ -42,13 +42,7 @@
     </div>
 
     <TouToast :message="message" :type="messageType" />
-    <action-buttons
-      :is-sending="isSending"
-      @send="handleShowConfirm"
-      @open-dishes="handleOpenDishes"
-      @open-shopping="handleOpenShopping"
-      @open-profile="$emit('open-profile')"
-    />
+    <action-buttons :is-sending="isSending" @send="handleShowConfirm" />
     <confirm-menu-modal
       :is-open="isConfirmModalOpen"
       :week-days="weekDays"
@@ -69,8 +63,8 @@ import {
   type MenuCategory,
   type MenuSelection,
   findNextIncompleteDay,
+  useMenuTranslations,
 } from '@/entities/menu'
-import { useMenuTranslations } from '@/shared/i18n'
 import { useTelegram, useApiFetch } from '@/entities/user'
 import { useMenuSelection } from '@/features/menu/send-menu'
 import { ShoppingListPreview } from '@/widgets/shopping-item'
@@ -80,10 +74,7 @@ import { TouToast } from '@/shared/ui'
 import { ActionButtons } from '@/widgets/action-buttons'
 import { ConfirmMenuModal } from '@/features/menu/confirm-menu'
 
-defineEmits<{ 'open-profile': [options?: { highlightPartner?: boolean }] }>()
-
 const { t } = useI18n()
-const localePath = useLocalePath()
 const { categories } = useMenuTranslations()
 const { apiFetch } = useApiFetch()
 const { isAuthenticated, hapticFeedback } = useTelegram()
@@ -170,16 +161,6 @@ const handleConfirmSend = async () => {
   isConfirmModalOpen.value = false
   await sendMenu(saveSchedule)
   hapticFeedback.success()
-}
-
-const handleOpenDishes = () => {
-  navigateTo(localePath('/dishes'))
-  hapticFeedback.light()
-}
-
-const handleOpenShopping = () => {
-  navigateTo(localePath('/shopping'))
-  hapticFeedback.light()
 }
 
 const handleMenuUpdate = (

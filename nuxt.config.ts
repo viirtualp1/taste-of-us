@@ -1,5 +1,6 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 import { fileURLToPath } from 'node:url'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
@@ -17,7 +18,6 @@ export default defineNuxtConfig({
 
   modules: [
     '@nuxt/eslint',
-    '@nuxt/fonts',
     '@nuxt/icon',
     '@nuxt/image',
     '@posthog/nuxt',
@@ -31,7 +31,6 @@ export default defineNuxtConfig({
     ],
     defaultLocale: 'en',
     strategy: 'prefix',
-    lazy: true,
     restructureDir: 'i18n',
     langDir: 'locales',
     detectBrowserLanguage: false,
@@ -48,25 +47,18 @@ export default defineNuxtConfig({
 
   components: false,
 
-  postcss: {
-    plugins: {
-      tailwindcss: {},
-      autoprefixer: {},
-    },
+  vite: {
+    plugins: [tailwindcss()],
   },
 
-  fonts: {
-    families: [
-      {
-        name: 'Manrope',
-        provider: 'google',
-        weights: [300, 400, 500, 600, 700, 800],
-      },
-    ],
+  // Tailwind v4 puts utilities in cascade layers; keep icon CSS in `base` so `w-5 h-5` can size icons.
+  icon: {
+    cssLayer: 'base',
   },
 
   runtimeConfig: {
     public: {
+      supabaseAnonKey: process.env.NUXT_PUBLIC_SUPABASE_ANON_KEY || '',
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://taste-of-us.com',
       mswEnabled:
         process.env.NODE_ENV === 'development' &&

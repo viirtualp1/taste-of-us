@@ -2,108 +2,92 @@
   <BottomSheet
     :is-open="isOpen"
     custom-layout
-    desktop-max-width="max-w-4xl"
+    desktop-max-width="max-w-2xl"
     desktop-height="85vh"
     :initial-height-ratio="0.7"
     @close="closeModal"
   >
     <template #custom>
-      <div
-        class="flex items-center justify-between px-4 py-3 border-b border-gray-200 shrink-0 bg-white"
-      >
-        <h2 class="text-lg sm:text-xl font-bold text-gray-900">
+      <div class="grid grid-cols-[36px_1fr_36px] items-center gap-2 px-4 pt-5 pb-2 shrink-0">
+        <span aria-hidden="true" />
+        <h2 class="text-[17px] font-semibold text-center truncate">
           {{ t('dishes.selectTitle', { category: categoryLabel }) }}
         </h2>
         <TouIconButton
           variant="close"
-          icon="heroicons:x-mark"
+          icon="heroicons:x-mark-20-solid"
           :aria-label="t('common.close')"
           @click.stop="closeModal"
         />
       </div>
 
-      <div class="flex flex-col sm:flex-row flex-1 overflow-hidden min-h-0">
-        <div
-          class="shrink-0 border-b sm:border-b-0 sm:border-r border-gray-200 bg-white sm:bg-gray-50 sm:w-48"
-        >
-          <div class="p-3 sm:p-4 space-y-3">
-            <div class="relative">
-              <Icon
-                name="heroicons:magnifying-glass"
-                class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
-              />
-              <input
-                v-model="searchQuery"
-                type="search"
-                :placeholder="t('dishes.searchDishes')"
-                class="w-full pl-9 pr-4 py-2.5 sm:py-2 rounded-[12px] border border-gray-200 bg-gray-50 sm:bg-white focus:bg-white focus:border-green-400 focus:outline-none focus:ring-2 focus:ring-green-200/50 text-gray-900 placeholder-gray-400 text-sm"
-                :aria-label="t('dishes.searchDishes')"
-              />
-            </div>
-
-            <div
-              class="flex sm:flex-col gap-2 overflow-x-auto sm:overflow-visible flex-nowrap sm:flex-wrap pb-0.5 sm:pb-0"
-            >
-              <button
-                v-for="menuCategory in categories"
-                :key="menuCategory.key"
-                class="px-4 py-2 sm:py-3 rounded-[12px] text-sm font-medium transition-all whitespace-nowrap sm:whitespace-normal flex-shrink-0 sm:flex-shrink sm:w-full border text-left"
-                :class="
-                  selectedCategory === menuCategory.key
-                    ? 'bg-green-500 text-white border-green-500 shadow-sm'
-                    : 'bg-white border-gray-200 text-gray-700 hover:border-green-300 hover:bg-green-50/50'
-                "
-                @click="selectedCategory = menuCategory.key"
-              >
-                {{ menuCategory.label }}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div
-          class="flex-1 overflow-y-auto p-4 sm:p-6 overscroll-contain min-h-0 bg-white"
-        >
-          <TouEmptyState
-            v-if="filteredDishes.length === 0"
-            :title="t('dishes.noDishesFound')"
-            :description="
-              searchQuery
-                ? t('dishes.tryDifferentSearch')
-                : t('dishes.tryDifferentCategory')
-            "
-          />
-
-          <div
-            v-else
-            class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
+      <div class="px-4 pt-1 pb-3 space-y-3 shrink-0">
+        <div class="segmented" role="tablist">
+          <button
+            v-for="menuCategory in categories"
+            :key="menuCategory.key"
+            type="button"
+            role="tab"
+            :aria-selected="selectedCategory === menuCategory.key"
+            @click="selectedCategory = menuCategory.key"
           >
-            <button
-              v-for="dish in filteredDishes"
-              :key="dish.id || dish.name"
-              class="p-4 sm:p-5 rounded-[16px] text-left transition-all border flex flex-col gap-1 sm:gap-2 sm:min-h-[100px]"
-              :class="
-                selectedDish === dish.name
-                  ? 'border-green-400 bg-green-50 shadow-sm sm:scale-[1.02]'
-                  : 'border-gray-200 bg-gray-50 hover:border-green-300 hover:bg-green-50/70 sm:hover:shadow'
-              "
-              @click="selectDish(dish.name)"
-            >
-              <span class="font-semibold text-gray-900 sm:text-base">{{
-                dish.name
-              }}</span>
-              <div
+            {{ menuCategory.label }}
+          </button>
+        </div>
+        <div class="relative">
+          <Icon
+            name="heroicons:magnifying-glass-20-solid"
+            class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+          />
+          <input
+            v-model="searchQuery"
+            type="search"
+            :placeholder="t('dishes.searchDishes')"
+            class="field h-9! pl-9! text-[15px]"
+            :aria-label="t('dishes.searchDishes')"
+          />
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto px-4 pb-6 overscroll-contain min-h-0">
+        <TouEmptyState
+          v-if="filteredDishes.length === 0"
+          :title="t('dishes.noDishesFound')"
+          :description="
+            searchQuery
+              ? t('dishes.tryDifferentSearch')
+              : t('dishes.tryDifferentCategory')
+          "
+        />
+
+        <div v-else class="list">
+          <button
+            v-for="dish in filteredDishes"
+            :key="dish.id || dish.name"
+            type="button"
+            class="list-row"
+            :aria-pressed="selectedDish === dish.name"
+            @click="selectDish(dish.name)"
+          >
+            <span class="flex-1 min-w-0">
+              <span class="block text-[17px] leading-snug">{{ dish.name }}</span>
+              <span
                 v-if="dish.id && dishIngredients[dish.id]?.length"
-                class="text-xs text-gray-500 mt-1 line-clamp-2"
+                class="block text-[13px] text-muted-foreground line-clamp-1"
               >
                 {{
                   (dishIngredients[dish.id] ?? [])
                     .map((ingredient) => ingredient.name)
                     .join(', ')
                 }}
-              </div>
-            </button>
-          </div>
+              </span>
+            </span>
+            <Icon
+              v-if="selectedDish === dish.name"
+              name="heroicons:check-20-solid"
+              class="w-5 h-5 shrink-0 text-green-700"
+            />
+          </button>
         </div>
       </div>
     </template>
@@ -111,11 +95,11 @@
 </template>
 
 <script setup lang="ts">
+import { useMenuTranslations } from '@/entities/menu'
 import { ref, computed, watch } from 'vue'
 import type { MenuCategory, Dish, Ingredient } from '@/entities/menu'
 import { BottomSheet, TouIconButton, TouEmptyState } from '@/shared/ui'
 import { useApiFetch } from '@/entities/user'
-import { useMenuTranslations } from '@/shared/i18n'
 
 interface Props {
   isOpen: boolean

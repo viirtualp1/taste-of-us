@@ -23,36 +23,40 @@ const handleItemClick = (e: MouseEvent) => {
 </script>
 
 <template>
+  <!-- A row of an inset grouped list (Reminders-style round checkbox). -->
   <div
-    class="flex items-center gap-3 p-3 glass-nested border border-gray-200/50 rounded-[12px] hover:border-green-300/60 hover:bg-green-50/40 transition-all cursor-pointer"
-    :class="item.is_checked && 'opacity-60'"
+    class="list-row cursor-pointer select-none py-2.5! pr-2!"
+    role="checkbox"
+    :aria-checked="item.is_checked"
+    tabindex="0"
     @click="handleItemClick"
+    @keydown.space.prevent="$emit('toggle')"
   >
-    <div
-      class="shrink-0 w-6 h-6 rounded-[8px] border-2 flex items-center justify-center transition-all pointer-events-none"
+    <span
+      class="shrink-0 grid place-items-center w-[22px] h-[22px] rounded-full transition-colors"
       :class="
         item.is_checked
-          ? 'bg-green-500 border-green-500'
-          : 'border-gray-300'
+          ? 'bg-green-500 text-white'
+          : 'shadow-[inset_0_0_0_1.5px_rgb(var(--gray-300))]'
       "
     >
       <Icon
         v-if="item.is_checked"
-        name="heroicons:check"
-        class="w-4 h-4 text-white"
+        name="heroicons:check-20-solid"
+        class="w-4 h-4"
       />
-    </div>
+    </span>
 
     <div class="flex-1 min-w-0">
       <span
-        class="text-sm font-medium text-gray-900 truncate block"
-        :class="item.is_checked && 'line-through text-gray-500'"
+        class="block text-[17px] leading-snug truncate transition-colors"
+        :class="item.is_checked && 'text-muted-foreground line-through'"
       >
         {{ item.name }}
       </span>
       <span
         v-if="item.quantity || item.source_dish_name"
-        class="text-xs text-gray-500 truncate block"
+        class="block text-[13px] text-muted-foreground truncate"
       >
         <template v-if="item.quantity">{{ item.quantity }}</template>
         <template v-if="item.quantity && item.source_dish_name"> · </template>
@@ -62,23 +66,19 @@ const handleItemClick = (e: MouseEvent) => {
       </span>
     </div>
 
-    <div class="shrink-0 w-9 h-9 flex items-center justify-center">
-      <button
-        class="w-9 h-9 flex items-center justify-center rounded-[8px] hover:bg-red-50/50 transition-colors text-red-500 disabled:opacity-50"
-        :disabled="isDeleting"
-        @click.stop="$emit('delete')"
-      >
-        <Icon
-          v-if="isDeleting"
-          name="heroicons:arrow-path"
-          class="w-4 h-4 animate-spin"
-        />
-        <Icon
-          v-else
-          name="heroicons:x-mark"
-          class="w-4 h-4"
-        />
-      </button>
-    </div>
+    <button
+      type="button"
+      class="shrink-0 grid place-items-center w-9 h-9 rounded-full text-gray-400 hover:text-red-500 hover:bg-red-500/10 transition-colors disabled:opacity-50"
+      :disabled="isDeleting"
+      aria-label="Delete"
+      @click.stop="$emit('delete')"
+    >
+      <Icon
+        v-if="isDeleting"
+        name="heroicons:arrow-path"
+        class="w-4 h-4 animate-spin"
+      />
+      <Icon v-else name="heroicons:x-mark-20-solid" class="w-[18px] h-[18px]" />
+    </button>
   </div>
 </template>

@@ -3,10 +3,10 @@
     <Icon
       v-if="icon"
       :name="icon"
-      class="w-12 h-12 text-gray-400 mx-auto mb-3"
+      class="w-11 h-11 text-gray-400 mx-auto mb-3"
     />
-    <p class="text-gray-500">{{ title }}</p>
-    <p v-if="description" class="text-sm text-gray-400 mt-1">
+    <p class="text-[17px] font-semibold text-foreground">{{ title }}</p>
+    <p v-if="description" class="text-sm text-muted-foreground mt-1 text-balance">
       {{ description }}
     </p>
     <slot />

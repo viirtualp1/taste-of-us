@@ -30,25 +30,25 @@ const props = withDefaults(defineProps<Props>(), {
   class: undefined,
 })
 
+// Circular buttons, as in iOS toolbars and sheet headers.
 const baseClasses =
-  'shrink-0 inline-flex items-center justify-center rounded-[12px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-green-400/60 disabled:opacity-50 disabled:cursor-not-allowed'
+  'shrink-0 inline-flex items-center justify-center rounded-full transition-[transform,background-color] duration-150 active:scale-[0.92] disabled:opacity-40 disabled:cursor-not-allowed'
 
 const variantClassesMap = {
-  ghost: 'text-gray-600 hover:bg-[var(--surface-hover)] hover:text-foreground',
-  close:
-    'text-muted-foreground hover:bg-[var(--surface-hover)] hover:text-foreground',
-  danger: 'text-red-500 hover:bg-red-50/50',
+  ghost: 'text-green-700 hover:bg-gray-500/10',
+  close: 'bg-gray-500/[0.14] text-gray-500 hover:bg-gray-500/20',
+  danger: 'text-red-500 hover:bg-red-500/10',
 }
 
 const sizeClassesMap = {
-  sm: 'w-8 h-8',
-  md: 'w-10 h-10',
+  sm: 'w-[30px] h-[30px]',
+  md: 'w-9 h-9',
   lg: 'w-11 h-11',
 }
 
 const iconSizeMap = {
   sm: 'w-4 h-4',
-  md: 'w-5 h-5',
+  md: 'w-[18px] h-[18px]',
   lg: 'w-5 h-5',
 }
 

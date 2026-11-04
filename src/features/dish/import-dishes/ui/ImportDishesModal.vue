@@ -14,7 +14,7 @@
       :class="
         isDragging
           ? 'border-green-400 bg-green-50/30'
-          : 'border-gray-300 glass-nested hover:border-green-300'
+          : 'border-gray-300 glass-nested'
       "
       @drop="handleDrop"
       @dragover.prevent="isDragging = true"
@@ -68,7 +68,7 @@
       <div class="flex items-start gap-3 mb-3">
         <Icon
           name="heroicons:information-circle"
-          class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"
+          class="w-5 h-5 text-blue-600 shrink-0 mt-0.5"
         />
         <div class="flex-1">
           <h3 class="text-sm font-semibold text-blue-900 mb-2">

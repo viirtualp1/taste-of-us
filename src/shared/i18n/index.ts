@@ -4,4 +4,3 @@ export {
   LOCALE_DATE_MAP,
   type AppLocale,
 } from './constants'
-export { useMenuTranslations } from './useMenuTranslations'

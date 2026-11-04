@@ -45,8 +45,6 @@ export default defineEventHandler(async (event) => {
   const telegramUser = parsedData.user
   const supabase = createSupabaseClient()
 
-  let userId: string | null = null
-
   const { data: existingUser, error: findError } = await supabase
     .from('telegram_users')
     .select('user_id')
@@ -58,8 +56,6 @@ export default defineEventHandler(async (event) => {
   }
 
   if (existingUser) {
-    userId = existingUser.user_id
-
     const { error: updateError } = await supabase
       .from('telegram_users')
       .update({
@@ -77,7 +73,7 @@ export default defineEventHandler(async (event) => {
       console.error('Error updating user:', updateError)
     }
   } else {
-    const { data: newUser, error: createError } = await supabase
+    const { data: newUser, error: insertError } = await supabase
       .from('telegram_users')
       .insert({
         telegram_id: telegramUser.id,
@@ -91,19 +87,17 @@ export default defineEventHandler(async (event) => {
       .select('user_id')
       .single()
 
-    if (createError) {
+    if (insertError) {
       throw createError({
         statusCode: 500,
-        message: `Failed to create user: ${createError.message}`,
+        message: `Failed to create user: ${insertError.message}`,
       })
     }
-
-    userId = newUser.user_id
 
     const { error: settingsError } = await supabase
       .from('user_settings')
       .insert({
-        user_id: userId,
+        user_id: newUser.user_id,
         telegram_chat_id: String(telegramUser.id),
       })
 

@@ -38,5 +38,6 @@ export type { CookRotationMode, CookRotationFirst } from './lib/cookRotation'
 export { useMenuSchedule } from './model/useMenuSchedule'
 export { useWeekNavigation } from './model/useWeekNavigation'
 export { useUserDishes } from './model/useUserDishes'
+export { useMenuTranslations } from './lib/useMenuTranslations'
 
 export type { WeekDay } from '@/shared/lib/utils/date'

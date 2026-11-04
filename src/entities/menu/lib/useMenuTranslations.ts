@@ -1,12 +1,7 @@
 import { computed } from 'vue'
-import type { MenuCategory, CuisineType, MenuSelection } from '@/entities/menu'
-import {
-  CATEGORY_KEYS,
-  CUISINE_KEYS,
-  getDayCount,
-  getDayBadgeClass,
-  getDayLabelColor,
-} from '@/entities/menu'
+import type { MenuCategory, CuisineType, MenuSelection } from '../model/types'
+import { CATEGORY_KEYS, CUISINE_KEYS } from '../config/constants'
+import { getDayCount, getDayBadgeClass, getDayLabelColor } from './menuHelpers'
 
 export function useMenuTranslations() {
   const { t } = useI18n()

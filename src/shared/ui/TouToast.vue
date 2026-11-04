@@ -2,28 +2,34 @@
   <Teleport to="body">
     <transition
       enter-active-class="transition ease-out duration-300"
-      enter-from-class="opacity-0 translate-y-2"
-      enter-to-class="opacity-100 translate-y-0"
+      enter-from-class="opacity-0 translate-y-3 scale-95"
+      enter-to-class="opacity-100 translate-y-0 scale-100"
       leave-active-class="transition ease-in duration-200"
-      leave-from-class="opacity-100 translate-y-0"
-      leave-to-class="opacity-0 translate-y-2"
+      leave-from-class="opacity-100 translate-y-0 scale-100"
+      leave-to-class="opacity-0 translate-y-3 scale-95"
     >
       <div
         v-if="message"
-        :class="[
-          'fixed z-[100]',
-          'bottom-16 left-4 right-4',
-          'sm:left-auto sm:right-4 sm:bottom-6 sm:max-w-[500px] sm:w-max',
-          'glass rounded-[16px] px-4 py-3 font-medium shadow-lg',
-          type === 'success'
-            ? 'text-green-700 dark:text-green-300 bg-green-50/80 dark:bg-green-950/60 border border-green-200/50 dark:border-green-800/50'
-            : 'text-red-700 dark:text-red-300 bg-red-50/80 dark:bg-red-950/60 border border-red-200/50 dark:border-red-800/50',
-        ]"
+        v-glass="{ bezel: 14, refraction: 12 }"
+        class="fixed z-100 inset-x-0 mx-auto w-max max-w-[calc(100vw-32px)] sm:max-w-[460px] glass rounded-full pl-2.5 pr-5 py-2.5 text-[15px] font-medium text-foreground"
+        style="bottom: calc(var(--tabbar) + var(--safe-b) + 24px)"
+        role="status"
       >
-        <div class="flex justify-center sm:justify-start gap-2 break-words">
-          <span class="leading-1">
-            {{ message }}
+        <div class="flex items-center gap-2.5 wrap-break-word">
+          <span
+            class="grid place-items-center w-6 h-6 rounded-full shrink-0 text-white"
+            :class="type === 'success' ? 'bg-green-500' : 'bg-red-500'"
+          >
+            <Icon
+              :name="
+                type === 'success'
+                  ? 'heroicons:check-20-solid'
+                  : 'heroicons:exclamation-triangle-20-solid'
+              "
+              class="w-4 h-4"
+            />
           </span>
+          <span class="leading-snug">{{ message }}</span>
         </div>
       </div>
     </transition>
@@ -31,6 +37,7 @@
 </template>
 
 <script setup lang="ts">
+import { vGlass } from '@/shared/lib/liquid-glass'
 interface Props {
   message: string
   type: 'success' | 'error'

@@ -1,3 +1,4 @@
+import { normalizeWeekStartKey } from '@/shared/lib/utils/date'
 import { getUserIdFromTelegram } from '../../utils/auth'
 import { createSupabaseClient } from '../../utils/supabase'
 
@@ -25,7 +26,7 @@ export default defineEventHandler(async (event) => {
     }
 
     const query = getQuery(event)
-    const weekStart = query.week_start as string | undefined
+    const weekStart = normalizeWeekStartKey(query.week_start as string | undefined)
 
     const supabase = createSupabaseClient()
 
@@ -69,7 +70,7 @@ export default defineEventHandler(async (event) => {
       source_type: item.source_type as 'dish' | 'manual' | 'common',
       source_dish_id: item.source_dish_id,
       source_dish_name:
-        (item.user_dishes as { name: string } | null)?.name || null,
+        (item.user_dishes as unknown as { name: string } | null)?.name || null,
       week_start: item.week_start,
       created_at: item.created_at,
     }))

@@ -3,7 +3,7 @@
     <select
       :class="
         cn(
-          'glass flex h-12 w-full rounded-[12px] border border-border px-4 py-3 text-sm font-medium text-foreground ring-offset-background transition-all duration-300 file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:border-green-400 disabled:cursor-not-allowed disabled:opacity-50 hover:bg-[var(--surface-hover)] hover:border-green-400/40',
+          'field font-medium disabled:cursor-not-allowed disabled:opacity-50',
           props.class,
         )
       "

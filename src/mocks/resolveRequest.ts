@@ -1,5 +1,6 @@
 import { MOCK_TELEGRAM_USER } from './data/constants'
 import { mockStore } from './data/store'
+import { normalizeWeekStartKey } from '@/shared/lib/utils/date'
 
 export interface MockRequestOptions {
   method?: string
@@ -42,7 +43,17 @@ function mergeQuery(
   return merged
 }
 
-function matchPath(pathname: string, pattern: string) {
+/** `'/api/user/dishes/:id'` → `'id'` — param names come from the pattern itself. */
+type PathParams<P extends string> = P extends `${string}:${infer Param}/${infer Rest}`
+  ? Param | PathParams<`/${Rest}`>
+  : P extends `${string}:${infer Param}`
+    ? Param
+    : never
+
+function matchPath<P extends string>(
+  pathname: string,
+  pattern: P,
+): Record<PathParams<P>, string> | null {
   const pathParts = pathname.split('/').filter(Boolean)
   const patternParts = pattern.split('/').filter(Boolean)
 
@@ -64,7 +75,7 @@ function matchPath(pathname: string, pattern: string) {
     if (part !== segment) return null
   }
 
-  return params
+  return params as Record<PathParams<P>, string>
 }
 
 function fail(status: number, message: string): MockRequestResult {
@@ -96,7 +107,13 @@ export async function resolveMockRequest(
   const telegramUserId =
     mockStore.getTelegramUserIdFromHeaders(options.headers) ??
     String(MOCK_TELEGRAM_USER.id)
-  const body = (options.body ?? {}) as Record<string, unknown>
+  const body = { ...((options.body ?? {}) as Record<string, unknown>) }
+
+  // Same guard as the real API: legacy clients sent the Sunday before the week.
+  if (query.week_start) query.week_start = normalizeWeekStartKey(query.week_start)
+  if (typeof body.week_start === 'string') {
+    body.week_start = normalizeWeekStartKey(body.week_start)
+  }
 
   if (pathname === '/api/auth/telegram' && method === 'POST') {
     return ok(mockStore.authTelegram())

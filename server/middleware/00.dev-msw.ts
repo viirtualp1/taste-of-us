@@ -23,7 +23,7 @@ export default defineEventHandler(async (event) => {
 
   const result = await resolveMockRequest(pathname + (getRequestURL(event).search || ''), {
     method: event.method,
-    headers: getHeaders(event),
+    headers: event.headers,
     body,
     query: getQuery(event),
   })

@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="cn('animate-pulse rounded-md bg-muted', props.class)"
+    :class="cn('animate-pulse rounded-[10px] bg-gray-500/12', props.class)"
     :style="props.style"
   />
 </template>

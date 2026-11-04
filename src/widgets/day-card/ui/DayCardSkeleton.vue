@@ -1,24 +1,27 @@
 <template>
-  <tou-card class="overflow-visible flex-1 flex flex-col">
-    <tou-card-header>
-      <div class="flex flex-wrap items-center justify-between gap-4">
-        <tou-skeleton class="h-7 w-40" />
-        <tou-skeleton class="h-6 w-24 rounded-full" />
-      </div>
-    </tou-card-header>
-    <tou-card-content class="pt-0 flex-1 flex flex-col overflow-visible">
-      <div
-        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 flex-1 overflow-visible"
-      >
-        <div v-for="i in 3" :key="i" class="space-y-2 sm:space-y-3">
-          <tou-skeleton class="h-5 w-32" />
-          <tou-skeleton class="h-10 w-full rounded-lg" />
+  <section>
+    <div class="flex items-center justify-between gap-3 px-1 pb-3">
+      <tou-skeleton class="h-7 w-48" />
+      <tou-skeleton class="h-6 w-20 rounded-full!" />
+    </div>
+    <div class="list">
+      <div v-for="i in 3" :key="i" class="list-row">
+        <tou-skeleton class="h-[30px] w-[30px] rounded-[8px]!" />
+        <div class="flex-1 space-y-1.5">
+          <tou-skeleton class="h-3 w-16" />
+          <tou-skeleton class="h-4 w-40" />
         </div>
       </div>
-    </tou-card-content>
-  </tou-card>
+    </div>
+    <div class="list mt-4">
+      <div class="list-row">
+        <tou-skeleton class="h-[30px] w-[30px] rounded-[8px]!" />
+        <tou-skeleton class="h-4 w-48" />
+      </div>
+    </div>
+  </section>
 </template>
 
 <script setup lang="ts">
-import { TouCard, TouCardHeader, TouCardContent, TouSkeleton } from '@/shared/ui'
+import { TouSkeleton } from '@/shared/ui'
 </script>

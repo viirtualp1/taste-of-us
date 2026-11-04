@@ -1,5 +1,5 @@
 <template>
-  <label :class="cn('block text-sm font-medium text-gray-700 mb-2', props.class)">
+  <label :class="cn('block px-1 mb-1.5 text-[13px] uppercase tracking-[0.02em] text-muted-foreground', props.class)">
     <slot />
   </label>
 </template>

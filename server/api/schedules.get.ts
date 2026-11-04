@@ -1,9 +1,12 @@
+import { normalizeWeekStartKey } from '@/shared/lib/utils/date'
 import { createSupabaseClient } from '../utils/supabase'
 
 export default defineEventHandler(async (event) => {
   try {
     const supabase = createSupabaseClient()
-    const weekStart = getQuery(event).week_start as string | undefined
+    const weekStart = normalizeWeekStartKey(
+      getQuery(event).week_start as string | undefined,
+    )
 
     let query = supabase
       .from('schedules')

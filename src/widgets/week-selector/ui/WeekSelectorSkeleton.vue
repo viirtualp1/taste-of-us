@@ -1,33 +1,21 @@
 <template>
-  <tou-card class="overflow-hidden flex-shrink-0">
-    <tou-card-content class="space-y-4 md:space-y-5">
-      <div
-        class="flex flex-col gap-3 sm:gap-4 md:flex-row md:items-center md:justify-between"
-      >
-        <div class="space-y-2">
-          <tou-skeleton class="h-3 w-24" />
-          <tou-skeleton class="h-7 w-48" />
-          <tou-skeleton class="h-4 w-56" />
-        </div>
-        <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-          <tou-skeleton class="h-9 w-20" />
-          <tou-skeleton class="h-9 w-32" />
-          <tou-skeleton class="h-9 w-20" />
-        </div>
+  <section class="surface rounded-[22px] p-3 sm:p-4">
+    <div class="flex items-center justify-between gap-2 pl-2 pb-3">
+      <tou-skeleton class="h-5 w-44" />
+      <div class="flex gap-2">
+        <tou-skeleton class="h-8 w-8 rounded-full!" />
+        <tou-skeleton class="h-8 w-8 rounded-full!" />
       </div>
-      <div
-        class="flex items-center gap-2 sm:gap-3 overflow-x-auto scrollbar-hide py-2 -mx-2 px-2"
-      >
-        <tou-skeleton
-          v-for="i in 7"
-          :key="i"
-          class="min-w-[120px] sm:min-w-[140px] h-20 flex-shrink-0 rounded-xl"
-        />
+    </div>
+    <div class="grid grid-cols-7 gap-1">
+      <div v-for="i in 7" :key="i" class="flex flex-col items-center gap-1.5 py-1">
+        <tou-skeleton class="h-3 w-6" />
+        <tou-skeleton class="h-[38px] w-[38px] rounded-full!" />
       </div>
-    </tou-card-content>
-  </tou-card>
+    </div>
+  </section>
 </template>
 
 <script setup lang="ts">
-import { TouCard, TouCardContent, TouSkeleton } from '@/shared/ui'
+import { TouSkeleton } from '@/shared/ui'
 </script>
