@@ -1,24 +1,27 @@
 <template>
   <div>
-    <PageHeader :title="t('shopping.title')" :subtitle="weekLabel" />
+    <h1 class="sr-only">{{ t('shopping.title') }}</h1>
 
-    <div class="flex items-center justify-between gap-2 pb-5">
-      <div v-glass="{ bezel: 14, refraction: 12 }" class="glass flex items-center rounded-full p-1">
+    <div class="flex flex-wrap items-center justify-between gap-2 pb-4">
+      <div class="shopping-week glass flex items-center rounded-full p-1">
         <button
           type="button"
-          class="icon-btn icon-btn--sm text-green-700"
+          class="icon-btn icon-btn--sm text-accent-foreground"
           :aria-label="t('common.prev')"
           @click="goPrevWeek"
         >
-          <Icon name="heroicons:chevron-left-20-solid" class="w-5 h-5" />
+          <TouIcon name="heroicons:chevron-left-20-solid" class="w-5 h-5" />
         </button>
+        <span class="px-1 text-center text-ios font-medium">{{
+          weekLabel
+        }}</span>
         <button
           type="button"
-          class="icon-btn icon-btn--sm text-green-700"
+          class="icon-btn icon-btn--sm text-accent-foreground"
           :aria-label="t('common.next')"
           @click="goNextWeek"
         >
-          <Icon name="heroicons:chevron-right-20-solid" class="w-5 h-5" />
+          <TouIcon name="heroicons:chevron-right-20-solid" class="w-5 h-5" />
         </button>
       </div>
 
@@ -28,32 +31,37 @@
         :disabled="isGenerating"
         @click="generateFromMenu"
       >
-        <Icon
-          :name="isGenerating ? 'heroicons:arrow-path' : 'heroicons:sparkles-solid'"
+        <TouIcon
+          :name="
+            isGenerating ? 'heroicons:arrow-path' : 'heroicons:sparkles-solid'
+          "
           :class="['w-4 h-4', isGenerating && 'animate-spin']"
         />
         {{ isGenerating ? t('common.generating') : t('shopping.fromMenu') }}
       </button>
     </div>
 
-    <div class="grid gap-6 lg:grid-cols-[minmax(0,1.6fr)_minmax(280px,1fr)] lg:items-start">
+    <div class="page-columns">
       <div class="min-w-0 space-y-6">
         <!-- New item row, Reminders-style -->
         <div class="list">
           <div class="list-row py-1.5! pr-1.5!">
-            <Icon name="heroicons:plus-circle-solid" class="w-[22px] h-[22px] shrink-0 text-green-500" />
+            <TouIcon
+              name="heroicons:plus-circle-solid"
+              class="size-5.5 shrink-0 text-green-500"
+            />
             <input
               v-model="newItemName"
               type="text"
               :placeholder="t('shopping.addItem')"
-              class="flex-1 min-w-0 h-10 bg-transparent text-[17px] outline-hidden placeholder:text-gray-400"
+              class="material-text-field flex-1 min-w-0 h-10 bg-transparent text-ios-body outline-hidden placeholder:text-gray-400"
               @keydown.enter="addItem"
             />
             <input
               v-model="newItemQuantity"
               type="text"
               :placeholder="t('shopping.qtyPlaceholder')"
-              class="field h-9! w-24! sm:w-32! px-3! text-[15px]"
+              class="field h-9! w-20! sm:w-24! px-3! text-ios"
               @keydown.enter="addItem"
             />
             <button
@@ -63,8 +71,12 @@
               :aria-label="t('common.add')"
               @click="addItem"
             >
-              <Icon
-                :name="isAddingItem ? 'heroicons:arrow-path' : 'heroicons:arrow-up-20-solid'"
+              <TouIcon
+                :name="
+                  isAddingItem
+                    ? 'heroicons:arrow-path'
+                    : 'heroicons:arrow-up-20-solid'
+                "
                 :class="['w-5 h-5', isAddingItem && 'animate-spin']"
               />
             </button>
@@ -73,7 +85,7 @@
 
         <div v-if="isLoading" class="list">
           <div v-for="i in 5" :key="i" class="list-row">
-            <tou-skeleton class="h-[22px] w-[22px] rounded-full!" />
+            <tou-skeleton class="size-5.5 rounded-full!" />
             <tou-skeleton class="h-4 w-40" />
           </div>
         </div>
@@ -89,11 +101,11 @@
 
         <template v-else>
           <section v-for="group in groups" :key="group.key">
-            <h3 class="section-header flex items-center gap-1.5">
-              <Icon :name="group.icon" class="w-3.5 h-3.5" />
+            <h2 class="section-header flex items-center gap-1.5">
+              <TouIcon :name="group.icon" class="w-3.5 h-3.5" />
               {{ group.title }}
-            </h3>
-            <div class="list" style="--row-inset: 50px">
+            </h2>
+            <div class="list shopping-list">
               <shopping-item
                 v-for="item in group.items"
                 :key="item.id"
@@ -109,12 +121,14 @@
 
       <section class="min-w-0">
         <div class="flex items-center justify-between px-4 pb-1.5">
-          <h3 class="text-[13px] uppercase tracking-[0.02em] text-muted-foreground">
+          <h2
+            class="text-ios-caption uppercase tracking-wide text-muted-foreground"
+          >
             {{ t('shopping.quickAdd') }}
-          </h3>
+          </h2>
           <button
             type="button"
-            class="text-[15px] text-green-700"
+            class="text-ios text-accent-foreground"
             :class="showCommonItemsManager && 'font-semibold'"
             @click="showCommonItemsManager = !showCommonItemsManager"
           >
@@ -122,12 +136,12 @@
           </button>
         </div>
 
-        <div class="list p-3">
+        <div class="list quick-add-panel p-3">
           <div v-if="isLoadingCommonItems" class="flex gap-2 flex-wrap">
             <tou-skeleton
               v-for="i in 4"
               :key="i"
-              class="h-[34px] w-20 rounded-full!"
+              class="h-8.5 w-20 rounded-full!"
             />
           </div>
 
@@ -137,14 +151,14 @@
                 v-model="newCommonItemName"
                 type="text"
                 :placeholder="t('shopping.itemName')"
-                class="field h-9! px-3! text-[15px] flex-1 min-w-0"
+                class="field h-9! px-3! text-ios flex-1 min-w-0"
                 @keydown.enter="addCommonItem"
               />
               <input
                 v-model="newCommonItemQuantity"
                 type="text"
                 :placeholder="t('shopping.qtyPlaceholder')"
-                class="field h-9! px-3! text-[15px] w-24!"
+                class="field h-9! px-3! text-ios w-24!"
                 @keydown.enter="addCommonItem"
               />
               <button
@@ -154,7 +168,7 @@
                 :aria-label="t('common.add')"
                 @click="addCommonItem"
               >
-                <Icon name="heroicons:plus-20-solid" class="w-5 h-5" />
+                <TouIcon name="heroicons:plus-20-solid" class="w-5 h-5" />
               </button>
             </div>
             <div class="flex gap-2 flex-wrap">
@@ -170,10 +184,16 @@
                   :aria-label="`× ${item.name}`"
                   @click="deleteCommonItem(item.id)"
                 >
-                  <Icon name="heroicons:x-mark-20-solid" class="w-3.5 h-3.5" />
+                  <TouIcon
+                    name="heroicons:x-mark-20-solid"
+                    class="w-3.5 h-3.5"
+                  />
                 </button>
               </span>
-              <p v-if="commonItems.length === 0" class="text-[15px] text-muted-foreground px-1">
+              <p
+                v-if="commonItems.length === 0"
+                class="text-ios text-muted-foreground px-1"
+              >
                 {{ t('shopping.noSavedItems') }}
               </p>
             </div>
@@ -187,10 +207,16 @@
               class="chip"
               @click="addCommonItemToList(item)"
             >
-              <Icon name="heroicons:plus-20-solid" class="w-4 h-4 text-green-700" />
+              <TouIcon
+                name="heroicons:plus-20-solid"
+                class="w-4 h-4 text-accent-foreground"
+              />
               {{ item.name }}
             </button>
-            <p v-if="commonItems.length === 0" class="text-[15px] text-muted-foreground px-1">
+            <p
+              v-if="commonItems.length === 0"
+              class="text-ios text-muted-foreground px-1"
+            >
               {{ t('shopping.editToAddCommon') }}
             </p>
           </div>
@@ -201,8 +227,6 @@
 </template>
 
 <script setup lang="ts">
-import { vGlass } from '@/shared/lib/liquid-glass'
-import { computed, onMounted, ref } from 'vue'
 import { useTelegram, useApiFetch, useRequireAuth } from '@/entities/user'
 import { useWeekNavigation } from '@/entities/menu'
 import {
@@ -211,12 +235,7 @@ import {
   type CommonItem,
 } from '@/entities/shopping-list'
 import { ShoppingItem } from '@/widgets/shopping-item'
-import { TouSkeleton, TouEmptyState } from '@/shared/ui'
-import { PageHeader } from '@/widgets/page-header'
-
-definePageMeta({
-  layout: 'default',
-})
+import { TouIcon, TouSkeleton, TouEmptyState } from '@/shared/ui'
 
 const { t } = useI18n()
 const localePath = useLocalePath()

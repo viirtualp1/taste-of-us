@@ -1,28 +1,30 @@
 <template>
   <BottomSheet
     :is-open="isOpen"
+    :title="t('cook.title')"
     custom-layout
     desktop-max-width="sm:max-w-lg"
     desktop-height="80vh"
-    :initial-height-ratio="0.5"
     @close="close"
   >
     <template #custom>
       <div class="flex flex-col h-full min-h-0">
-        <div class="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-4 pt-5 pb-2 shrink-0">
+        <div
+          class="grid grid-cols-[auto_1fr_auto] items-center gap-2 px-4 pt-5 pb-2 shrink-0"
+        >
           <button
             type="button"
-            class="btn btn--sm bg-transparent! px-1! font-normal text-[17px]"
+            class="btn btn--sm bg-transparent! px-1! font-normal text-ios-body"
             @click="close"
           >
             {{ t('common.cancel') }}
           </button>
-          <h2 class="text-[17px] font-semibold text-center truncate">
+          <h2 class="text-ios-title font-bold">
             {{ t('cook.title') }}
           </h2>
           <button
             type="button"
-            class="btn btn--sm bg-transparent! px-1! text-[17px] text-green-700"
+            class="btn btn--sm bg-transparent! px-1! text-ios-body text-accent-foreground"
             @click="handleSubmit"
           >
             {{ t('common.save') }}
@@ -33,7 +35,7 @@
           <div>
             <div class="list">
               <label class="list-row cursor-pointer">
-                <span class="flex-1 text-[17px]">
+                <span class="flex-1 text-ios-body">
                   {{ t('cook.enableAssignment') }}
                 </span>
                 <input
@@ -105,7 +107,9 @@
               </div>
 
               <template v-else>
-                <p class="section-footer pt-0! -mt-2">{{ t('cook.assignPerMeal') }}</p>
+                <p class="section-footer pt-0! -mt-2">
+                  {{ t('cook.assignPerMeal') }}
+                </p>
                 <div class="space-y-4">
                   <div
                     v-for="m in mealCookFields"

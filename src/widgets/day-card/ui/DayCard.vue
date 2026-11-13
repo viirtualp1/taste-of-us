@@ -10,8 +10,8 @@
       leave-to-class="opacity-0"
     >
       <div :key="day.date">
-        <div class="flex items-center justify-between gap-3 px-1 pb-3">
-          <h2 class="text-[22px] font-bold leading-tight capitalize truncate">
+        <div class="section-label">
+          <h2 class="capitalize truncate">
             {{ day.display }}
           </h2>
           <span
@@ -30,20 +30,25 @@
             class="list-row"
             @click="openModal(category.key)"
           >
-            <span class="row-icon" :style="{ background: meta[category.key].color }">
-              <Icon :name="meta[category.key].icon" class="w-[18px] h-[18px]" />
+            <span class="row-icon" :class="meta[category.key].color">
+              <TouIcon :name="meta[category.key].icon" class="size-4.5" />
             </span>
             <span class="flex-1 min-w-0">
-              <span class="block text-[13px] leading-tight text-muted-foreground">
+              <span
+                class="block text-ios-caption leading-tight text-muted-foreground"
+              >
                 {{ category.label }}
               </span>
               <span
                 v-if="selectedMenu?.[category.key]"
-                class="block text-[17px] leading-snug truncate"
+                class="block text-ios-body leading-snug truncate"
               >
                 {{ selectedMenu[category.key] }}
               </span>
-              <span v-else class="block text-[17px] leading-snug text-green-700">
+              <span
+                v-else
+                class="block text-ios-body leading-snug text-accent-foreground"
+              >
                 {{
                   t('menu.selectCategory', {
                     category: category.label.toLowerCase(),
@@ -51,21 +56,25 @@
                 }}
               </span>
             </span>
-            <Icon name="heroicons:chevron-right-20-solid" class="chevron" />
+            <TouIcon name="heroicons:chevron-right-20-solid" class="chevron" />
           </button>
         </div>
 
         <div class="list list--icons mt-4">
           <button type="button" class="list-row" @click="openCookModal">
-            <span class="row-icon" style="background: #ff9500">
-              <Icon name="heroicons:fire-solid" class="w-[18px] h-[18px]" />
+            <span class="row-icon bg-orange-500">
+              <TouIcon name="heroicons:fire-solid" class="size-4.5" />
             </span>
-            <span class="flex-1 min-w-0 text-[17px] truncate">
+            <span
+              class="flex-1 min-w-0 text-ios-body leading-tight wrap-break-word"
+            >
               {{ t('menu.responsibleForCooking') }}
             </span>
-            <span class="flex items-center gap-1.5 text-[15px] text-muted-foreground shrink-0">
+            <span
+              class="flex max-w-2/5 items-center gap-1.5 text-right text-ios text-muted-foreground"
+            >
               <span
-                class="w-2 h-2 rounded-full"
+                class="size-2 shrink-0 rounded-full"
                 :class="
                   cookSummaryKey === 'not_set'
                     ? 'bg-gray-300'
@@ -76,7 +85,7 @@
               />
               {{ cookSummary }}
             </span>
-            <Icon name="heroicons:chevron-right-20-solid" class="chevron" />
+            <TouIcon name="heroicons:chevron-right-20-solid" class="chevron" />
           </button>
         </div>
       </div>
@@ -100,14 +109,10 @@
 </template>
 
 <script setup lang="ts">
+import { TouIcon } from '@/shared/ui'
 import { useMenuTranslations } from '@/entities/menu'
-import { computed, ref } from 'vue'
-import type {
-  MenuSelection,
-  MenuCategory,
-  Dish,
-} from '@/entities/menu'
-import type { WeekDay } from '@/shared/lib/utils/date'
+import type { MenuSelection, MenuCategory, Dish } from '@/entities/menu'
+import type { WeekDay } from '@/shared/lib/utils'
 import { CookAssignmentModal } from '@/features/menu/assign-cook'
 import { DishSelectionModal } from '@/features/menu/select-dish'
 
@@ -129,16 +134,16 @@ defineEmits<{
   ): void
 }>()
 
+// Settings-style row icons: white glyph on a system-colour tile.
+const meta: Record<MenuCategory, { icon: string; color: string }> = {
+  brunch: { icon: 'heroicons:sun-solid', color: 'bg-amber-500' },
+  dinner: { icon: 'heroicons:moon-solid', color: 'bg-primary' },
+  dessert: { icon: 'heroicons:cake-solid', color: 'bg-rose-500' },
+}
+
 const { t } = useI18n()
 const { categories, getDayLabel, getDayBadgeClass, getCookLabel } =
   useMenuTranslations()
-
-// Settings-style row icons: white glyph on a system-colour tile.
-const meta: Record<MenuCategory, { icon: string; color: string }> = {
-  brunch: { icon: 'heroicons:sun-solid', color: '#ffcc00' },
-  dinner: { icon: 'heroicons:moon-solid', color: '#5856d6' },
-  dessert: { icon: 'heroicons:cake-solid', color: '#ff2d55' },
-}
 
 const isModalOpen = ref(false)
 const selectedCategory = ref<MenuCategory>('brunch')
@@ -164,20 +169,20 @@ const cookSummaryKey = computed(() => {
 
 const cookSummary = computed(() => getCookLabel(cookSummaryKey.value))
 
-const openModal = (category: MenuCategory) => {
+function openModal(category: MenuCategory) {
   selectedCategory.value = category
   isModalOpen.value = true
 }
 
-const closeModal = () => {
+function closeModal() {
   isModalOpen.value = false
 }
 
-const openCookModal = () => {
+function openCookModal() {
   isCookModalOpen.value = true
 }
 
-const closeCookModal = () => {
+function closeCookModal() {
   isCookModalOpen.value = false
 }
 

@@ -1,327 +1,454 @@
 <template>
   <div
-    class="fixed inset-x-0 bottom-0 z-40 pointer-events-none flex justify-center px-4"
-    style="padding-bottom: max(12px, var(--safe-b))"
+    class="dock"
+    :class="{
+      'has-action': props.hasAction,
+      'material-dock': design === 'material',
+    }"
   >
-    <div class="flex items-center gap-2.5 pointer-events-auto">
-      <nav
-        ref="navRef"
-        v-glass="{ bezel: 20, refraction: 18 }"
-        class="tabbar glass"
-        :aria-label="t('nav.menu')"
-        @pointerdown="onPointerDown"
-        @pointermove="onPointerMove"
-        @pointerup="onPointerUp"
-        @pointercancel="reset"
-        @lostpointercapture="reset"
+    <MaterialNavigation
+      v-if="design === 'material'"
+      :account-open="props.accountOpen"
+      @account="emit('account')"
+    />
+    <nav
+      v-else
+      ref="bar"
+      class="tabbar glass"
+      :class="{ 'is-dragging': drag?.moved }"
+      :aria-label="t('nav.sections')"
+      :style="{ '--nav-count': accountIndex + 1 }"
+      @pointerdown="onDown"
+      @pointermove="onMove"
+      @pointerup="onUp"
+      @pointercancel="resetDrag"
+      @lostpointercapture="resetDrag"
+      @click.capture="onClickCapture"
+    >
+      <span
+        v-show="props.accountOpen || active >= 0"
+        class="lens"
+        :style="{ '--selection': selection }"
+        aria-hidden="true"
       >
-        <a
-          v-for="(tab, i) in tabs"
-          :key="tab.to"
-          :ref="(el) => setTabRef(el, i)"
-          :href="localePath(tab.to)"
-          class="tab"
-          :data-tab="i"
-          :aria-current="i === activeIndex ? 'page' : undefined"
-          @click.prevent="onKeyboardClick(i, $event)"
-        >
-          <Icon
-            :name="i === activeIndex ? tab.iconActive : tab.icon"
-            class="w-5 h-5 shrink-0"
-          />
-          <span>{{ t(tab.label) }}</span>
-        </a>
-
-        <!-- The selection is a lens: a drop of glass that magnifies the tab under it. -->
         <span
-          v-show="drop.visible"
-          v-glass="{ bezel: 10, refraction: 5, magnify: 0.1, blur: 0, dispersion: 0.15 }"
-          class="drop glass"
-          :class="{
-            'is-moving': isMoving,
-            'is-pressed': isPressed,
-            'is-dragging': isDragging,
-          }"
-          :style="{ '--x': `${drop.x}px`, '--w': `${drop.w}px` }"
-          aria-hidden="true"
+          ref="blob"
+          class="blob"
+          :style="{ transform: stretchTo(stretch, -stretch / 2) }"
         />
-      </nav>
-      <!-- Page-specific primary action (e.g. «Send menu») teleports in here. -->
-      <div id="tabbar-accessory" class="contents" />
-    </div>
+      </span>
+      <NuxtLink
+        v-for="(link, index) in destinations"
+        :key="link.to"
+        :to="localePath(link.to)"
+        class="nav-link"
+        :class="{ 'is-active': index === Math.round(selection) }"
+        :aria-current="index === active ? 'page' : undefined"
+        draggable="false"
+      >
+        <TouIcon :name="link.icon" class="nav-icon" aria-hidden="true" />
+        <span>{{ t(link.label) }}</span>
+      </NuxtLink>
+      <TouButton
+        type="button"
+        variant="ghost"
+        class="nav-link account-link"
+        aria-haspopup="dialog"
+        :aria-expanded="props.accountOpen"
+        @click="emit('account')"
+      >
+        <TouIcon name="heroicons:user-circle" class="nav-icon" />
+        <span>{{ t('nav.account') }}</span>
+      </TouButton>
+    </nav>
+    <div id="tabbar-accessory" class="dock-action" />
   </div>
 </template>
 
 <script setup lang="ts">
-import {
-  computed,
-  nextTick,
-  onBeforeUnmount,
-  onMounted,
-  reactive,
-  ref,
-  watch,
-  type ComponentPublicInstance,
-} from 'vue'
-import { vGlass } from '@/shared/lib/liquid-glass'
+import { TouButton, TouIcon } from '@/shared/ui'
+import { useAppearance } from '@/shared/lib/theme'
+import MaterialNavigation from './MaterialNavigation.vue'
+import { destinations } from './destinations'
+
+interface Drag {
+  index: number
+  moved: boolean
+  pointerId: number
+  start: number
+  last: number
+  lastTime: number
+  vertical: boolean
+}
+
+const props = defineProps<{
+  hasAction: boolean
+  accountOpen: boolean
+}>()
+
+const emit = defineEmits<{
+  account: []
+}>()
+
+const accountIndex = destinations.length
+const inset = 4
+let suppressClick = false
+let clickTimer: ReturnType<typeof setTimeout> | undefined
+let stretchTimer: ReturnType<typeof setTimeout> | undefined
 
 const { t } = useI18n()
 const localePath = useLocalePath()
 const route = useRoute()
-const router = useRouter()
+const { design } = useAppearance()
 
-const tabs = [
-  {
-    to: '/',
-    label: 'nav.menu',
-    icon: 'heroicons:calendar-days',
-    iconActive: 'heroicons:calendar-days-solid',
-  },
-  {
-    to: '/dishes',
-    label: 'nav.dishes',
-    icon: 'heroicons:book-open',
-    iconActive: 'heroicons:book-open-solid',
-  },
-  {
-    to: '/shopping',
-    label: 'nav.shopping',
-    icon: 'heroicons:shopping-cart',
-    iconActive: 'heroicons:shopping-cart-solid',
-  },
-] as const
+const bar = useTemplateRef<HTMLElement>('bar')
+const blob = useTemplateRef<HTMLElement>('blob')
+const drag = ref<Drag | null>(null)
+const stretch = ref(0)
 
-const navRef = ref<HTMLElement | null>(null)
-const tabEls: HTMLElement[] = []
-const setTabRef = (el: Element | ComponentPublicInstance | null, i: number) => {
-  if (el instanceof HTMLElement) tabEls[i] = el
+const active = computed(() =>
+  destinations.findIndex(
+    (link) =>
+      localePath(link.to).replace(/\/$/, '') === route.path.replace(/\/$/, ''),
+  ),
+)
+const selection = computed(() =>
+  props.accountOpen
+    ? accountIndex
+    : drag.value?.moved
+      ? drag.value.index
+      : Math.max(0, active.value),
+)
+
+function stretchTo(along: number, across: number) {
+  return drag.value?.vertical
+    ? `scale(${1 + across}, ${1 + along})`
+    : `scale(${1 + along}, ${1 + across})`
 }
 
-const activeIndex = computed(() => {
-  const current = route.path.replace(/\/$/, '')
-  return tabs.findIndex(
-    (tab) => localePath(tab.to).replace(/\/$/, '') === current,
+function onDown(event: PointerEvent) {
+  if (
+    event.button !== 0 ||
+    !event.isPrimary ||
+    (event.target instanceof Element && event.target.closest('button')) ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.shiftKey ||
+    event.altKey
+  )
+    return
+
+  const vertical = window.matchMedia('(min-width: 900px)').matches
+  const start = vertical ? event.clientY : event.clientX
+
+  drag.value = {
+    index: active.value,
+    moved: false,
+    pointerId: event.pointerId,
+    start,
+    last: start,
+    lastTime: event.timeStamp,
+    vertical,
+  }
+}
+
+function onMove(event: PointerEvent) {
+  const current = drag.value
+  const element = bar.value
+  if (!current || !element || current.pointerId !== event.pointerId) return
+
+  const position = current.vertical ? event.clientY : event.clientX
+  if (!current.moved && Math.abs(position - current.start) < 6) return
+
+  if (!current.moved) {
+    element.setPointerCapture(event.pointerId)
+    current.moved = true
+  }
+
+  const rect = element.getBoundingClientRect()
+  const start = current.vertical ? rect.top : rect.left
+  const size = current.vertical ? rect.height : rect.width
+  const tabSize = (size - inset * 2) / (accountIndex + 1)
+
+  current.index = Math.min(
+    Math.max((position - start - inset) / tabSize - 0.5, 0),
+    destinations.length - 1,
+  )
+  stretch.value = Math.min(
+    (Math.abs(position - current.last) /
+      Math.max(event.timeStamp - current.lastTime, 1)) *
+      0.35,
+    0.4,
+  )
+  current.last = position
+  current.lastTime = event.timeStamp
+
+  clearTimeout(stretchTimer)
+  stretchTimer = setTimeout(() => {
+    stretch.value = 0
+  }, 90)
+}
+
+function resetDrag() {
+  drag.value = null
+  stretch.value = 0
+  clearTimeout(stretchTimer)
+}
+
+async function onUp(event: PointerEvent) {
+  const current = drag.value
+  if (current?.pointerId !== event.pointerId) return
+
+  resetDrag()
+  if (!current.moved) return
+
+  suppressClick = true
+  clearTimeout(clickTimer)
+  clickTimer = setTimeout(() => {
+    suppressClick = false
+  }, 0)
+
+  const target = destinations[Math.round(current.index)]
+  if (target) await navigateTo(localePath(target.to))
+}
+
+function onClickCapture(event: MouseEvent) {
+  if (!suppressClick) return
+
+  event.preventDefault()
+  event.stopPropagation()
+}
+
+watch(active, (index, previous) => {
+  if (
+    index < 0 ||
+    previous < 0 ||
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  )
+    return
+
+  const vertical = window.matchMedia('(min-width: 900px)').matches
+  blob.value?.animate(
+    [
+      { transform: 'scale(1)' },
+      {
+        transform: vertical ? 'scale(0.8, 1.35)' : 'scale(1.35, 0.8)',
+        offset: 0.35,
+      },
+      {
+        transform: vertical ? 'scale(1.06, 0.94)' : 'scale(0.94, 1.06)',
+        offset: 0.7,
+      },
+      { transform: 'scale(1)' },
+    ],
+    { duration: 480, easing: 'ease-out' },
   )
 })
 
-const drop = reactive({ x: 0, w: 0, visible: false })
-const isMoving = ref(false)
-const isPressed = ref(false)
-const isDragging = ref(false)
-let moveTimer: ReturnType<typeof setTimeout> | undefined
-
-function snapTo(index: number) {
-  const el = tabEls[index]
-  if (!el) {
-    drop.visible = false
-    return
-  }
-  drop.x = el.offsetLeft
-  drop.w = el.offsetWidth
-  drop.visible = true
-}
-
-function flow() {
-  isMoving.value = true
-  clearTimeout(moveTimer)
-  moveTimer = setTimeout(() => (isMoving.value = false), 450)
-}
-
-watch(activeIndex, (index, previous) => {
-  if (previous !== undefined && previous >= 0 && index >= 0 && !isDragging.value) {
-    flow()
-  }
-  nextTick(() => snapTo(index))
-})
-
-let resizeObserver: ResizeObserver | undefined
-onMounted(() => {
-  nextTick(() => snapTo(activeIndex.value))
-  // Labels change width with the locale; keep the drop sized to its tab.
-  resizeObserver = new ResizeObserver(() => {
-    if (!isDragging.value) snapTo(activeIndex.value)
-  })
-  if (navRef.value) resizeObserver.observe(navRef.value)
-})
 onBeforeUnmount(() => {
-  resizeObserver?.disconnect()
-  clearTimeout(moveTimer)
+  clearTimeout(clickTimer)
+  clearTimeout(stretchTimer)
 })
-
-function go(index: number) {
-  const tab = tabs[index]
-  if (!tab) return
-  if (index === activeIndex.value) {
-    snapTo(index)
-    return
-  }
-  router.push(localePath(tab.to))
-}
-
-/* ---------- Touch: tap a tab, or grab the drop and slide it ---------- */
-let startX = 0
-let startDropX = 0
-let pressedTab = -1
-
-function onPointerDown(e: PointerEvent) {
-  if (e.button !== 0) return
-  const tabEl = (e.target as HTMLElement).closest<HTMLElement>('[data-tab]')
-  pressedTab = tabEl ? Number(tabEl.dataset.tab) : -1
-  isPressed.value = true
-  startX = e.clientX
-  startDropX = drop.x
-  navRef.value?.setPointerCapture(e.pointerId)
-}
-
-function onPointerMove(e: PointerEvent) {
-  if (!isPressed.value) return
-  const dx = e.clientX - startX
-  if (!isDragging.value && Math.abs(dx) > 6 && pressedTab === activeIndex.value) {
-    isDragging.value = true
-  }
-  if (!isDragging.value) return
-  const first = tabEls[0]
-  const last = tabEls[tabEls.length - 1]
-  if (!first || !last) return
-  const min = first.offsetLeft
-  const max = last.offsetLeft + last.offsetWidth - drop.w
-  drop.x = Math.min(max, Math.max(min, startDropX + dx))
-}
-
-function nearestTab(): number {
-  const center = drop.x + drop.w / 2
-  let best = 0
-  let bestDistance = Infinity
-  tabEls.forEach((el, i) => {
-    const d = Math.abs(el.offsetLeft + el.offsetWidth / 2 - center)
-    if (d < bestDistance) {
-      bestDistance = d
-      best = i
-    }
-  })
-  return best
-}
-
-function onPointerUp() {
-  if (!isPressed.value) return
-  const target = isDragging.value ? nearestTab() : pressedTab
-  isPressed.value = false
-  isDragging.value = false
-  if (target >= 0) {
-    flow()
-    go(target)
-  } else {
-    snapTo(activeIndex.value)
-  }
-}
-
-function reset() {
-  if (!isPressed.value && !isDragging.value) return
-  isPressed.value = false
-  if (isDragging.value) {
-    isDragging.value = false
-    snapTo(activeIndex.value)
-  }
-}
-
-// Pointer taps are handled above; a click with detail 0 comes from the keyboard.
-function onKeyboardClick(index: number, e: MouseEvent) {
-  if (e.detail === 0) go(index)
-}
 </script>
 
 <style scoped>
-/* iOS 26 tab bar: a floating capsule of Liquid Glass, icons left of the labels. */
-.tabbar {
+.dock {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--safe-b) + 12px);
+  z-index: 30;
+  transform: translateX(-50%);
   display: flex;
-  align-items: center;
+  gap: 8px;
+  width: min(420px, calc(100% - 24px));
+}
+
+.tabbar {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--nav-count), minmax(0, 1fr));
   height: var(--tabbar);
   padding: 4px;
   border-radius: var(--r-pill);
-  touch-action: pan-y;
+  touch-action: none;
   user-select: none;
   -webkit-user-select: none;
 }
-.tab {
-  position: relative;
-  z-index: 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  height: 100%;
-  padding: 0 13px;
-  border-radius: var(--r-pill);
-  color: rgb(var(--ink));
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-  text-decoration: none;
-  -webkit-tap-highlight-color: transparent;
-  transition: color 0.25s;
-}
-.tab[aria-current='page'] {
-  color: rgb(var(--accent-ink));
-}
-.tab:focus-visible {
-  outline-offset: -2px;
+
+.dock-action {
+  display: none;
 }
 
-/* ---------- The drop ---------- */
-.drop {
+.has-action .dock-action {
+  display: block;
+  flex: none;
+}
+
+.lens {
   position: absolute;
   top: 4px;
   bottom: 4px;
-  left: 0;
-  z-index: 3;
-  width: var(--w);
-  translate: var(--x) 0;
-  border-radius: var(--r-pill);
+  left: 4px;
+  z-index: 1;
+  width: calc((100% - 8px) / var(--nav-count));
+  transform: translateX(calc(var(--selection) * 100%));
+  transition: transform 0.5s cubic-bezier(0.3, 1.35, 0.5, 1);
   pointer-events: none;
-  background: rgb(var(--fill) / 0.14);
-  -webkit-backdrop-filter: blur(2px) saturate(160%);
-  backdrop-filter: blur(2px) saturate(160%);
+}
+
+.is-dragging .lens {
+  transition: none;
+}
+
+.blob {
+  display: block;
+  height: 100%;
+  border-radius: var(--r-pill);
+  background: color-mix(in srgb, rgb(var(--accent)) 16%, var(--well));
+  transition:
+    transform 0.25s cubic-bezier(0.3, 1.5, 0.5, 1),
+    background 0.2s,
+    box-shadow 0.2s;
+}
+
+.is-dragging .blob {
+  scale: 1.12;
+  background: rgb(255 255 255 / 0.35);
   box-shadow:
-    inset 0 0 8px rgb(255 255 255 / 0.25),
-    0 4px 14px rgb(0 0 0 / 0.08);
+    inset 0 0.5px 0 var(--glass-rim),
+    0 0 0 0.5px var(--glass-line),
+    0 6px 18px rgb(0 0 0 / 0.14);
   transition:
-    translate 0.55s cubic-bezier(0.3, 1.3, 0.5, 1),
-    width 0.55s cubic-bezier(0.3, 1.3, 0.5, 1),
-    scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
-    background-color 0.25s;
+    transform 0.12s ease-out,
+    background 0.2s,
+    box-shadow 0.2s,
+    scale 0.2s;
 }
-.drop[data-liquid] {
-  background: rgb(255 255 255 / 0.08);
+
+:global(.dark) .is-dragging .blob {
+  background: rgb(255 255 255 / 0.12);
 }
-:global(.dark) .drop[data-liquid] {
-  background: rgb(255 255 255 / 0.06);
+
+.nav-link {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  border-radius: var(--r-pill);
+  font-size: 10px;
+  font-weight: 600;
+  color: rgb(var(--ink));
+  transition: color 0.2s;
 }
-/* Under a finger the drop swells past the bar, like iOS. */
-.drop.is-pressed {
-  scale: 1.16 1.22;
-  background: rgb(255 255 255 / 0.18);
+
+.account-link {
+  width: 100%;
+  height: 100%;
+  padding: 0;
 }
-.drop.is-dragging {
-  transition:
-    width 0.3s ease,
-    scale 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+.nav-icon {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  transition: transform 0.25s cubic-bezier(0.3, 1.5, 0.5, 1);
 }
-/* In flight it stretches along the bar and settles with a wobble. */
-.drop.is-moving:not(.is-pressed) {
-  animation: drop-flow 0.5s cubic-bezier(0.3, 1.2, 0.5, 1);
+
+.nav-link:is(.is-active, [aria-expanded='true']) {
+  color: rgb(var(--accent-ink));
 }
-@keyframes drop-flow {
-  0% {
-    scale: 1;
+
+.is-dragging .nav-link.is-active .nav-icon {
+  transform: scale(1.12);
+}
+
+@media (min-width: 900px) {
+  .dock {
+    left: max(16px, calc((100% - var(--content-max)) / 2 + 16px));
+    top: calc(var(--safe-t) + 16px);
+    bottom: auto;
+    transform: none;
+    width: var(--sidebar);
+    flex-direction: column;
   }
-  30% {
-    scale: 1.22 0.84;
+
+  .tabbar {
+    flex: none;
+    height: auto;
+    grid-template-columns: 1fr;
+    grid-auto-rows: var(--tap);
+    border-radius: var(--r-lg);
   }
-  65% {
-    scale: 0.95 1.06;
+
+  .lens {
+    right: 4px;
+    bottom: auto;
+    width: auto;
+    height: var(--tap);
+    transform: translateY(calc(var(--selection) * 100%));
   }
-  100% {
-    scale: 1;
+
+  .blob,
+  .nav-link {
+    border-radius: var(--r);
+  }
+
+  .nav-link {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 0 12px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .nav-icon {
+    width: 19px;
+    height: 19px;
+  }
+}
+.material-dock {
+  inset: auto 0 0;
+  transform: none;
+  width: 100%;
+  background: var(--md-surface-container);
+  box-shadow: 0 -1px 0 var(--md-outline-variant);
+}
+
+.material-dock .dock-action {
+  position: absolute;
+  right: 16px;
+  bottom: calc(100% + 16px);
+}
+
+@media (min-width: 600px) {
+  .material-dock {
+    inset: 0 auto 0 0;
+    width: var(--md-rail-width);
+    flex-direction: column;
+    align-items: center;
+    padding: calc(var(--safe-t) + 16px) 0 var(--safe-b);
+    gap: 16px;
+    box-shadow: 1px 0 0 var(--md-outline-variant);
+  }
+
+  .material-dock .dock-action {
+    position: static;
+    order: -1;
+  }
+}
+
+@media (min-width: 1200px) {
+  .material-dock {
+    align-items: stretch;
+  }
+
+  .material-dock .dock-action {
+    padding-inline: 16px;
   }
 }
 </style>

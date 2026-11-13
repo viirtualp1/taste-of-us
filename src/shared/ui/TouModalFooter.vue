@@ -1,15 +1,15 @@
 <template>
-  <div class="flex gap-2.5 px-4 pt-3 pb-4 sm:px-5 sm:pb-5">
+  <footer class="flex gap-2.5 px-4 pt-3 pb-4 sm:px-5 sm:pb-5">
     <button
       type="button"
-      class="btn flex-1 h-[50px]! text-[17px]!"
+      class="btn modal-dismiss flex-1 min-h-11"
       @click="$emit('cancel')"
     >
       {{ cancelLabel }}
     </button>
     <button
       type="button"
-      class="btn btn--primary flex-1 h-[50px]! text-[17px]!"
+      class="btn btn--primary flex-1 min-h-11"
       :disabled="loading || confirmDisabled"
       @click="$emit('confirm')"
     >
@@ -19,7 +19,7 @@
       </span>
       <span v-else>{{ confirmLabel }}</span>
     </button>
-  </div>
+  </footer>
 </template>
 
 <script setup lang="ts">

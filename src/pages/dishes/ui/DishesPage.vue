@@ -1,29 +1,16 @@
 <template>
   <div>
-    <PageHeader :title="t('dishes.title')" :subtitle="t('dishes.subtitle')">
-      <template #actions>
-        <button
-          v-glass="{ bezel: 12, refraction: 10 }"
-          type="button"
-          class="icon-btn icon-btn--sm glass glass-press"
-          :aria-label="t('common.import')"
-          :title="t('common.import')"
-          @click="openImportModal"
-        >
-          <Icon name="heroicons:arrow-down-tray" class="w-5 h-5" />
-        </button>
-      </template>
-    </PageHeader>
+    <h1 class="sr-only">{{ t('dishes.title') }}</h1>
 
-    <div class="grid gap-6 lg:grid-cols-3 lg:items-start">
+    <div class="dish-grid grid items-start gap-6">
       <section
         v-for="category in categories"
         :key="category.key"
         class="min-w-0"
       >
-        <div class="flex items-center justify-between gap-2 px-1 pb-3">
+        <div class="section-label">
           <div class="flex items-center gap-2 min-w-0">
-            <h2 class="text-[22px] font-bold leading-tight truncate">
+            <h2 class="truncate">
               {{ category.label }}
             </h2>
             <TouBadge>{{ userDishes[category.key]?.length || 0 }}</TouBadge>
@@ -34,8 +21,8 @@
               class="icon-btn icon-btn--sm transition-colors"
               :class="
                 activeSearchCategory === category.key
-                  ? 'bg-green-500/15 text-green-700'
-                  : 'text-green-700'
+                  ? 'bg-primary/15 text-accent-foreground'
+                  : 'text-accent-foreground'
               "
               :aria-pressed="activeSearchCategory === category.key"
               :aria-label="t('dishes.searchPlaceholder')"
@@ -44,21 +31,24 @@
                   activeSearchCategory === category.key ? null : category.key
               "
             >
-              <Icon name="heroicons:magnifying-glass-20-solid" class="w-5 h-5" />
+              <TouIcon
+                name="heroicons:magnifying-glass-20-solid"
+                class="w-5 h-5"
+              />
             </button>
             <button
               type="button"
-              class="icon-btn icon-btn--sm text-green-700"
+              class="icon-btn icon-btn--sm text-accent-foreground"
               :aria-label="t('dishes.addDish')"
               @click="openAddDishModal(category.key)"
             >
-              <Icon name="heroicons:plus-circle-solid" class="w-7 h-7" />
+              <TouIcon name="heroicons:plus-circle-solid" class="w-7 h-7" />
             </button>
           </div>
         </div>
 
         <div v-if="activeSearchCategory === category.key" class="mb-3 relative">
-          <Icon
+          <TouIcon
             name="heroicons:magnifying-glass-20-solid"
             class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
           />
@@ -66,7 +56,7 @@
             v-model="searchQueries[category.key]"
             type="search"
             :placeholder="t('dishes.searchPlaceholder')"
-            class="field h-9! pl-9! pr-9! text-[15px]"
+            class="field h-9! pl-9! pr-9! text-ios"
           />
           <button
             v-if="searchQueries[category.key]"
@@ -75,7 +65,7 @@
             aria-label="Clear"
             @click="searchQueries[category.key] = ''"
           >
-            <Icon name="heroicons:x-mark-20-solid" class="w-3.5 h-3.5" />
+            <TouIcon name="heroicons:x-mark-20-solid" class="w-3.5 h-3.5" />
           </button>
         </div>
 
@@ -102,18 +92,18 @@
             >
               <button
                 type="button"
-                class="flex-1 min-w-0 py-1.5 text-left text-[17px] truncate"
+                class="flex-1 min-w-0 py-1.5 text-left text-ios-body truncate"
                 @click="openEditDishModal(dish)"
               >
                 {{ dish.name }}
               </button>
               <button
                 type="button"
-                class="grid place-items-center w-9 h-9 rounded-full text-gray-400 hover:text-green-700 hover:bg-gray-500/10 transition-colors"
+                class="grid place-items-center w-9 h-9 rounded-full text-gray-400 hover:text-accent-foreground hover:bg-gray-500/10 transition-colors"
                 :aria-label="t('common.edit')"
                 @click="openEditDishModal(dish)"
               >
-                <Icon name="heroicons:pencil-square" class="w-[18px] h-[18px]" />
+                <TouIcon name="heroicons:pencil-square" class="size-4.5" />
               </button>
               <button
                 type="button"
@@ -121,7 +111,7 @@
                 :aria-label="`× ${dish.name}`"
                 @click="confirmDeleteDish(dish)"
               >
-                <Icon name="heroicons:trash" class="w-[18px] h-[18px]" />
+                <TouIcon name="heroicons:trash" class="size-4.5" />
               </button>
             </div>
             <button
@@ -130,7 +120,7 @@
                 !searchQueries[category.key].trim()
               "
               type="button"
-              class="list-row justify-center text-[15px] text-green-700"
+              class="list-row justify-center text-ios text-accent-foreground"
               @click="
                 expandedCategories[category.key] =
                   !expandedCategories[category.key]
@@ -140,14 +130,21 @@
                 expandedCategories[category.key]
                   ? t('dishes.showLess')
                   : t('dishes.showAll', {
-                    count: userDishes[category.key]?.length - 5,
-                  })
+                      count: userDishes[category.key]?.length - 5,
+                    })
               }}
             </button>
           </div>
         </template>
       </section>
     </div>
+
+    <footer class="mt-6 flex justify-end">
+      <TouButton type="button" variant="secondary" @click="openImportModal">
+        <TouIcon name="heroicons:arrow-down-tray" class="size-5" />
+        {{ t('common.import') }}
+      </TouButton>
+    </footer>
 
     <dish-form-modal
       :is-open="isDishModalOpen"
@@ -165,8 +162,6 @@
 </template>
 
 <script setup lang="ts">
-import { vGlass } from '@/shared/lib/liquid-glass'
-import { ref } from 'vue'
 import { useAuth, useApiFetch, useRequireAuth } from '@/entities/user'
 import {
   useUserDishes,
@@ -176,13 +171,14 @@ import {
 } from '@/entities/menu'
 import { DishFormModal } from '@/features/dish/manage-dish'
 import { ImportDishesModal } from '@/features/dish/import-dishes'
-import { TouSkeleton, TouBadge, TouEmptyState } from '@/shared/ui'
-import { PageHeader } from '@/widgets/page-header'
-import { getApiErrorMessage } from '@/shared/lib/utils/apiError'
-
-definePageMeta({
-  layout: 'default',
-})
+import {
+  TouButton,
+  TouIcon,
+  TouSkeleton,
+  TouBadge,
+  TouEmptyState,
+} from '@/shared/ui'
+import { getApiErrorMessage } from '@/shared/lib/utils'
 
 const { t } = useI18n()
 const localePath = useLocalePath()
@@ -220,9 +216,9 @@ const activeSearchCategory = ref<MenuCategory | null>(null)
 
 function displayedDishes(category: MenuCategory) {
   const q = searchQueries.value[category].trim().toLowerCase()
-  const base = (userDishes.value[category] || []).slice().sort((a, b) =>
-    a.name.localeCompare(b.name),
-  )
+  const base = (userDishes.value[category] || [])
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name))
   const filtered = q
     ? base.filter((dish) => dish.name.toLowerCase().includes(q))
     : base
@@ -282,3 +278,17 @@ async function confirmDeleteDish(dish: Dish) {
   }
 }
 </script>
+
+<style scoped>
+@media (min-width: 600px) {
+  .dish-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .dish-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+</style>

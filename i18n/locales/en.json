@@ -31,12 +31,15 @@
     "dash": "—"
   },
   "locale": {
+    "language": "Language",
     "chooseTitle": "Choose your language",
     "chooseDescription": "Select the language you'd like to use in Taste of Us. You can change it anytime.",
     "english": "English",
     "russian": "Русский"
   },
   "nav": {
+    "account": "Account",
+    "sections": "Sections",
     "menu": "Menu",
     "sendMenu": "Send Menu",
     "dishes": "Dishes",
@@ -162,6 +165,12 @@
     "itemNamePlaceholder": "Enter item name",
     "quantityOptional": "Quantity (Optional)",
     "quantityExample": "e.g. 500g, 1kg"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "automatic": "Automatic",
+    "glass": "Liquid Glass",
+    "material": "Material 3"
   },
   "profile": {
     "title": "Profile Settings",

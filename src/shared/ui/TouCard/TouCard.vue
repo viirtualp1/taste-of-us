@@ -1,7 +1,5 @@
 <template>
-  <div
-    :class="cn('surface rounded-[22px]', props.class)"
-  >
+  <div :class="cn('surface rounded-lg', props.class)">
     <slot />
   </div>
 </template>

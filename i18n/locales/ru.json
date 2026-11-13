@@ -31,12 +31,15 @@
     "dash": "—"
   },
   "locale": {
+    "language": "Язык",
     "chooseTitle": "Выберите язык",
     "chooseDescription": "Выберите язык для Taste of Us. Его можно изменить в любой момент.",
     "english": "English",
     "russian": "Русский"
   },
   "nav": {
+    "account": "Аккаунт",
+    "sections": "Разделы",
     "menu": "Меню",
     "sendMenu": "Отправить меню",
     "dishes": "Блюда",
@@ -162,6 +165,12 @@
     "itemNamePlaceholder": "Введите название",
     "quantityOptional": "Количество (необязательно)",
     "quantityExample": "напр. 500г, 1кг"
+  },
+  "appearance": {
+    "title": "Оформление",
+    "automatic": "Автоматически",
+    "glass": "Жидкое стекло",
+    "material": "Material 3"
   },
   "profile": {
     "title": "Настройки профиля",

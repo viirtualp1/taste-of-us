@@ -1,16 +1,18 @@
 <template>
   <button
     type="button"
+    class="tou-icon-button"
     :class="cn(baseClasses, variantClasses, sizeClasses, props.class)"
     :disabled="disabled"
     v-bind="$attrs"
   >
-    <Icon v-if="icon" :name="icon" :class="iconSizeClasses" />
+    <TouIcon v-if="icon" :name="icon" :class="iconSizeClasses" />
     <slot />
   </button>
 </template>
 
 <script setup lang="ts">
+import TouIcon from './TouIcon.vue'
 import { computed } from 'vue'
 import { cn } from '@/shared/lib/utils'
 
@@ -35,20 +37,20 @@ const baseClasses =
   'shrink-0 inline-flex items-center justify-center rounded-full transition-[transform,background-color] duration-150 active:scale-[0.92] disabled:opacity-40 disabled:cursor-not-allowed'
 
 const variantClassesMap = {
-  ghost: 'text-green-700 hover:bg-gray-500/10',
+  ghost: 'text-accent-foreground hover:bg-gray-500/10',
   close: 'bg-gray-500/[0.14] text-gray-500 hover:bg-gray-500/20',
   danger: 'text-red-500 hover:bg-red-500/10',
 }
 
 const sizeClassesMap = {
-  sm: 'w-[30px] h-[30px]',
+  sm: 'size-7.5',
   md: 'w-9 h-9',
   lg: 'w-11 h-11',
 }
 
 const iconSizeMap = {
   sm: 'w-4 h-4',
-  md: 'w-[18px] h-[18px]',
+  md: 'size-4.5',
   lg: 'w-5 h-5',
 }
 

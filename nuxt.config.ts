@@ -6,6 +6,15 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
 
+  app: {
+    head: {
+      link: [
+        { rel: 'manifest', href: '/manifest.webmanifest' },
+        { rel: 'apple-touch-icon', href: '/pwa-192.png' },
+      ],
+    },
+  },
+
   alias: {
     '@': fileURLToPath(new URL('./src', import.meta.url)),
   },

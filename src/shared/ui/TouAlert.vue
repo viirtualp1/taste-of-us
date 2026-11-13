@@ -1,12 +1,21 @@
 <template>
-  <div :class="cn('rounded-[14px] p-3.5', containerClass, props.class)">
+  <div
+    :class="
+      cn(
+        'tou-alert rounded-lg p-3.5',
+        `tou-alert--${props.variant}`,
+        containerClass,
+        props.class,
+      )
+    "
+  >
     <div v-if="icon" class="flex items-start gap-3">
-      <Icon :name="icon" :class="cn('w-5 h-5 shrink-0 mt-0.5', iconClass)" />
+      <TouIcon :name="icon" :class="cn('w-5 h-5 shrink-0 mt-0.5', iconClass)" />
       <div class="flex-1 min-w-0">
         <h3 v-if="title" :class="cn('text-sm font-semibold mb-2', titleClass)">
           {{ title }}
         </h3>
-        <div :class="cn('text-xs', bodyClass)">
+        <div :class="cn('tou-alert-body text-xs', bodyClass)">
           <slot />
         </div>
       </div>
@@ -15,7 +24,7 @@
       <h3 v-if="title" :class="cn('text-sm font-semibold mb-1', titleClass)">
         {{ title }}
       </h3>
-      <div :class="cn('text-sm', bodyClass)">
+      <div :class="cn('tou-alert-body text-sm', bodyClass)">
         <slot />
       </div>
     </template>
@@ -23,6 +32,7 @@
 </template>
 
 <script setup lang="ts">
+import TouIcon from './TouIcon.vue'
 import { computed } from 'vue'
 import { cn } from '@/shared/lib/utils'
 

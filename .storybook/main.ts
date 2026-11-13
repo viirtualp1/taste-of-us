@@ -6,6 +6,7 @@ import type { StorybookConfig } from '@storybook/vue3-vite'
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(ts|tsx|js|jsx)'],
   addons: ['@storybook/addon-docs'],
+  staticDirs: [{ from: '../public/fonts', to: '/fonts' }],
   framework: {
     name: '@storybook/vue3-vite',
     options: {},

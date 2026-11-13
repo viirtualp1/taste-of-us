@@ -1,13 +1,13 @@
 <template>
-  <section class="surface rounded-[22px] p-3 sm:p-4">
+  <section class="week-calendar surface rounded-lg p-3 sm:p-4">
     <div class="flex items-center justify-between gap-2 pl-2 pb-2">
       <label class="relative flex items-center gap-1.5 min-w-0 cursor-pointer">
-        <span class="text-[17px] font-semibold truncate">
+        <span class="text-ios-body font-semibold truncate">
           {{ t('week.weekOf', { label: weekLabel }) }}
         </span>
-        <Icon
+        <TouIcon
           name="heroicons:chevron-down-20-solid"
-          class="w-4 h-4 text-green-700 shrink-0"
+          class="w-4 h-4 text-accent-foreground shrink-0"
         />
         <!-- Native date picker sits invisibly over the title, as a tappable menu. -->
         <input
@@ -21,19 +21,19 @@
       <div class="flex items-center gap-1 shrink-0">
         <button
           type="button"
-          class="icon-btn icon-btn--sm text-green-700"
+          class="icon-btn icon-btn--sm text-accent-foreground"
           :aria-label="t('common.prev')"
           @click="$emit('prev-week')"
         >
-          <Icon name="heroicons:chevron-left-20-solid" class="w-5 h-5" />
+          <TouIcon name="heroicons:chevron-left-20-solid" class="w-5 h-5" />
         </button>
         <button
           type="button"
-          class="icon-btn icon-btn--sm text-green-700"
+          class="icon-btn icon-btn--sm text-accent-foreground"
           :aria-label="t('common.next')"
           @click="$emit('next-week')"
         >
-          <Icon name="heroicons:chevron-right-20-solid" class="w-5 h-5" />
+          <TouIcon name="heroicons:chevron-right-20-solid" class="w-5 h-5" />
         </button>
       </div>
     </div>
@@ -59,8 +59,13 @@
 </template>
 
 <script setup lang="ts">
-import type { WeekDay } from '@/shared/lib/utils/date'
-import { getDayCount, type MenuSelection, useMenuTranslations } from '@/entities/menu'
+import { TouIcon } from '@/shared/ui'
+import type { WeekDay } from '@/shared/lib/utils'
+import {
+  getDayCount,
+  type MenuSelection,
+  useMenuTranslations,
+} from '@/entities/menu'
 
 interface Props {
   weekLabel: string
@@ -72,9 +77,6 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const { t } = useI18n()
-const { categories, getDayLabel } = useMenuTranslations()
-
 const emit = defineEmits<{
   'prev-week': []
   'next-week': []
@@ -82,13 +84,16 @@ const emit = defineEmits<{
   'week-input-change': [event: Event]
 }>()
 
-const status = (dayIndex: number) => {
+const { t } = useI18n()
+const { categories, getDayLabel } = useMenuTranslations()
+
+function status(dayIndex: number) {
   const count = getDayCount(dayIndex, props.selectedMenu, categories.value)
   if (count === 0) return 'empty'
   return count === categories.value.length ? 'complete' : 'partial'
 }
 
-const onInputChange = (event: Event) => {
+function onInputChange(event: Event) {
   emit('week-input-change', event)
 }
 </script>

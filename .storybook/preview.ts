@@ -21,6 +21,18 @@ setup((app) => {
 })
 
 const preview: Preview = {
+  globalTypes: {
+    design: {
+      description: 'Taste of Us design system',
+      toolbar: {
+        icon: 'paintbrush',
+        items: [
+          { value: 'glass', title: 'Liquid Glass' },
+          { value: 'material', title: 'Material 3' },
+        ],
+      },
+    },
+  },
   parameters: {
     controls: {
       matchers: { color: /(background|color)$/i, date: /Date$/i },
@@ -34,6 +46,7 @@ const preview: Preview = {
     },
   },
   initialGlobals: {
+    design: 'glass',
     backgrounds: { value: 'app' },
   },
   decorators: [
@@ -41,7 +54,12 @@ const preview: Preview = {
       // Flip the app's `.dark` palette together with the Dark background.
       const isDark = context.globals.backgrounds?.value === 'dark'
       document.documentElement.classList.toggle('dark', isDark)
-      return { components: { story }, template: '<div class="p-6"><story /></div>' }
+      document.documentElement.dataset.design =
+        context.globals.design === 'material' ? 'material' : 'glass'
+      return {
+        components: { story },
+        template: '<div class="p-6"><story /></div>',
+      }
     },
   ],
 }

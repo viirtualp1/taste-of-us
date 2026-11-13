@@ -1,21 +1,21 @@
 <template>
   <section class="min-w-0">
-    <div class="flex items-center justify-between gap-3 px-1 pb-3">
-      <h2 class="text-[22px] font-bold leading-tight truncate">
+    <div class="section-label">
+      <h2 class="truncate">
         {{ t('shopping.thisWeek') }}
       </h2>
       <div class="flex items-center gap-1 shrink-0">
         <button
           type="button"
-          class="icon-btn icon-btn--sm text-green-700"
+          class="icon-btn icon-btn--sm text-accent-foreground"
           :aria-label="t('shopping.addItemTitle')"
           @click="isAddModalOpen = true"
         >
-          <Icon name="heroicons:plus-circle-solid" class="w-7 h-7" />
+          <TouIcon name="heroicons:plus-circle-solid" class="w-7 h-7" />
         </button>
         <button
           type="button"
-          class="btn btn--sm bg-transparent! px-2! text-green-700 font-normal text-[15px]"
+          class="btn btn--sm bg-transparent! px-2! text-accent-foreground font-normal text-ios"
           @click="navigateToShopping"
         >
           {{ t('shopping.viewAll') }}
@@ -25,20 +25,20 @@
 
     <div v-if="isLoading" class="list">
       <div v-for="i in 3" :key="i" class="list-row">
-        <tou-skeleton class="h-[22px] w-[22px] rounded-full!" />
+        <tou-skeleton class="size-5.5 rounded-full!" />
         <tou-skeleton class="h-4 w-32" />
       </div>
     </div>
 
     <div v-else-if="items.length === 0" class="list">
       <div class="flex flex-col items-center gap-2 py-8 px-4 text-center">
-        <Icon name="heroicons:shopping-cart" class="w-8 h-8 text-gray-400" />
-        <p class="text-[15px] text-muted-foreground">{{ t('shopping.empty') }}</p>
+        <TouIcon name="heroicons:shopping-cart" class="w-8 h-8 text-gray-400" />
+        <p class="text-ios text-muted-foreground">{{ t('shopping.empty') }}</p>
       </div>
     </div>
 
     <template v-else>
-      <div class="list" style="--row-inset: 50px">
+      <div class="list shopping-list">
         <ShoppingItem
           v-for="item in previewItems"
           :key="item.id"
@@ -106,6 +106,7 @@
 import { computed, ref, toRef } from 'vue'
 import { useRouter } from 'vue-router'
 import {
+  TouIcon,
   BottomSheet,
   TouSkeleton,
   TouFieldLabel,

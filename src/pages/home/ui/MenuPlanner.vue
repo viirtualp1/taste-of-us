@@ -1,14 +1,6 @@
 <template>
-  <div
-    class="grid grid-cols-1 lg:grid-cols-[minmax(0,1.6fr)_minmax(280px,1fr)] lg:grid-rows-[auto_1fr] gap-x-6 gap-y-6 min-w-0 w-full"
-  >
-    <div
-      class="min-h-0 min-w-0 order-4 lg:order-0 lg:col-start-2 lg:row-start-1 lg:row-span-2"
-    >
-      <shopping-list-preview :week-start="weekStart" />
-    </div>
-
-    <div class="min-h-0 min-w-0 order-2 lg:order-0 lg:col-start-1 lg:row-start-1">
+  <div class="page-columns planner-grid">
+    <div class="planner-week min-w-0">
       <week-selector-skeleton v-if="isPageLoading" />
       <week-selector
         v-else
@@ -24,7 +16,7 @@
       />
     </div>
 
-    <div class="min-h-0 min-w-0 order-3 lg:order-0 lg:col-start-1 lg:row-start-2">
+    <div class="planner-day min-w-0">
       <day-card-skeleton v-if="isPageLoading || !weekDays[activeDayIndex]" />
       <day-card
         v-else-if="weekDays[activeDayIndex]"
@@ -41,6 +33,10 @@
       />
     </div>
 
+    <div class="planner-shopping min-w-0">
+      <shopping-list-preview :week-start="weekStart" />
+    </div>
+
     <TouToast :message="message" :type="messageType" />
     <action-buttons :is-sending="isSending" @send="handleShowConfirm" />
     <confirm-menu-modal
@@ -55,7 +51,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
 import {
   useWeekNavigation,
   useMenuSchedule,
@@ -66,6 +61,7 @@ import {
   useMenuTranslations,
 } from '@/entities/menu'
 import { useTelegram, useApiFetch } from '@/entities/user'
+import { useProfileSettingsRevision } from '@/features/profile/settings'
 import { useMenuSelection } from '@/features/menu/send-menu'
 import { ShoppingListPreview } from '@/widgets/shopping-item'
 import { WeekSelectorSkeleton, WeekSelector } from '@/widgets/week-selector'
@@ -74,12 +70,19 @@ import { TouToast } from '@/shared/ui'
 import { ActionButtons } from '@/widgets/action-buttons'
 import { ConfirmMenuModal } from '@/features/menu/confirm-menu'
 
+let toastClearTimer: ReturnType<typeof setTimeout> | null = null
+let dayFocusTimer: ReturnType<typeof setTimeout> | undefined
+
 const { t } = useI18n()
+const settingsRevision = useProfileSettingsRevision()
 const { categories } = useMenuTranslations()
 const { apiFetch } = useApiFetch()
 const { isAuthenticated, hapticFeedback } = useTelegram()
-const { allDishes, isLoading: isDishesLoading, load: loadUserDishes } =
-  useUserDishes(apiFetch, isAuthenticated)
+const {
+  allDishes,
+  isLoading: isDishesLoading,
+  load: loadUserDishes,
+} = useUserDishes(apiFetch, isAuthenticated)
 
 const {
   weekStart,
@@ -95,27 +98,23 @@ const {
   onWeekInputChange,
 } = useWeekNavigation()
 
-const { selectedMenu, isLoading: isScheduleLoading, loadSchedule, saveSchedule } =
-  useMenuSchedule(apiFetch, weekStart, isClient, weekDays)
-
 const {
-  isSending,
-  message,
-  messageType,
-  updateMenu,
-  updateCook,
-  sendMenu,
-} = useMenuSelection(selectedMenu, weekDays)
+  selectedMenu,
+  isLoading: isScheduleLoading,
+  loadSchedule,
+  saveSchedule,
+} = useMenuSchedule(apiFetch, weekStart, isClient, weekDays)
 
+const { isSending, message, messageType, updateMenu, updateCook, sendMenu } =
+  useMenuSelection(selectedMenu, weekDays)
+
+const isConfirmModalOpen = ref(false)
+const initialSelectedMenu = ref<MenuSelection[]>([])
 const isPageLoading = computed(
   () => isScheduleLoading.value || isDishesLoading.value,
 )
 
-const isConfirmModalOpen = ref(false)
-const initialSelectedMenu = ref<MenuSelection[]>([])
-let toastClearTimer: ReturnType<typeof setTimeout> | null = null
-
-const showToast = (msg: string) => {
+function showToast(msg: string) {
   if (toastClearTimer) clearTimeout(toastClearTimer)
   message.value = msg
   messageType.value = 'error'
@@ -125,7 +124,7 @@ const showToast = (msg: string) => {
   }, 4000)
 }
 
-const handleShowConfirm = () => {
+function handleShowConfirm() {
   const hasAnyDish = selectedMenu.value.some((day) => {
     if (!day) return false
     return !!(day.brunch || day.dinner || day.dessert)
@@ -153,21 +152,21 @@ const handleShowConfirm = () => {
   hapticFeedback.light()
 }
 
-const closeConfirmModal = () => {
+function closeConfirmModal() {
   isConfirmModalOpen.value = false
 }
 
-const handleConfirmSend = async () => {
+async function handleConfirmSend() {
   isConfirmModalOpen.value = false
   await sendMenu(saveSchedule)
   hapticFeedback.success()
 }
 
-const handleMenuUpdate = (
+function handleMenuUpdate(
   dayIndex: number,
   category: MenuCategory,
   value: string,
-) => {
+) {
   updateMenu(dayIndex, category, value)
 
   const currentMenu = selectedMenu.value[dayIndex]
@@ -186,9 +185,12 @@ const handleMenuUpdate = (
   )
 
   if (nextIncompleteDay !== null) {
-    setTimeout(() => focusDay(nextIncompleteDay), 300)
+    clearTimeout(dayFocusTimer)
+    dayFocusTimer = setTimeout(() => focusDay(nextIncompleteDay), 300)
   }
 }
+
+watch(settingsRevision, loadSchedule)
 
 onMounted(async () => {
   initialize()
@@ -198,7 +200,26 @@ onMounted(async () => {
   ) as MenuSelection[]
 })
 
-defineExpose({
-  reloadSchedule: loadSchedule,
+onBeforeUnmount(() => {
+  clearTimeout(toastClearTimer ?? undefined)
+  clearTimeout(dayFocusTimer)
 })
 </script>
+
+<style scoped>
+@media (min-width: 900px) {
+  .planner-grid {
+    grid-template-areas: 'week shopping' 'day shopping';
+  }
+
+  .planner-week {
+    grid-area: week;
+  }
+  .planner-day {
+    grid-area: day;
+  }
+  .planner-shopping {
+    grid-area: shopping;
+  }
+}
+</style>

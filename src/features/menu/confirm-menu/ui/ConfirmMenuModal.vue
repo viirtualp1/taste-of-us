@@ -14,10 +14,12 @@
         <div class="list list--icons">
           <div v-for="meal in meals" :key="meal.key" class="list-row py-2.5!">
             <span class="row-icon" :style="{ background: meal.color }">
-              <Icon :name="meal.icon" class="w-[18px] h-[18px]" />
+              <TouIcon :name="meal.icon" class="w-[18px] h-[18px]" />
             </span>
             <span class="flex-1 min-w-0">
-              <span class="block text-[13px] leading-tight text-muted-foreground">
+              <span
+                class="block text-[13px] leading-tight text-muted-foreground"
+              >
                 {{ t(`menu.categories.${meal.key}`) }}
               </span>
               <span
@@ -49,7 +51,7 @@
 </template>
 
 <script setup lang="ts">
-import { BottomSheet, TouModalFooter } from '@/shared/ui'
+import { TouIcon, BottomSheet, TouModalFooter } from '@/shared/ui'
 import type { MenuCategory, MenuSelection } from '@/entities/menu'
 import type { WeekDay } from '@/shared/lib/utils/date'
 
@@ -77,9 +79,24 @@ const meals: {
   color: string
   emptyKey: string
 }[] = [
-  { key: 'brunch', icon: 'heroicons:sun-solid', color: '#ffcc00', emptyKey: 'menu.noBrunch' },
-  { key: 'dinner', icon: 'heroicons:moon-solid', color: '#5856d6', emptyKey: 'menu.noDinner' },
-  { key: 'dessert', icon: 'heroicons:cake-solid', color: '#ff2d55', emptyKey: 'menu.noDessert' },
+  {
+    key: 'brunch',
+    icon: 'heroicons:sun-solid',
+    color: '#ffcc00',
+    emptyKey: 'menu.noBrunch',
+  },
+  {
+    key: 'dinner',
+    icon: 'heroicons:moon-solid',
+    color: '#5856d6',
+    emptyKey: 'menu.noDinner',
+  },
+  {
+    key: 'dessert',
+    icon: 'heroicons:cake-solid',
+    color: '#ff2d55',
+    emptyKey: 'menu.noDessert',
+  },
 ]
 
 const handleEdit = () => {

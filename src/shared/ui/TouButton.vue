@@ -1,6 +1,15 @@
 <template>
   <button
-    :class="cn(baseClasses, variantClasses, sizeClasses, props.class)"
+    class="tou-button"
+    :class="
+      cn(
+        baseClasses,
+        variantClasses,
+        sizeClasses,
+        `tou-button--${props.variant}`,
+        props.class,
+      )
+    "
     :disabled="disabled"
     v-bind="$attrs"
   >
@@ -14,12 +23,7 @@ import { cn } from '@/shared/lib/utils'
 
 interface Props {
   variant?:
-    | 'default'
-    | 'destructive'
-    | 'outline'
-    | 'secondary'
-    | 'ghost'
-    | 'link'
+    'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link'
   size?: 'default' | 'sm' | 'lg' | 'icon'
   disabled?: boolean
   class?: string
@@ -39,16 +43,16 @@ const baseClasses =
 const variantClassesMap = {
   default: 'bg-primary text-primary-foreground',
   destructive: 'bg-red-500/12 text-red-500',
-  outline: 'bg-green-500/15 text-green-700',
+  outline: 'bg-primary/15 text-accent-foreground',
   secondary: 'bg-gray-500/12 text-foreground',
-  ghost: 'text-green-700 hover:bg-gray-500/10',
-  link: 'text-green-700 underline-offset-4 hover:underline',
+  ghost: 'text-accent-foreground hover:bg-gray-500/10',
+  link: 'text-accent-foreground underline-offset-4 hover:underline',
 }
 
 const sizeClassesMap = {
-  default: 'h-11 px-5 text-[15px]',
-  sm: 'h-[34px] px-3.5 text-sm',
-  lg: 'h-[50px] px-6 text-[17px]',
+  default: 'h-11 px-5 text-ios',
+  sm: 'h-8.5 px-3.5 text-sm',
+  lg: 'h-12.5 px-6 text-ios-body',
   icon: 'h-11 w-11',
 }
 

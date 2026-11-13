@@ -24,13 +24,10 @@
         >
           <div
             v-if="modelValue"
-            v-glass="{ bezel: 22, refraction: 14, blur: 16 }"
-            class="relative z-50 glass rounded-[28px] max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
+            class="relative z-50 glass glass-strong rounded-sheet max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
           >
-            <div
-              class="flex items-center justify-between px-5 pt-5 pb-2"
-            >
-              <h2 class="text-[17px] font-semibold text-foreground">
+            <div class="flex items-center justify-between px-5 pt-5 pb-2">
+              <h2 class="text-ios-body font-semibold text-foreground">
                 <slot name="title">Select a dish</slot>
               </h2>
               <TouIconButton
@@ -51,7 +48,6 @@
 </template>
 
 <script setup lang="ts">
-import { vGlass } from '@/shared/lib/liquid-glass'
 import TouIconButton from './TouIconButton.vue'
 
 interface Props {

@@ -1,5 +1,5 @@
 <template>
-  <section class="surface rounded-[22px] p-3 sm:p-4">
+  <section class="surface rounded-lg p-3 sm:p-4">
     <div class="flex items-center justify-between gap-2 pl-2 pb-3">
       <tou-skeleton class="h-5 w-44" />
       <div class="flex gap-2">
@@ -8,9 +8,13 @@
       </div>
     </div>
     <div class="grid grid-cols-7 gap-1">
-      <div v-for="i in 7" :key="i" class="flex flex-col items-center gap-1.5 py-1">
+      <div
+        v-for="i in 7"
+        :key="i"
+        class="flex flex-col items-center gap-1.5 py-1"
+      >
         <tou-skeleton class="h-3 w-6" />
-        <tou-skeleton class="h-[38px] w-[38px] rounded-full!" />
+        <tou-skeleton class="size-9.5 rounded-full!" />
       </div>
     </div>
   </section>

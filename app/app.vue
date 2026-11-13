@@ -5,8 +5,18 @@
 </template>
 
 <script setup lang="ts">
+import { useAppearance, useTelegramTheme } from '@/shared/lib/theme'
+
 const { t, locale } = useI18n()
 const config = useRuntimeConfig()
+const { design } = useAppearance()
+const { isDark } = useTelegramTheme()
+
+const themeColor = computed(() => {
+  if (design.value === 'glass') return isDark.value ? '#000000' : '#f2f2f7'
+
+  return isDark.value ? '#141218' : '#fdf8ff'
+})
 
 useHead({
   htmlAttrs: {
@@ -31,7 +41,7 @@ useHead({
       name: 'viewport',
       content: 'width=device-width, initial-scale=1, viewport-fit=cover',
     },
-    { name: 'theme-color', content: '#f2f2f7' },
+    { name: 'theme-color', content: themeColor },
 
     { property: 'og:title', content: () => t('app.title') },
     {
@@ -52,7 +62,7 @@ useHead({
     { name: 'twitter:image', content: '/favicon.png' },
   ],
   link: [
-    { rel: 'icon', type: 'image/jpg', href: '/favicon.png' },
+    { rel: 'icon', type: 'image/png', href: '/favicon.png' },
     { rel: 'canonical', href: 'https://taste-of-us.com' },
   ],
   script: config.public.mswEnabled

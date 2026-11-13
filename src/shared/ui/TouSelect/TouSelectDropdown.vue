@@ -4,7 +4,7 @@
       type="button"
       :class="
         cn(
-          'field flex items-center justify-between text-[15px] font-medium disabled:cursor-not-allowed disabled:opacity-50',
+          'field flex items-center justify-between text-ios font-medium disabled:cursor-not-allowed disabled:opacity-50',
           isOpen && 'shadow-[0_0_0_2px_rgb(var(--accent)/0.55)]!',
           props.class,
         )
@@ -43,8 +43,7 @@
         <div
           v-if="isOpen"
           ref="dropdownMenuRef"
-          v-glass="{ bezel: 14, refraction: 10, blur: 14 }"
-          class="glass fixed rounded-[16px] max-h-64 overflow-hidden"
+          class="glass fixed rounded-lg max-h-64 overflow-hidden"
           :style="{
             zIndex: 99999,
             top: `${dropdownPosition.top}px`,
@@ -59,9 +58,9 @@
               type="button"
               :class="
                 cn(
-                  'w-full text-left px-4 py-3 text-[15px] transition-colors hover:bg-gray-500/10 border-b border-border last:border-b-0',
+                  'w-full text-left px-4 py-3 text-ios transition-colors hover:bg-gray-500/10 border-b border-border last:border-b-0',
                   modelValue === option.value &&
-                    'text-green-700 font-semibold',
+                    'text-accent-foreground font-semibold',
                 )
               "
               @click="selectOption(option.value)"
@@ -76,7 +75,6 @@
 </template>
 
 <script setup lang="ts">
-import { vGlass } from '@/shared/lib/liquid-glass'
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { cn } from '@/shared/lib/utils'
 

@@ -29,11 +29,7 @@
       </div>
 
       <div v-if="isLoadingIngredients" class="space-y-2">
-        <tou-skeleton
-          v-for="i in 2"
-          :key="i"
-          class="h-10 rounded-[10px]"
-        />
+        <tou-skeleton v-for="i in 2" :key="i" class="h-10 rounded-[10px]" />
       </div>
 
       <div v-else class="space-y-2">
@@ -53,12 +49,12 @@
             :disabled="isDeletingIngredient === ingredient.id"
             @click="deleteIngredient(ingredient.id)"
           >
-            <Icon
+            <TouIcon
               v-if="isDeletingIngredient === ingredient.id"
               name="heroicons:arrow-path"
               class="w-4 h-4 text-gray-400 animate-spin"
             />
-            <Icon
+            <TouIcon
               v-else
               name="heroicons:x-mark"
               class="w-4 h-4 text-red-500"
@@ -89,12 +85,12 @@
           :disabled="!newIngredientName.trim() || isAddingIngredient"
           @click="addIngredient"
         >
-          <Icon
+          <TouIcon
             v-if="isAddingIngredient"
             name="heroicons:arrow-path"
             class="w-4 h-4 animate-spin"
           />
-          <Icon v-else name="heroicons:plus" class="w-4 h-4" />
+          <TouIcon v-else name="heroicons:plus" class="w-4 h-4" />
         </button>
       </div>
     </div>
@@ -121,6 +117,7 @@
 import { ref, watch } from 'vue'
 import { useApiFetch } from '@/entities/user'
 import {
+  TouIcon,
   BottomSheet,
   TouSkeleton,
   TouAlert,
@@ -200,7 +197,9 @@ const addIngredient = async () => {
     console.error('Error adding ingredient:', err)
     const apiError = err as { data?: { message?: string }; message?: string }
     error.value =
-      apiError?.data?.message || apiError?.message || t('dishes.addIngredientFailed')
+      apiError?.data?.message ||
+      apiError?.message ||
+      t('dishes.addIngredientFailed')
   } finally {
     isAddingIngredient.value = false
   }

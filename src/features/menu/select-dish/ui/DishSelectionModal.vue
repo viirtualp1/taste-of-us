@@ -1,16 +1,15 @@
 <template>
   <BottomSheet
     :is-open="isOpen"
+    :title="t('dishes.selectTitle', { category: categoryLabel })"
     custom-layout
     desktop-max-width="max-w-2xl"
     desktop-height="85vh"
-    :initial-height-ratio="0.7"
     @close="closeModal"
   >
     <template #custom>
-      <div class="grid grid-cols-[36px_1fr_36px] items-center gap-2 px-4 pt-5 pb-2 shrink-0">
-        <span aria-hidden="true" />
-        <h2 class="text-[17px] font-semibold text-center truncate">
+      <div class="flex shrink-0 items-center justify-between gap-2 px-4 pb-2">
+        <h2 class="text-ios-title font-bold">
           {{ t('dishes.selectTitle', { category: categoryLabel }) }}
         </h2>
         <TouIconButton
@@ -35,7 +34,7 @@
           </button>
         </div>
         <div class="relative">
-          <Icon
+          <TouIcon
             name="heroicons:magnifying-glass-20-solid"
             class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
           />
@@ -43,7 +42,7 @@
             v-model="searchQuery"
             type="search"
             :placeholder="t('dishes.searchDishes')"
-            class="field h-9! pl-9! text-[15px]"
+            class="field h-9! pl-9! text-ios"
             :aria-label="t('dishes.searchDishes')"
           />
         </div>
@@ -70,10 +69,12 @@
             @click="selectDish(dish.name)"
           >
             <span class="flex-1 min-w-0">
-              <span class="block text-[17px] leading-snug">{{ dish.name }}</span>
+              <span class="block text-ios-body leading-snug">{{
+                dish.name
+              }}</span>
               <span
                 v-if="dish.id && dishIngredients[dish.id]?.length"
-                class="block text-[13px] text-muted-foreground line-clamp-1"
+                class="block text-ios-caption text-muted-foreground line-clamp-1"
               >
                 {{
                   (dishIngredients[dish.id] ?? [])
@@ -82,10 +83,10 @@
                 }}
               </span>
             </span>
-            <Icon
+            <TouIcon
               v-if="selectedDish === dish.name"
               name="heroicons:check-20-solid"
-              class="w-5 h-5 shrink-0 text-green-700"
+              class="w-5 h-5 shrink-0 text-accent-foreground"
             />
           </button>
         </div>
@@ -98,7 +99,7 @@
 import { useMenuTranslations } from '@/entities/menu'
 import { ref, computed, watch } from 'vue'
 import type { MenuCategory, Dish, Ingredient } from '@/entities/menu'
-import { BottomSheet, TouIconButton, TouEmptyState } from '@/shared/ui'
+import { TouIcon, BottomSheet, TouIconButton, TouEmptyState } from '@/shared/ui'
 import { useApiFetch } from '@/entities/user'
 
 interface Props {

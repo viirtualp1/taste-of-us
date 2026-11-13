@@ -34,7 +34,7 @@
           <div
             class="w-16 h-16 rounded-full glass flex items-center justify-center"
           >
-            <Icon
+            <TouIcon
               name="heroicons:document-arrow-up"
               class="w-8 h-8 text-gray-600"
             />
@@ -66,7 +66,7 @@
 
     <div class="glass-nested rounded-[12px] p-4">
       <div class="flex items-start gap-3 mb-3">
-        <Icon
+        <TouIcon
           name="heroicons:information-circle"
           class="w-5 h-5 text-blue-600 shrink-0 mt-0.5"
         />
@@ -98,7 +98,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useApiFetch } from '@/entities/user'
-import { BottomSheet, TouAlert, TouModalFooter } from '@/shared/ui'
+import { TouIcon, BottomSheet, TouAlert, TouModalFooter } from '@/shared/ui'
 import { getApiErrorMessage } from '@/shared/lib/utils/apiError'
 
 interface Props {
@@ -195,9 +195,7 @@ const handleImport = async () => {
 
     for (const dish of dishes) {
       if (!dish.name || !dish.category) {
-        throw new Error(
-          t('dishes.invalidDish', { dish: JSON.stringify(dish) }),
-        )
+        throw new Error(t('dishes.invalidDish', { dish: JSON.stringify(dish) }))
       }
 
       if (!validCategories.includes(dish.category)) {

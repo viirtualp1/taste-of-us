@@ -23,12 +23,11 @@ const props = withDefaults(defineProps<Props>(), {
 
 const model = defineModel<string>({ default: '' })
 
-const baseClasses =
-  'field disabled:opacity-50 disabled:cursor-not-allowed'
+const baseClasses = 'field disabled:opacity-50 disabled:cursor-not-allowed'
 
 const sizeClassesMap = {
   md: '',
-  sm: 'h-9! px-3! text-sm rounded-[10px]!',
+  sm: 'h-9! px-3! text-sm',
 }
 
 const sizeClasses = computed(() => sizeClassesMap[props.size])

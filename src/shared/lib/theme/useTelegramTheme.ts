@@ -1,82 +1,53 @@
-import { computed, readonly, ref } from 'vue'
-import WebApp from '@twa-dev/sdk'
+import { getTelegramWebApp } from '@/shared/lib/telegram/getTelegramWebApp'
 
 export type ColorScheme = 'light' | 'dark'
 
-const colorScheme = ref<ColorScheme>('light')
-let initialized = false
-
-function resolveColorScheme(): ColorScheme {
-  try {
-    return WebApp.colorScheme === 'dark' ? 'dark' : 'light'
-  } catch {
-    if (
-      typeof window !== 'undefined' &&
-      window.matchMedia?.('(prefers-color-scheme: dark)').matches
-    ) {
-      return 'dark'
-    }
-    return 'light'
-  }
+interface TelegramTheme {
+  initData?: string
+  colorScheme?: ColorScheme
+  onEvent?: (event: 'themeChanged', callback: () => void) => void
+  offEvent?: (event: 'themeChanged', callback: () => void) => void
 }
 
-function applyColorScheme(scheme: ColorScheme) {
-  colorScheme.value = scheme
+const colorScheme = ref<ColorScheme>('light')
+let media: MediaQueryList | undefined
+let telegram: TelegramTheme | null = null
 
-  if (typeof document === 'undefined') {
-    return
-  }
+function applyColorScheme() {
+  colorScheme.value =
+    telegram?.initData && telegram.colorScheme
+      ? telegram.colorScheme
+      : media?.matches
+        ? 'dark'
+        : 'light'
 
   const root = document.documentElement
-  root.classList.toggle('dark', scheme === 'dark')
-  root.style.colorScheme = scheme
+  root.classList.toggle('dark', colorScheme.value === 'dark')
+  root.style.colorScheme = colorScheme.value
 }
 
-function handleThemeChanged() {
-  applyColorScheme(resolveColorScheme())
+function init() {
+  if (media) return
+
+  media = window.matchMedia('(prefers-color-scheme: dark)')
+  telegram = getTelegramWebApp<TelegramTheme>()
+  media.addEventListener('change', applyColorScheme)
+  telegram?.onEvent?.('themeChanged', applyColorScheme)
+  applyColorScheme()
+}
+
+function cleanup() {
+  media?.removeEventListener('change', applyColorScheme)
+  telegram?.offEvent?.('themeChanged', applyColorScheme)
+  media = undefined
+  telegram = null
 }
 
 export function useTelegramTheme() {
-  const init = () => {
-    if (initialized) {
-      applyColorScheme(resolveColorScheme())
-      return
-    }
-
-    initialized = true
-    applyColorScheme(resolveColorScheme())
-
-    try {
-      WebApp.onEvent('themeChanged', handleThemeChanged)
-    } catch {
-      /* outside Telegram */
-    }
-  }
-
-  const cleanup = () => {
-    try {
-      WebApp.offEvent('themeChanged', handleThemeChanged)
-    } catch {
-      /* outside Telegram */
-    }
-    initialized = false
-  }
-
   return {
     colorScheme: readonly(colorScheme),
     isDark: computed(() => colorScheme.value === 'dark'),
     init,
     cleanup,
-  }
-}
-
-if (typeof window !== 'undefined') {
-  applyColorScheme(resolveColorScheme())
-
-  try {
-    WebApp.onEvent('themeChanged', handleThemeChanged)
-    initialized = true
-  } catch {
-    /* outside Telegram */
   }
 }

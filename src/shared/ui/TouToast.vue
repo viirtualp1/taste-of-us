@@ -10,17 +10,15 @@
     >
       <div
         v-if="message"
-        v-glass="{ bezel: 14, refraction: 12 }"
-        class="fixed z-100 inset-x-0 mx-auto w-max max-w-[calc(100vw-32px)] sm:max-w-[460px] glass rounded-full pl-2.5 pr-5 py-2.5 text-[15px] font-medium text-foreground"
-        style="bottom: calc(var(--tabbar) + var(--safe-b) + 24px)"
+        class="toast glass glass-strong fixed z-100 inset-x-0 mx-auto w-max rounded-2xl pl-2.5 pr-5 py-2.5 text-ios font-medium text-foreground"
         role="status"
       >
         <div class="flex items-center gap-2.5 wrap-break-word">
           <span
-            class="grid place-items-center w-6 h-6 rounded-full shrink-0 text-white"
+            class="toast-icon grid place-items-center w-6 h-6 rounded-full shrink-0 text-white"
             :class="type === 'success' ? 'bg-green-500' : 'bg-red-500'"
           >
-            <Icon
+            <TouIcon
               :name="
                 type === 'success'
                   ? 'heroicons:check-20-solid'
@@ -37,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { vGlass } from '@/shared/lib/liquid-glass'
+import TouIcon from './TouIcon.vue'
 interface Props {
   message: string
   type: 'success' | 'error'
@@ -45,3 +43,10 @@ interface Props {
 
 defineProps<Props>()
 </script>
+
+<style scoped>
+.toast {
+  bottom: calc(var(--dock-h) + var(--safe-b) + 24px);
+  max-width: min(calc(100% - 32px), 460px);
+}
+</style>

@@ -1,57 +1,106 @@
 <template>
-  <!-- Docks next to the tab bar: AppTabBar renders #tabbar-accessory. -->
   <Teleport defer to="#tabbar-accessory">
-    <button
-      v-glass="{ bezel: 16, refraction: 14, magnify: 0.08 }"
+    <TouButton
       type="button"
-      class="send-btn glass glass-press"
-      :disabled="isSending"
-      :aria-label="isSending ? t('common.sending') : t('nav.sendMenu')"
-      :title="t('nav.sendMenu')"
-      @click="$emit('send')"
+      :class="
+        design === 'material' ? 'material-fab md-state' : 'send-btn glass'
+      "
+      :disabled="props.isSending"
+      :aria-label="label"
+      aria-haspopup="dialog"
+      @click="emit('send')"
     >
-      <TouSpinner v-if="isSending" class="h-5 w-5" />
-      <Icon v-else name="heroicons:paper-airplane-solid" class="w-6 h-6 -rotate-45 translate-x-0.5 -translate-y-px" />
-    </button>
+      <TouSpinner v-if="props.isSending" class="size-5" />
+      <TouIcon
+        v-else
+        name="heroicons:paper-airplane"
+        class="size-5"
+        aria-hidden="true"
+      />
+      <span class="send-label">{{ label }}</span>
+    </TouButton>
   </Teleport>
 </template>
 
 <script setup lang="ts">
-import { vGlass } from '@/shared/lib/liquid-glass'
-import { TouSpinner } from '@/shared/ui'
+import { TouIcon, TouButton, TouSpinner } from '@/shared/ui'
+import { useAppearance } from '@/shared/lib/theme'
 
-interface Props {
+const props = defineProps<{
   isSending: boolean
-}
+}>()
 
-defineProps<Props>()
-
-defineEmits<{
+const emit = defineEmits<{
   send: []
 }>()
 
 const { t } = useI18n()
+const { design } = useAppearance()
+
+const label = computed(() =>
+  props.isSending ? t('common.sending') : t('nav.sendMenu'),
+)
 </script>
 
 <style scoped>
-/* Separate circular action beside the tab bar, as in iOS 26: tinted Liquid Glass. */
 .send-btn {
-  display: grid;
-  place-items: center;
   width: var(--tabbar);
   height: var(--tabbar);
+  padding: 0;
   border-radius: 50%;
-  background: rgb(var(--accent) / 0.94);
-  color: rgb(var(--on-accent));
-  box-shadow:
-    inset 0 0 10px rgb(255 255 255 / 0.35),
-    0 0 0 0.5px rgb(0 0 0 / 0.06),
-    0 10px 26px rgb(var(--accent) / 0.4);
+  background: var(--glass);
+  color: rgb(var(--accent-ink));
 }
-.send-btn[data-liquid] {
-  background: rgb(var(--accent) / 0.88);
+
+.send-label {
+  display: none;
 }
-.send-btn:disabled {
-  opacity: 0.7;
+
+@media (prefers-reduced-transparency: reduce) {
+  .send-btn {
+    background: rgb(var(--panel));
+  }
+}
+
+@media (min-width: 900px) {
+  .send-btn {
+    justify-content: flex-start;
+    width: 100%;
+    height: 52px;
+    padding: 0 16px;
+    gap: 10px;
+    border-radius: var(--r-lg);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .send-btn .send-label {
+    display: inline;
+  }
+}
+
+.material-fab {
+  --symbol-size: 24px;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  padding: 0;
+  border-radius: 16px;
+  color: var(--md-on-primary-container);
+  background: var(--md-primary-container);
+  box-shadow: var(--md-elevation-3);
+  font: var(--md-label-large);
+}
+
+@media (min-width: 1200px) {
+  .material-fab {
+    width: 100%;
+    justify-content: flex-start;
+    padding-inline: 16px;
+  }
+
+  .material-fab .send-label {
+    display: inline;
+  }
 }
 </style>
